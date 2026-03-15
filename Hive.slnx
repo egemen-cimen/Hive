@@ -1,3 +1,7 @@
 <Solution>
   <Project Path="Hive.ConsoleRunner/Hive.ConsoleRunner.csproj" />
+  <Project Path="Hive.Core.Tests/Hive.Core.Tests.csproj" />
+  <Project Path="Hive.Core/Hive.Core.csproj" />
+  <Project Path="Hive.PlayerAgent.Tests/Hive.PlayerAgent.Tests.csproj" />
+  <Project Path="Hive.PlayerAgent/Hive.PlayerAgent.csproj" />
 </Solution>
