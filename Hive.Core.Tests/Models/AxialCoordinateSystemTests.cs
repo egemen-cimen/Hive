@@ -13,6 +13,7 @@ namespace Hive.Core.Tests.Models
             var hexagon = new Hexagon();
             var column = 0;
             var row = 0;
+
             coordinateSystem.AddHexagonToCoordinate(hexagon, column, row);
 
             // WHEN
@@ -33,6 +34,7 @@ namespace Hive.Core.Tests.Models
             var anotherHexagon = new Hexagon();
             var column = 0;
             var row = 0;
+
             coordinateSystem.AddHexagonToCoordinate(hexagon, column, row);
 
             // WHEN & THEN
@@ -51,6 +53,7 @@ namespace Hive.Core.Tests.Models
             var anotherHexagon = new Hexagon();
             var anotherColumn = 1;
             var anotherRow = -1;
+
             coordinateSystem.AddHexagonToCoordinate(hexagon, column, row);
 
             // WHEN
@@ -70,6 +73,7 @@ namespace Hive.Core.Tests.Models
             var hexagon = new Hexagon();
             var column = 0;
             var row = 0;
+
             coordinateSystem.AddHexagonToCoordinate(hexagon, column, row);
 
             // WHEN

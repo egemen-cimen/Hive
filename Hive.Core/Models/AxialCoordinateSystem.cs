@@ -7,7 +7,7 @@
         public AxialCoordinateSystem() => hexagonalGrid = [];
 
         public void AddHexagonToCoordinate(Hexagon hexagon, int column, int row) => hexagonalGrid.Add(new Tuple<int, int>(column, row), hexagon);
-        
+
         public Hexagon? GetHexagonAtCoordinate(int column, int row)
         {
             hexagonalGrid.TryGetValue(new Tuple<int, int>(column, row), out Hexagon? hexagon);
