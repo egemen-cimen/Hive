@@ -6,8 +6,6 @@
 
         public AxialCoordinateSystem() => hexagonalGrid = [];
 
-        public Dictionary<Tuple<int, int>, Hexagon> GetAxialGrid() => hexagonalGrid;
-
         public void AddHexagonToCoordinate(Hexagon hexagon, int column, int row) => hexagonalGrid.Add(new Tuple<int, int>(column, row), hexagon);
         
         public Hexagon? GetHexagonAtCoordinate(int column, int row)
