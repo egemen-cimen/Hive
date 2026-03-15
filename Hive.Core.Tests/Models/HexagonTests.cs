@@ -12,6 +12,7 @@ namespace Hive.Core.Tests.Models
             // GIVEN
             var hexagon = new Hexagon();
             var piece = Substitute.For<IPiece>();
+
             hexagon.PushPiece(piece);
 
             // WHEN
@@ -29,6 +30,7 @@ namespace Hive.Core.Tests.Models
             var hexagon = new Hexagon();
             var piece1 = Substitute.For<IPiece>();
             var piece2 = Substitute.For<IPiece>();
+
             hexagon.PushPiece(piece1);
             hexagon.PushPiece(piece2);
 
@@ -50,6 +52,7 @@ namespace Hive.Core.Tests.Models
             piece1.Color.ReturnsForAnyArgs(PlayerColor.BLACK);
             var piece2 = Substitute.For<IPiece>();
             piece2.Color.ReturnsForAnyArgs(PlayerColor.WHITE);
+
             hexagon.PushPiece(piece1);
             hexagon.PushPiece(piece2);
 
