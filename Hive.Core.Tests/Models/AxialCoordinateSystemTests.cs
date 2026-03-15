@@ -6,6 +6,27 @@ namespace Hive.Core.Tests.Models
     public class AxialCoordinateSystemTests
     {
         [TestMethod]
+        public void Given_PopulatedGrid_When_Retrieved_Then_ReturnsAxialGrid()
+        {
+            // GIVEN
+            var coordinateSystem = new AxialCoordinateSystem();
+            var hexagon1 = new Hexagon();
+            var hexagon2 = new Hexagon();
+            var hexagon3 = new Hexagon();
+
+            coordinateSystem.AddHexagonToCoordinate(hexagon1, 0, 0);
+            coordinateSystem.AddHexagonToCoordinate(hexagon2, -1, 0);
+            coordinateSystem.AddHexagonToCoordinate(hexagon3, 1, 0);
+
+            // WHEN
+            var retrievedAxialGrid = coordinateSystem.GetAxialGrid();
+
+            // THEN
+            Assert.IsNotNull(retrievedAxialGrid);
+            Assert.HasCount(3, retrievedAxialGrid);
+        }
+
+        [TestMethod]
         public void Given_AddedHexagon_When_Retrieved_Then_ReturnsSameHexagon()
         {
             // GIVEN
@@ -13,6 +34,7 @@ namespace Hive.Core.Tests.Models
             var hexagon = new Hexagon();
             var column = 0;
             var row = 0;
+
             coordinateSystem.AddHexagonToCoordinate(hexagon, column, row);
 
             // WHEN
@@ -33,6 +55,7 @@ namespace Hive.Core.Tests.Models
             var anotherHexagon = new Hexagon();
             var column = 0;
             var row = 0;
+
             coordinateSystem.AddHexagonToCoordinate(hexagon, column, row);
 
             // WHEN & THEN
@@ -51,6 +74,7 @@ namespace Hive.Core.Tests.Models
             var anotherHexagon = new Hexagon();
             var anotherColumn = 1;
             var anotherRow = -1;
+
             coordinateSystem.AddHexagonToCoordinate(hexagon, column, row);
 
             // WHEN
@@ -70,6 +94,7 @@ namespace Hive.Core.Tests.Models
             var hexagon = new Hexagon();
             var column = 0;
             var row = 0;
+
             coordinateSystem.AddHexagonToCoordinate(hexagon, column, row);
 
             // WHEN
