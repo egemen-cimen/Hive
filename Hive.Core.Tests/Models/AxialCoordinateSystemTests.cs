@@ -16,11 +16,11 @@ namespace Hive.Core.Tests.Models
             coordinateSystem.AddHexagonToCoordinate(hexagon, column, row);
 
             // WHEN
-            var hexagonFromSystem = coordinateSystem.GetHexagonAtCoordinate(column, row);
+            var retrievedHexagon = coordinateSystem.GetHexagonAtCoordinate(column, row);
 
             // THEN
-            Assert.IsNotNull(hexagonFromSystem);
-            Assert.AreEqual(hexagon, hexagonFromSystem);
+            Assert.IsNotNull(retrievedHexagon);
+            Assert.AreEqual(hexagon, retrievedHexagon);
         }
 
         [TestMethod]
@@ -40,6 +40,29 @@ namespace Hive.Core.Tests.Models
         }
 
         [TestMethod]
+
+        public void Given_AddedHexagon_When_AddedToAnotherCoordinate_Then_RetrievalReturnsSecondHexagon()
+        {
+            // GIVEN
+            var coordinateSystem = new AxialCoordinateSystem();
+            var hexagon = new Hexagon();
+            var column = 0;
+            var row = 0;
+            var anotherHexagon = new Hexagon();
+            var anotherColumn = 1;
+            var anotherRow = -1;
+            coordinateSystem.AddHexagonToCoordinate(hexagon, column, row);
+
+            // WHEN
+            coordinateSystem.AddHexagonToCoordinate(anotherHexagon, anotherColumn, anotherRow);
+
+            // THEN
+            var retrievedHexagon = coordinateSystem.GetHexagonAtCoordinate(anotherColumn, anotherRow);
+            Assert.IsNotNull(retrievedHexagon);
+            Assert.AreNotEqual(hexagon, retrievedHexagon);
+        }
+
+        [TestMethod]
         public void Given_AddedHexagon_When_Removed_Then_RetrievalReturnsNull()
         {
             // GIVEN
@@ -53,8 +76,8 @@ namespace Hive.Core.Tests.Models
             coordinateSystem.RemoveHexagonFromCoordinate(column, row);
 
             // THEN
-            var hexagonFromSystem = coordinateSystem.GetHexagonAtCoordinate(column, row);
-            Assert.IsNull(hexagonFromSystem);
+            var retrievedHexagon = coordinateSystem.GetHexagonAtCoordinate(column, row);
+            Assert.IsNull(retrievedHexagon);
         }
 
         [TestMethod]
