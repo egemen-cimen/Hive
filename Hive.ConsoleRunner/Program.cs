@@ -6,6 +6,7 @@ var hexagon1 = new Hexagon();
 hexagon1.PushPiece(new SpiderPiece(PlayerColor.BLACK));
 var hexagon2 = new Hexagon();
 hexagon2.PushPiece(new SpiderPiece(PlayerColor.WHITE));
+hexagon2.PushPiece(new BeetlePiece(PlayerColor.BLACK));
 
 axialCoordinateSystem.AddHexagonToCoordinate(hexagon1, 0, 0);
 axialCoordinateSystem.AddHexagonToCoordinate(hexagon2, 0, 1);

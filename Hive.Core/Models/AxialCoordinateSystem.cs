@@ -2,22 +2,22 @@
 {
     public class AxialCoordinateSystem : ICoordinateSystem
     {
-        private readonly Dictionary<Tuple<int, int>, Hexagon> hexagonalGrid;
+        private readonly Dictionary<(int column, int row), Hexagon> hexagonalGrid;
 
         public AxialCoordinateSystem() => hexagonalGrid = [];
 
-        public void AddHexagonToCoordinate(Hexagon hexagon, int column, int row) => hexagonalGrid.Add(new Tuple<int, int>(column, row), hexagon);
+        public void AddHexagonToCoordinate(Hexagon hexagon, int column, int row) => hexagonalGrid.Add((column, row), hexagon);
 
         public Hexagon? GetHexagonAtCoordinate(int column, int row)
         {
-            hexagonalGrid.TryGetValue(new Tuple<int, int>(column, row), out Hexagon? hexagon);
+            hexagonalGrid.TryGetValue((column, row), out Hexagon? hexagon);
 
             return hexagon;
         }
 
         public void RemoveHexagonFromCoordinate(int column, int row)
         {
-            var isRemoved = hexagonalGrid.Remove(new Tuple<int, int>(column, row));
+            var isRemoved = hexagonalGrid.Remove((column, row));
 
             if (!isRemoved)
             {
@@ -25,7 +25,7 @@
             }
         }
 
-        public List<Tuple<int, int>> GetListOfCoordinates()
+        public List<(int column, int row)> GetListOfCoordinates()
         {
             return [.. hexagonalGrid.Keys];
         }
