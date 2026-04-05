@@ -3,5 +3,7 @@
     public interface IPiece
     {
         public PlayerColor Color { get; }
+
+        public string GetPieceName();
     }
 }

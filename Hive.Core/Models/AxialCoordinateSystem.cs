@@ -24,5 +24,10 @@
                 throw new ArgumentException("There is no hexagon at the given coordinates.");
             }
         }
+
+        public List<Tuple<int, int>> GetListOfCoordinates()
+        {
+            return [.. hexagonalGrid.Keys];
+        }
     }
 }
