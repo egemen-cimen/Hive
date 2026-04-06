@@ -16,10 +16,9 @@ namespace Hive.Core.Tests.Models
             coordinateSystem.AddHexagonToCoordinate(hexagon, coordinate);
 
             // WHEN
-            var hexagonExists = coordinateSystem.TryGetHexagonAtCoordinate(coordinate, out Hexagon? retrievedHexagon);
+            var retrievedHexagon = coordinateSystem.GetHexagonAtCoordinate(coordinate);
 
             // THEN
-            Assert.IsTrue(hexagonExists);
             Assert.IsNotNull(retrievedHexagon);
             Assert.AreEqual(hexagon, retrievedHexagon);
         }
@@ -58,8 +57,7 @@ namespace Hive.Core.Tests.Models
             coordinateSystem.AddHexagonToCoordinate(anotherHexagon, anotherCoordinate);
 
             // THEN
-            var hexagonExists = coordinateSystem.TryGetHexagonAtCoordinate(anotherCoordinate, out Hexagon? retrievedHexagon);
-            Assert.IsTrue(hexagonExists);
+            var retrievedHexagon = coordinateSystem.GetHexagonAtCoordinate(anotherCoordinate);
             Assert.IsNotNull(retrievedHexagon);
             Assert.AreNotEqual(hexagon, retrievedHexagon);
         }
@@ -96,6 +94,17 @@ namespace Hive.Core.Tests.Models
         }
 
         [TestMethod]
+        public void Given_NoHexagon_When_Retrieved_Then_ThrowsException()
+        {
+            // GIVEN
+            var coordinateSystem = new AxialCoordinateSystem();
+            (int column, int row) coordinate = (0, 0);
+
+            // WHEN & THEN
+            Assert.Throws<ArgumentException>(() => coordinateSystem.GetHexagonAtCoordinate(coordinate));
+        }
+
+        [TestMethod]
         public void Given_AddedHexagons_When_PopulatedNeighborsRetrieved_Then_RetrievalReturnsOnlyNeighbors()
         {
             // GIVEN
@@ -113,7 +122,7 @@ namespace Hive.Core.Tests.Models
             coordinateSystem.AddHexagonToCoordinate(notNeighborHexagon, (2, 0));
 
             // WHEN
-            var neigborHexagons = coordinateSystem.GetPopulatedNeighborsForCoordinate(coordinate);
+            var neigborHexagons = coordinateSystem.GetPopulatedNeighborHexagonsForCoordinate(coordinate);
 
             Assert.HasCount(2, neigborHexagons);
             CollectionAssert.AreEquivalent(new List<Hexagon>() { neighborHexagon1, neighborHexagon2 }, neigborHexagons);
@@ -127,7 +136,7 @@ namespace Hive.Core.Tests.Models
             (int column, int row) coordinate = (0, 0);
 
             // WHEN
-            var adjacentCoordinates = coordinateSystem.GetAdjacentCoordinates(coordinate);
+            var adjacentCoordinates = coordinateSystem.GetAdjacentCoordinatesForCoordinate(coordinate);
 
             // THEN
             Assert.HasCount(6, adjacentCoordinates);
@@ -141,6 +150,201 @@ namespace Hive.Core.Tests.Models
             };
 
             CollectionAssert.AreEquivalent(expectedCoordinates, adjacentCoordinates);
+        }
+
+        [TestMethod]
+        public void Given_NoHexagon_When_RetrievedAllFreeAdjacents_Then_ReturnsSingleCoordinate()
+        {
+            // GIVEN
+            var coordinateSystem = new AxialCoordinateSystem();
+
+            // WHEN
+            var freeAdjacents = coordinateSystem.GetAllFreeAdjacentCoordinates();
+
+            // THEN
+            Assert.HasCount(1, freeAdjacents);
+            var expectedCoordinates = new List<(int column, int row)>() {
+                (0, 0)
+            };
+
+            CollectionAssert.AreEquivalent(expectedCoordinates, freeAdjacents);
+        }
+
+        /// <summary>
+        /// Single hexagon in the middle should return all the spaces around it.
+        /// 
+        ///     [ 0,-1] [ 1,-1]
+        /// 
+        /// [-1, 0] [ q, r] [ 1, 0]
+        /// 
+        ///     [-1, 1] [ 0, 1]
+        /// 
+        /// Where q is column and r is row.
+        /// </summary>
+        [TestMethod]
+        public void Given_AddedHexagon_When_RetrievedAllFreeAdjacents_Then_ReturnsSixCoordinates()
+        {
+            // GIVEN
+            var coordinateSystem = new AxialCoordinateSystem();
+            var hexagon = new Hexagon();
+            (int column, int row) coordinate = (0, 0);
+
+            coordinateSystem.AddHexagonToCoordinate(hexagon, coordinate);
+
+            // WHEN
+            var freeAdjacents = coordinateSystem.GetAllFreeAdjacentCoordinates();
+
+            // THEN
+            Assert.HasCount(6, freeAdjacents);
+            var expectedCoordinates = new List<(int column, int row)>() {
+                ( 0,-1),
+                ( 1,-1),
+                (-1, 0),
+                ( 1, 0),
+                (-1, 1),
+                ( 0, 1)
+            };
+
+            CollectionAssert.AreEquivalent(expectedCoordinates, freeAdjacents);
+        }
+
+        /// <summary>
+        /// Two hexagons in should return all the empty spaces around it.
+        /// 
+        ///     [ 0,-2] [ 1,-2]
+        /// 
+        /// [-1,-1] [ 0,-1] [ 1,-1]
+        /// 
+        ///     [-1, 0] [ q, r] [ 1, 0]
+        /// 
+        ///         [-1, 1] [ 0, 1]
+        /// 
+        /// Where q is column and r is row.
+        /// </summary>
+        [TestMethod]
+        public void Given_AddedHexagons_When_RetrievedAllFreeAdjacents_Then_ReturnsAllFreeCoordinates()
+        {
+            // GIVEN
+            var coordinateSystem = new AxialCoordinateSystem();
+            var hexagon1 = new Hexagon();
+            (int column, int row) coordinate1 = (0, 0);
+            var hexagon2 = new Hexagon();
+            (int column, int row) coordinate2 = (0, -1);
+
+            coordinateSystem.AddHexagonToCoordinate(hexagon1, coordinate1);
+            coordinateSystem.AddHexagonToCoordinate(hexagon2, coordinate2);
+
+            // WHEN
+            var freeAdjacents = coordinateSystem.GetAllFreeAdjacentCoordinates();
+
+            // THEN
+            Assert.HasCount(8, freeAdjacents);
+            var expectedCoordinates = new List<(int column, int row)>() {
+                ( 0,-2),
+                ( 1,-2),
+                (-1,-1),
+                ( 1,-1),
+                (-1, 0),
+                ( 1, 0),
+                (-1, 1),
+                ( 0, 1),
+            };
+
+            CollectionAssert.AreEquivalent(expectedCoordinates, freeAdjacents);
+        }
+
+        /// <summary>
+        /// A cycle with hexagons should return all the free spaces around and inside it.
+        /// 
+        /// 	    [ 0,-2] [ 1,-2] [ 2,-2]
+        /// 
+        ///     [-1,-1] [ 0,-1] [ 1,-1] [ 2,-1]
+        /// 
+        /// [-2, 0] [-1, 0] [ q, r] [ 1, 0] [ 2, 0]
+        /// 
+        ///     [-2, 1] [-1, 1] [ 0, 1] [ 1, 1]
+        /// 
+        ///         [-2, 2] [-1, 2] [ 0, 2]
+        /// 
+        /// Where q is column and r is row.
+        /// </summary>
+        [TestMethod]
+        public void Given_AddedHexagonsInACycle_When_RetrievedAllFreeAdjacents_Then_ReturnsAllFreeCoordinates()
+        {
+            // GIVEN
+            var coordinateSystem = new AxialCoordinateSystem();
+            var hexagon1 = new Hexagon();
+            (int column, int row) coordinate1 = (0, -1);
+            var hexagon2 = new Hexagon();
+            (int column, int row) coordinate2 = (1, -1);
+            var hexagon3 = new Hexagon();
+            (int column, int row) coordinate3 = (-1, 0);
+            var hexagon4 = new Hexagon();
+            (int column, int row) coordinate4 = (1, 0);
+            var hexagon5 = new Hexagon();
+            (int column, int row) coordinate5 = (-1, 1);
+            var hexagon6 = new Hexagon();
+            (int column, int row) coordinate6 = (0, 1);
+
+            coordinateSystem.AddHexagonToCoordinate(hexagon1, coordinate1);
+            coordinateSystem.AddHexagonToCoordinate(hexagon2, coordinate2);
+            coordinateSystem.AddHexagonToCoordinate(hexagon3, coordinate3);
+            coordinateSystem.AddHexagonToCoordinate(hexagon4, coordinate4);
+            coordinateSystem.AddHexagonToCoordinate(hexagon5, coordinate5);
+            coordinateSystem.AddHexagonToCoordinate(hexagon6, coordinate6);
+
+            // WHEN
+            var freeAdjacents = coordinateSystem.GetAllFreeAdjacentCoordinates();
+
+            // THEN
+            Assert.HasCount(13, freeAdjacents);
+            var expectedCoordinates = new List<(int column, int row)>() {
+                ( 0,-2),
+                ( 1,-2),
+                ( 2,-2),
+                (-1,-1),
+                ( 2,-1),
+                (-2, 0),
+                ( 0, 0),
+                ( 2, 0),
+                (-2, 1),
+                ( 1, 1),
+                (-2, 2),
+                (-1, 2),
+                ( 0, 2)
+            };
+
+            CollectionAssert.AreEquivalent(expectedCoordinates, freeAdjacents);
+        }
+
+        /// <summary>
+        /// Two hexagons in should return all the empty spaces around it.
+        /// 
+        ///     [ 0,-2] [ 1,-2]
+        /// 
+        /// [-1,-1] [ 0,-1] [ 1,-1]
+        /// 
+        ///     [-1, 0] [ q, r] [ 1, 0]
+        /// 
+        ///         [-1, 1] [ 0, 1]
+        /// 
+        /// Where q is column and r is row.
+        /// </summary>
+        [TestMethod]
+        public void Given_AddedUnreachableHexagons_When_RetrievedAllFreeAdjacents_Then_ThrowsException()
+        {
+            // GIVEN
+            var coordinateSystem = new AxialCoordinateSystem();
+            var hexagon1 = new Hexagon();
+            (int column, int row) coordinate1 = (0, 0);
+            var hexagon2 = new Hexagon();
+            (int column, int row) coordinate2 = (0, -2);
+
+            coordinateSystem.AddHexagonToCoordinate(hexagon1, coordinate1);
+            coordinateSystem.AddHexagonToCoordinate(hexagon2, coordinate2);
+
+            // WHEN & THEN
+            Assert.Throws<InvalidOperationException>(coordinateSystem.GetAllFreeAdjacentCoordinates);
         }
     }
 }

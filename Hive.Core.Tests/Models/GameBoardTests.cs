@@ -7,21 +7,6 @@ namespace Hive.Core.Tests.Models
     public class GameBoardTests
     {
         [TestMethod]
-        public void Given_EmptyGameBoard_When_EmptySpacesRetrieved_Then_ReturnsSingleSpace()
-        {
-            // GIVEN
-            var coordinateSystem = Substitute.For<ICoordinateSystem>();
-            coordinateSystem.GetListOfCoordinates().Returns([]);
-            var gameBoard = new GameBoard(coordinateSystem);
-
-            // WHEN
-            var emptySpaces = gameBoard.GetEmptySpacesOnTheBoard();
-
-            // THEN
-            Assert.HasCount(1, emptySpaces);
-        }
-
-        [TestMethod]
         public void Given_GameBoardWithNoPieces_When_SpawnedPiece_Then_AddsHexagon()
         {
             // GIVEN

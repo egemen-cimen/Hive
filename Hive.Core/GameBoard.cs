@@ -25,28 +25,16 @@ namespace Hive.Core
 
         public bool MovePiece((int column, int row) startCoordinate, (int column, int row) endCoordinate)
         {
-            // ...
             throw new NotImplementedException();
-
-            return true;
         }
 
-        public List<(int column, int row)> GetEmptySpacesOnTheBoard()
+        public List<(int column, int row)> GetValidSpawnPoints()
         {
             var emptySpaces = new List<(int column, int row)>();
 
             var listOfCoordinates = _coordinateSystem.GetListOfCoordinates();
 
-            if (listOfCoordinates.Count == 0)
-            {
-                return [(0, 0)];
-            }
-
-            // TODO: refactor
-            if (listOfCoordinates.Count == 1)
-            {
-
-            }
+            // TODO: use _coordinateSystem for this
 
             return emptySpaces;
         }
