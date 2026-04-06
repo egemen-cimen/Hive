@@ -322,7 +322,7 @@ namespace Hive.Core.Tests.Models
         /// 
         /// [ 0,-2]
         /// 
-        ///     [ 0,-1]
+        /// 
         /// 
         ///         [ q, r]
         /// 
