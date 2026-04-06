@@ -318,15 +318,13 @@ namespace Hive.Core.Tests.Models
         }
 
         /// <summary>
-        /// Two hexagons in should return all the empty spaces around it.
+        /// Two hexagons are NOT connected.
         /// 
-        ///     [ 0,-2] [ 1,-2]
+        /// [ 0,-2]
         /// 
-        /// [-1,-1] [ 0,-1] [ 1,-1]
+        ///     [ 0,-1]
         /// 
-        ///     [-1, 0] [ q, r] [ 1, 0]
-        /// 
-        ///         [-1, 1] [ 0, 1]
+        ///         [ q, r]
         /// 
         /// Where q is column and r is row.
         /// </summary>
@@ -345,6 +343,135 @@ namespace Hive.Core.Tests.Models
 
             // WHEN & THEN
             Assert.Throws<InvalidOperationException>(coordinateSystem.GetAllFreeAdjacentCoordinates);
+        }
+
+        /// <summary>
+        /// Single hexagon in the middle.
+        /// 
+        /// [ q, r]
+        /// 
+        /// Where q is column and r is row.
+        /// </summary>
+        [TestMethod]
+        public void Given_AddedHexagon_When_CheckedWhetherAllConnectedWithoutIt_Then_ReturnsTrue()
+        {
+            // GIVEN
+            var coordinateSystem = new AxialCoordinateSystem();
+            var hexagon = new Hexagon();
+            (int column, int row) coordinate = (0, 0);
+
+            coordinateSystem.AddHexagonToCoordinate(hexagon, coordinate);
+
+            // WHEN
+            var isAllConnected = coordinateSystem.VerifyWhetherAllHexagonsConnectedWithoutHexagon(coordinate);
+
+            // THEN
+            Assert.IsTrue(isAllConnected);
+        }
+
+        /// <summary>
+        /// Hexagon is connected after removing one of them.
+        /// 
+        ///     [ 0,-1]
+        /// 
+        ///         [ q, r]
+        /// 
+        /// Where q is column and r is row.
+        [TestMethod]
+        public void Given_AddedHexagons_When_CheckedWhetherAllConnectedWithoutOne_Then_ReturnsTrue()
+        {
+            // GIVEN
+            var coordinateSystem = new AxialCoordinateSystem();
+            var hexagon1 = new Hexagon();
+            (int column, int row) coordinate1 = (0, -1);
+            var hexagon2 = new Hexagon();
+            (int column, int row) coordinate2 = (0, 0);
+
+            coordinateSystem.AddHexagonToCoordinate(hexagon1, coordinate1);
+            coordinateSystem.AddHexagonToCoordinate(hexagon2, coordinate2);
+
+            // WHEN
+            var isAllConnected = coordinateSystem.VerifyWhetherAllHexagonsConnectedWithoutHexagon(coordinate2);
+
+            // THEN
+            Assert.IsTrue(isAllConnected);
+        }
+
+        /// <summary>
+        /// Two hexagons are NOT connected after removing the middle one.
+        /// 
+        /// [ 0,-2]
+        /// 
+        ///     [ 0,-1]
+        /// 
+        ///         [ q, r]
+        /// 
+        /// Where q is column and r is row.
+        [TestMethod]
+        public void Given_AddedHexagons_When_CheckedWhetherAllConnectedWithoutMiddleOne_Then_ReturnsFalse()
+        {
+            // GIVEN
+            var coordinateSystem = new AxialCoordinateSystem();
+            var hexagon1 = new Hexagon();
+            (int column, int row) coordinate1 = (0, -2);
+            var hexagon2 = new Hexagon();
+            (int column, int row) coordinate2 = (0, -1);
+            var hexagon3 = new Hexagon();
+            (int column, int row) coordinate3 = (0, 0);
+
+            coordinateSystem.AddHexagonToCoordinate(hexagon1, coordinate1);
+            coordinateSystem.AddHexagonToCoordinate(hexagon2, coordinate2);
+            coordinateSystem.AddHexagonToCoordinate(hexagon3, coordinate3);
+
+            // WHEN
+            var isAllConnected = coordinateSystem.VerifyWhetherAllHexagonsConnectedWithoutHexagon(coordinate2);
+
+            // THEN
+            Assert.IsFalse(isAllConnected);
+        }
+
+
+        /// <summary>
+        /// A cycle with hexagons are connected after removing one.
+        ///  
+        ///     [ 0,-1] [ 1,-1]
+        /// 
+        /// [-1, 0] [ q, r] [ 1, 0]
+        /// 
+        ///     [-1, 1] [ 0, 1]
+        /// 
+        /// Where q is column and r is row.
+        /// </summary>
+        [TestMethod]
+        public void Given_AddedHexagonsInACycle_When_CheckedWhetherAllConnectedWithoutOne_Then_ReturnsTrue()
+        {
+            // GIVEN
+            var coordinateSystem = new AxialCoordinateSystem();
+            var hexagon1 = new Hexagon();
+            (int column, int row) coordinate1 = (0, -1);
+            var hexagon2 = new Hexagon();
+            (int column, int row) coordinate2 = (1, -1);
+            var hexagon3 = new Hexagon();
+            (int column, int row) coordinate3 = (-1, 0);
+            var hexagon4 = new Hexagon();
+            (int column, int row) coordinate4 = (1, 0);
+            var hexagon5 = new Hexagon();
+            (int column, int row) coordinate5 = (-1, 1);
+            var hexagon6 = new Hexagon();
+            (int column, int row) coordinate6 = (0, 1);
+
+            coordinateSystem.AddHexagonToCoordinate(hexagon1, coordinate1);
+            coordinateSystem.AddHexagonToCoordinate(hexagon2, coordinate2);
+            coordinateSystem.AddHexagonToCoordinate(hexagon3, coordinate3);
+            coordinateSystem.AddHexagonToCoordinate(hexagon4, coordinate4);
+            coordinateSystem.AddHexagonToCoordinate(hexagon5, coordinate5);
+            coordinateSystem.AddHexagonToCoordinate(hexagon6, coordinate6);
+
+            // WHEN
+            var isAllConnected = coordinateSystem.VerifyWhetherAllHexagonsConnectedWithoutHexagon(coordinate2);
+
+            // THEN
+            Assert.IsTrue(isAllConnected);
         }
     }
 }

@@ -102,7 +102,7 @@
                     if (TryGetHexagonAtCoordinate(coordinateSummation, out _))
                     {
                         if (!visitedCoordinates.TryGetValue(coordinateSummation, out _))
-                        { 
+                        {
                             coordinatesToVisit.Push(coordinateSummation);
                         }
                     }
@@ -122,9 +122,40 @@
             return [.. freeAdjacentCoordinates];
         }
 
-        public bool VerifyWhetherAllHexagonsConnected()
+        private bool VerifyWhetherAllHexagonsConnected()
         {
-            throw new NotImplementedException();
+            if (_hexagonalGrid.Count == 0)
+            {
+                return true;
+            }
+
+            var visitedCoordinates = new HashSet<(int column, int row)>();
+            var coordinatesToVisit = new Stack<(int column, int row)>();
+
+            coordinatesToVisit.Push(_hexagonalGrid.First().Key);
+
+            while (coordinatesToVisit.Count > 0)
+            {
+                var currentCoordinate = coordinatesToVisit.Pop();
+                visitedCoordinates.Add(currentCoordinate);
+
+                foreach (var direction in _adjacentDirections)
+                {
+                    var coordinateSummation = SumTwoCoordinates(direction, currentCoordinate);
+                    if (TryGetHexagonAtCoordinate(coordinateSummation, out _)
+                        && !visitedCoordinates.TryGetValue(coordinateSummation, out _))
+                    {
+                        coordinatesToVisit.Push(coordinateSummation);
+                    }
+                }
+            }
+
+            if (visitedCoordinates.Count != _hexagonalGrid.Count)
+            {
+                return false;
+            }
+
+            return true;
         }
 
         public bool VerifyWhetherAllHexagonsConnectedWithoutHexagon((int column, int row) coordinate)

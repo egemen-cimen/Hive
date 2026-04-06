@@ -14,6 +14,7 @@
 
         public List<(int column, int row)> GetListOfCoordinates();
 
-        public bool VerifyWhetherAllHexagonsConnected();
+        public bool VerifyWhetherAllHexagonsConnectedWithoutHexagon((int column, int row) coordinate);
+
     }
 }
