@@ -372,9 +372,9 @@ namespace Hive.Core.Tests.Models
         /// <summary>
         /// Hexagon is connected after removing one of them.
         /// 
-        ///     [ 0,-1]
+        /// [ 0,-1]
         /// 
-        ///         [ q, r]
+        ///     [ q, r]
         /// 
         /// Where q is column and r is row.
         [TestMethod]

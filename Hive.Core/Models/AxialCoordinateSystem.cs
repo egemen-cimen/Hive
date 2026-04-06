@@ -9,19 +9,15 @@
             (-1,  0),
             ( 1,  0),
             (-1,  1),
-            ( 0,  1)
-            ];
+            ( 0,  1)];
 
         public AxialCoordinateSystem() => _hexagonalGrid = [];
 
-        public void AddHexagonToCoordinate(Hexagon hexagon, (int column, int row) coordinate) => _hexagonalGrid.Add(coordinate, hexagon);
+        public void AddHexagonToCoordinate(Hexagon hexagon, (int column, int row) coordinate)
+            => _hexagonalGrid.Add(coordinate, hexagon);
 
         public bool TryGetHexagonAtCoordinate((int column, int row) coordinate, out Hexagon? hexagon)
-        {
-            var hexagonExists = _hexagonalGrid.TryGetValue(coordinate, out hexagon);
-
-            return hexagonExists;
-        }
+            => _hexagonalGrid.TryGetValue(coordinate, out hexagon);
 
         public Hexagon GetHexagonAtCoordinate((int column, int row) coordinate)
         {
@@ -67,15 +63,11 @@
             }
         }
 
-        public List<(int column, int row)> GetListOfCoordinates()
-        {
-            return [.. _hexagonalGrid.Keys];
-        }
+        public List<(int column, int row)> GetListOfCoordinates() => [.. _hexagonalGrid.Keys];
 
-        private static (int column, int row) SumTwoCoordinates((int column, int row) coordinate1, (int column, int row) coordinate2)
-        {
-            return (coordinate1.column + coordinate2.column, coordinate1.row + coordinate2.row);
-        }
+        private static (int column, int row) SumTwoCoordinates((int column, int row) coordinate1,
+                                                               (int column, int row) coordinate2)
+            => (coordinate1.column + coordinate2.column, coordinate1.row + coordinate2.row);
 
         public List<(int column, int row)> GetAllFreeAdjacentCoordinates()
         {
@@ -111,12 +103,12 @@
                         freeAdjacentCoordinates.Add(coordinateSummation);
                     }
                 }
-
             }
 
             if (visitedCoordinates.Count != _hexagonalGrid.Count)
             {
-                throw new InvalidOperationException($"{System.Reflection.MethodBase.GetCurrentMethod()} was unable to reach all coordinates.");
+                throw new InvalidOperationException(System.Reflection.MethodBase.GetCurrentMethod() +
+                    "was unable to reach all coordinates.");
             }
 
             return [.. freeAdjacentCoordinates];
