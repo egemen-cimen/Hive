@@ -2,10 +2,19 @@
 {
     public interface ICoordinateSystem
     {
-        public void AddHexagonToCoordinate(Hexagon hexagon, int column, int row);
+        public void AddHexagonToCoordinate(Hexagon hexagon, (int column, int row) coordinate);
 
-        public Hexagon? GetHexagonAtCoordinate(int column, int row);
+        public bool TryGetHexagonAtCoordinate((int column, int row) coordinate, out Hexagon? hexagon);
 
-        public void RemoveHexagonFromCoordinate(int column, int row);
+        public List<Hexagon> GetPopulatedNeighborHexagonsForCoordinate((int column, int row) coordinate);
+
+        public List<(int column, int row)> GetAdjacentCoordinatesForCoordinate((int column, int row) coordinate);
+
+        public void RemoveHexagonFromCoordinate((int column, int row) coordinate);
+
+        public List<(int column, int row)> GetListOfCoordinates();
+
+        public bool VerifyWhetherAllHexagonsConnectedWithoutHexagon((int column, int row) coordinate);
+
     }
 }
