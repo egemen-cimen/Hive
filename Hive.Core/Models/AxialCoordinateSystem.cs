@@ -14,21 +14,21 @@
 
         public AxialCoordinateSystem() => _hexagonalGrid = [];
 
-        public void AddHexagonToCoordinate(Hexagon hexagon, int column, int row) => _hexagonalGrid.Add((column, row), hexagon);
+        public void AddHexagonToCoordinate(Hexagon hexagon, (int column, int row) coordinate) => _hexagonalGrid.Add(coordinate, hexagon);
 
-        public Hexagon? GetHexagonAtCoordinate(int column, int row)
+        public bool TryGetHexagonAtCoordinate((int column, int row) coordinate, out Hexagon? hexagon)
         {
-            _hexagonalGrid.TryGetValue((column, row), out Hexagon? hexagon);
+            var hexagonExists = _hexagonalGrid.TryGetValue(coordinate, out hexagon);
 
-            return hexagon;
+            return hexagonExists;
         }
 
-        public List<Hexagon?> GetPopulatedNeighborsForCoordinate(int column, int row)
+        public List<Hexagon> GetPopulatedNeighborsForCoordinate((int column, int row) coordinate)
         {
-            var neighbors = new List<Hexagon?>();
-            foreach (var direction in _adjacentDirections)
+            var neighbors = new List<Hexagon>();
+            foreach (var (directionColumn, directionRow) in _adjacentDirections)
             {
-                var neighborHexagon = GetHexagonAtCoordinate(direction.column + column, direction.row + row);
+                TryGetHexagonAtCoordinate((directionColumn + coordinate.column, directionRow + coordinate.row), out Hexagon? neighborHexagon);
                 if (neighborHexagon != null)
                 {
                     neighbors.Add(neighborHexagon);
@@ -38,20 +38,20 @@
             return neighbors;
         }
 
-        public List<(int column, int row)> GetAdjacentCoordinates(int column, int row)
+        public List<(int column, int row)> GetAdjacentCoordinates((int column, int row) coordinate)
         {
             var adjacentCoordinates = new List<(int column, int row)>();
-            foreach (var direction in _adjacentDirections)
+            foreach (var (directionColumn, directionRow) in _adjacentDirections)
             {
-                adjacentCoordinates.Add((direction.column + column, direction.row + row));
+                adjacentCoordinates.Add((directionColumn + coordinate.column, directionRow + coordinate.row));
             }
 
             return adjacentCoordinates;
         }
 
-        public void RemoveHexagonFromCoordinate(int column, int row)
+        public void RemoveHexagonFromCoordinate((int column, int row) coordinate)
         {
-            var isRemoved = _hexagonalGrid.Remove((column, row));
+            var isRemoved = _hexagonalGrid.Remove(coordinate);
 
             if (!isRemoved)
             {

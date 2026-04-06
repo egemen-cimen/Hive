@@ -11,15 +11,15 @@ namespace Hive.Core.Tests.Models
             // GIVEN
             var coordinateSystem = new AxialCoordinateSystem();
             var hexagon = new Hexagon();
-            var column = 0;
-            var row = 0;
+            (int column, int row) coordinate = (0, 0);
 
-            coordinateSystem.AddHexagonToCoordinate(hexagon, column, row);
+            coordinateSystem.AddHexagonToCoordinate(hexagon, coordinate);
 
             // WHEN
-            var retrievedHexagon = coordinateSystem.GetHexagonAtCoordinate(column, row);
+            var hexagonExists = coordinateSystem.TryGetHexagonAtCoordinate(coordinate, out Hexagon? retrievedHexagon);
 
             // THEN
+            Assert.IsTrue(hexagonExists);
             Assert.IsNotNull(retrievedHexagon);
             Assert.AreEqual(hexagon, retrievedHexagon);
         }
@@ -32,13 +32,12 @@ namespace Hive.Core.Tests.Models
             var coordinateSystem = new AxialCoordinateSystem();
             var hexagon = new Hexagon();
             var anotherHexagon = new Hexagon();
-            var column = 0;
-            var row = 0;
+            (int column, int row) coordinate = (0, 0);
 
-            coordinateSystem.AddHexagonToCoordinate(hexagon, column, row);
+            coordinateSystem.AddHexagonToCoordinate(hexagon, coordinate);
 
             // WHEN & THEN
-            Assert.Throws<ArgumentException>(() => coordinateSystem.AddHexagonToCoordinate(anotherHexagon, column, row));
+            Assert.Throws<ArgumentException>(() => coordinateSystem.AddHexagonToCoordinate(anotherHexagon, coordinate));
         }
 
         [TestMethod]
@@ -48,19 +47,19 @@ namespace Hive.Core.Tests.Models
             // GIVEN
             var coordinateSystem = new AxialCoordinateSystem();
             var hexagon = new Hexagon();
-            var column = 0;
-            var row = 0;
-            var anotherHexagon = new Hexagon();
-            var anotherColumn = 1;
-            var anotherRow = -1;
+            (int column, int row) coordinate = (0, 0);
 
-            coordinateSystem.AddHexagonToCoordinate(hexagon, column, row);
+            var anotherHexagon = new Hexagon();
+            (int column, int row) anotherCoordinate = (1, -1);
+
+            coordinateSystem.AddHexagonToCoordinate(hexagon, coordinate);
 
             // WHEN
-            coordinateSystem.AddHexagonToCoordinate(anotherHexagon, anotherColumn, anotherRow);
+            coordinateSystem.AddHexagonToCoordinate(anotherHexagon, anotherCoordinate);
 
             // THEN
-            var retrievedHexagon = coordinateSystem.GetHexagonAtCoordinate(anotherColumn, anotherRow);
+            var hexagonExists = coordinateSystem.TryGetHexagonAtCoordinate(anotherCoordinate, out Hexagon? retrievedHexagon);
+            Assert.IsTrue(hexagonExists);
             Assert.IsNotNull(retrievedHexagon);
             Assert.AreNotEqual(hexagon, retrievedHexagon);
         }
@@ -71,16 +70,16 @@ namespace Hive.Core.Tests.Models
             // GIVEN
             var coordinateSystem = new AxialCoordinateSystem();
             var hexagon = new Hexagon();
-            var column = 0;
-            var row = 0;
+            (int column, int row) coordinate = (0, 0);
 
-            coordinateSystem.AddHexagonToCoordinate(hexagon, column, row);
+            coordinateSystem.AddHexagonToCoordinate(hexagon, coordinate);
 
             // WHEN
-            coordinateSystem.RemoveHexagonFromCoordinate(column, row);
+            coordinateSystem.RemoveHexagonFromCoordinate(coordinate);
 
             // THEN
-            var retrievedHexagon = coordinateSystem.GetHexagonAtCoordinate(column, row);
+            var hexagonExists = coordinateSystem.TryGetHexagonAtCoordinate(coordinate, out Hexagon? retrievedHexagon);
+            Assert.IsFalse(hexagonExists);
             Assert.IsNull(retrievedHexagon);
         }
 
@@ -90,11 +89,10 @@ namespace Hive.Core.Tests.Models
         {
             // GIVEN
             var coordinateSystem = new AxialCoordinateSystem();
-            var column = 0;
-            var row = 0;
+            (int column, int row) coordinate = (0, 0);
 
             // WHEN & THEN
-            Assert.Throws<ArgumentException>(() => coordinateSystem.RemoveHexagonFromCoordinate(column, row));
+            Assert.Throws<ArgumentException>(() => coordinateSystem.RemoveHexagonFromCoordinate(coordinate));
         }
 
         [TestMethod]
@@ -103,20 +101,22 @@ namespace Hive.Core.Tests.Models
             // GIVEN
             var coordinateSystem = new AxialCoordinateSystem();
             var hexagon = new Hexagon();
+            (int column, int row) coordinate = (0, 0);
+
             var neighborHexagon1 = new Hexagon();
             var neighborHexagon2 = new Hexagon();
             var notNeighborHexagon = new Hexagon();
 
-            coordinateSystem.AddHexagonToCoordinate(hexagon, 0, 0);
-            coordinateSystem.AddHexagonToCoordinate(neighborHexagon1, 0, -1);
-            coordinateSystem.AddHexagonToCoordinate(neighborHexagon2, 1, 0);
-            coordinateSystem.AddHexagonToCoordinate(notNeighborHexagon, 2, 0);
+            coordinateSystem.AddHexagonToCoordinate(hexagon, coordinate);
+            coordinateSystem.AddHexagonToCoordinate(neighborHexagon1, (0, -1));
+            coordinateSystem.AddHexagonToCoordinate(neighborHexagon2, (1, 0));
+            coordinateSystem.AddHexagonToCoordinate(notNeighborHexagon, (2, 0));
 
             // WHEN
-            var neigborHexagons = coordinateSystem.GetPopulatedNeighborsForCoordinate(0, 0);
+            var neigborHexagons = coordinateSystem.GetPopulatedNeighborsForCoordinate(coordinate);
 
             Assert.HasCount(2, neigborHexagons);
-            CollectionAssert.AreEquivalent(new List<Hexagon?>() { neighborHexagon1, neighborHexagon2 }, neigborHexagons);
+            CollectionAssert.AreEquivalent(new List<Hexagon>() { neighborHexagon1, neighborHexagon2 }, neigborHexagons);
         }
 
         [TestMethod]
@@ -124,11 +124,10 @@ namespace Hive.Core.Tests.Models
         {
             // GIVEN
             var coordinateSystem = new AxialCoordinateSystem();
-            var column = 0;
-            var row = 0;
+            (int column, int row) coordinate = (0, 0);
 
             // WHEN
-            var adjacentCoordinates = coordinateSystem.GetAdjacentCoordinates(column, row);
+            var adjacentCoordinates = coordinateSystem.GetAdjacentCoordinates(coordinate);
 
             // THEN
             Assert.HasCount(6, adjacentCoordinates);

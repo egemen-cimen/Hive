@@ -6,10 +6,10 @@ namespace Hive.Core
     {
         private readonly ICoordinateSystem _coordinateSystem = coordinateSystem;
 
-        public bool SpawnPiece(int column, int row, IPiece piece)
+        public bool SpawnPiece((int column, int row) coordinate, IPiece piece)
         {
-            var hexagonAtDestination = _coordinateSystem.GetHexagonAtCoordinate(column, row);
-            if (hexagonAtDestination != null)
+            var hexagonExists = _coordinateSystem.TryGetHexagonAtCoordinate(coordinate, out Hexagon? hexagonAtDestination);
+            if (hexagonExists)
             {
                 return false;
             }
@@ -18,12 +18,12 @@ namespace Hive.Core
 
             var hexagon = new Hexagon();
             hexagon.PushPiece(piece);
-            _coordinateSystem.AddHexagonToCoordinate(hexagon, column, row);
+            _coordinateSystem.AddHexagonToCoordinate(hexagon, coordinate);
 
             return true;
         }
 
-        public bool MovePiece(int startColumn, int startRow, int endColumn, int endRow)
+        public bool MovePiece((int column, int row) startCoordinate, (int column, int row) endCoordinate)
         {
             // ...
             throw new NotImplementedException();

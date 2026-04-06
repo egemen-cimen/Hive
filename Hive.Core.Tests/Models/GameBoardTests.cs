@@ -26,16 +26,16 @@ namespace Hive.Core.Tests.Models
         {
             // GIVEN
             var coordinateSystem = Substitute.For<ICoordinateSystem>();
-            Hexagon? nullHexagonAtDestiantion = null;
-            coordinateSystem.GetHexagonAtCoordinate(0, 0).Returns(nullHexagonAtDestiantion);
+            (int column, int row) coordinate = (0, 0);
+            coordinateSystem.TryGetHexagonAtCoordinate(coordinate, out var _).Returns(false);
             var gameBoard = new GameBoard(coordinateSystem);
 
             // WHEN
-            var result = gameBoard.SpawnPiece(0, 0, new SpiderPiece(PlayerColor.BLACK));
+            var result = gameBoard.SpawnPiece(coordinate, new SpiderPiece(PlayerColor.BLACK));
 
             // THEN
             Assert.IsTrue(result);
-            coordinateSystem.Received().AddHexagonToCoordinate(Arg.Any<Hexagon>(), 0, 0);
+            coordinateSystem.Received().AddHexagonToCoordinate(Arg.Any<Hexagon>(), coordinate);
         }
     }
 }
