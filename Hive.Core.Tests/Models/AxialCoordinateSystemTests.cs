@@ -96,5 +96,52 @@ namespace Hive.Core.Tests.Models
             // WHEN & THEN
             Assert.Throws<ArgumentException>(() => coordinateSystem.RemoveHexagonFromCoordinate(column, row));
         }
+
+        [TestMethod]
+        public void Given_AddedHexagons_When_PopulatedNeighborsRetrieved_Then_RetrievalReturnsOnlyNeighbors()
+        {
+            // GIVEN
+            var coordinateSystem = new AxialCoordinateSystem();
+            var hexagon = new Hexagon();
+            var neighborHexagon1 = new Hexagon();
+            var neighborHexagon2 = new Hexagon();
+            var notNeighborHexagon = new Hexagon();
+
+            coordinateSystem.AddHexagonToCoordinate(hexagon, 0, 0);
+            coordinateSystem.AddHexagonToCoordinate(neighborHexagon1, 0, -1);
+            coordinateSystem.AddHexagonToCoordinate(neighborHexagon2, 1, 0);
+            coordinateSystem.AddHexagonToCoordinate(notNeighborHexagon, 2, 0);
+
+            // WHEN
+            var neigborHexagons = coordinateSystem.GetPopulatedNeighborsForCoordinate(0, 0);
+
+            Assert.HasCount(2, neigborHexagons);
+            CollectionAssert.AreEquivalent(new List<Hexagon?>() { neighborHexagon1, neighborHexagon2 }, neigborHexagons);
+        }
+
+        [TestMethod]
+        public void Given_CoordinateSystem_When_AdjacentCoordinatesRetrieved_Then_RetrivalReturnsAllSix()
+        {
+            // GIVEN
+            var coordinateSystem = new AxialCoordinateSystem();
+            var column = 0;
+            var row = 0;
+
+            // WHEN
+            var adjacentCoordinates = coordinateSystem.GetAdjacentCoordinates(column, row);
+
+            // THEN
+            Assert.HasCount(6, adjacentCoordinates);
+            var expectedCoordinates = new List<(int column, int row)>() {
+                (0, -1),
+                (1, -1),
+                (-1, 0),
+                (1, 0),
+                (-1, 1),
+                (0, 1)
+            };
+
+            CollectionAssert.AreEquivalent(expectedCoordinates, adjacentCoordinates);
+        }
     }
 }

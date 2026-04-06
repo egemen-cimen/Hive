@@ -4,11 +4,11 @@ namespace Hive.Core
 {
     public class GameBoard(ICoordinateSystem coordinateSystem)
     {
-        private readonly ICoordinateSystem CoordinateSystem = coordinateSystem;
+        private readonly ICoordinateSystem _coordinateSystem = coordinateSystem;
 
         public bool SpawnPiece(int column, int row, IPiece piece)
         {
-            var hexagonAtDestination = CoordinateSystem.GetHexagonAtCoordinate(column, row);
+            var hexagonAtDestination = _coordinateSystem.GetHexagonAtCoordinate(column, row);
             if (hexagonAtDestination != null)
             {
                 return false;
@@ -18,7 +18,7 @@ namespace Hive.Core
 
             var hexagon = new Hexagon();
             hexagon.PushPiece(piece);
-            CoordinateSystem.AddHexagonToCoordinate(hexagon, column, row);
+            _coordinateSystem.AddHexagonToCoordinate(hexagon, column, row);
 
             return true;
         }
@@ -35,11 +35,17 @@ namespace Hive.Core
         {
             var emptySpaces = new List<(int column, int row)>();
 
-            var listOfCoordinates = CoordinateSystem.GetListOfCoordinates();
+            var listOfCoordinates = _coordinateSystem.GetListOfCoordinates();
 
             if (listOfCoordinates.Count == 0)
             {
                 return [(0, 0)];
+            }
+
+            // TODO: refactor
+            if (listOfCoordinates.Count == 1)
+            {
+
             }
 
             return emptySpaces;

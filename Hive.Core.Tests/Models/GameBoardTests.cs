@@ -22,12 +22,12 @@ namespace Hive.Core.Tests.Models
         }
 
         [TestMethod]
-        public void Given_GameBoardWithNoPieces_When_SpawnedPiece_Then_Returns_True()
+        public void Given_GameBoardWithNoPieces_When_SpawnedPiece_Then_AddsHexagon()
         {
             // GIVEN
             var coordinateSystem = Substitute.For<ICoordinateSystem>();
-            Hexagon? hexagonAtDestiantion = null;
-            coordinateSystem.GetHexagonAtCoordinate(0, 0).Returns(hexagonAtDestiantion);
+            Hexagon? nullHexagonAtDestiantion = null;
+            coordinateSystem.GetHexagonAtCoordinate(0, 0).Returns(nullHexagonAtDestiantion);
             var gameBoard = new GameBoard(coordinateSystem);
 
             // WHEN
@@ -35,6 +35,7 @@ namespace Hive.Core.Tests.Models
 
             // THEN
             Assert.IsTrue(result);
+            coordinateSystem.Received().AddHexagonToCoordinate(Arg.Any<Hexagon>(), 0, 0);
         }
     }
 }
