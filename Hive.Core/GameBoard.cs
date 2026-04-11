@@ -16,7 +16,7 @@ namespace Hive.Core
                 return false;
             }
 
-            // TODO: rules
+            // TODO: spawn rules
 
             var hexagon = new Hexagon();
             hexagon.PushPiece(piece);
@@ -25,22 +25,25 @@ namespace Hive.Core
             return true;
         }
 
+        public List<(int column, int row)> GetValidSpawnPoints(PlayerColor playerColor)
+        {
+            throw new NotImplementedException();
+
+            // TODO: spawn rules
+        }
+
         public bool TryMovePiece((int column, int row) startCoordinate, (int column, int row) endCoordinate)
         {
             throw new NotImplementedException();
+
+            // TODO: move rules
         }
 
-        public List<(int column, int row)> GetValidSpawnPoints()
+        public List<(int column, int row)> GetValidMovePoints((int column, int row) pieceCoordinate)
         {
             throw new NotImplementedException();
 
-            //var allFreeAdjacentCoordinates = _coordinateSystem.GetAllFreeAdjacentCoordinates();
-
-
-
-            //return emptySpaces;
+            // TODO: move rules
         }
-
-
     }
 }
