@@ -12,11 +12,12 @@ namespace Hive.Core.Tests.Models
             // GIVEN
             var coordinateSystem = Substitute.For<ICoordinateSystem>();
             (int column, int row) coordinate = (0, 0);
-            coordinateSystem.TryGetHexagonAtCoordinate(coordinate, out var _).Returns(false);
+            var freeCoordinates = new HashSet<(int column, int row)>() { coordinate };
+            coordinateSystem.GetAllFreeAdjacentCoordinates().Returns(freeCoordinates);
             var gameBoard = new GameBoard(coordinateSystem);
 
             // WHEN
-            var result = gameBoard.SpawnPiece(coordinate, new SpiderPiece(PlayerColor.BLACK));
+            var result = gameBoard.TrySpawnPiece(coordinate, new SpiderPiece(PlayerColor.BLACK));
 
             // THEN
             Assert.IsTrue(result);

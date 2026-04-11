@@ -6,15 +6,17 @@ namespace Hive.Core
     {
         private readonly ICoordinateSystem _coordinateSystem = coordinateSystem;
 
-        public bool SpawnPiece((int column, int row) coordinate, IPiece piece)
+        public bool TrySpawnPiece((int column, int row) coordinate, IPiece piece)
         {
-            var hexagonExists = _coordinateSystem.TryGetHexagonAtCoordinate(coordinate, out Hexagon? hexagonAtDestination);
-            if (hexagonExists)
+            var allFreeAdjacentCoordinates = _coordinateSystem.GetAllFreeAdjacentCoordinates();
+
+            var isSpaceAvailable = allFreeAdjacentCoordinates.Contains(coordinate);
+            if (!isSpaceAvailable)
             {
                 return false;
             }
 
-            // TODO: rules
+            // TODO: spawn rules
 
             var hexagon = new Hexagon();
             hexagon.PushPiece(piece);
@@ -23,22 +25,25 @@ namespace Hive.Core
             return true;
         }
 
-        public bool MovePiece((int column, int row) startCoordinate, (int column, int row) endCoordinate)
+        public List<(int column, int row)> GetValidSpawnPoints(PlayerColor playerColor)
         {
             throw new NotImplementedException();
+
+            // TODO: spawn rules
         }
 
-        public List<(int column, int row)> GetValidSpawnPoints()
+        public bool TryMovePiece((int column, int row) startCoordinate, (int column, int row) endCoordinate)
         {
-            var emptySpaces = new List<(int column, int row)>();
+            throw new NotImplementedException();
 
-            var listOfCoordinates = _coordinateSystem.GetListOfCoordinates();
-
-            // TODO: use _coordinateSystem for this
-
-            return emptySpaces;
+            // TODO: move rules
         }
 
+        public List<(int column, int row)> GetValidMovePoints((int column, int row) pieceCoordinate)
+        {
+            throw new NotImplementedException();
 
+            // TODO: move rules
+        }
     }
 }
