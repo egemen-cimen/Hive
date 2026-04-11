@@ -6,10 +6,12 @@ namespace Hive.Core
     {
         private readonly ICoordinateSystem _coordinateSystem = coordinateSystem;
 
-        public bool SpawnPiece((int column, int row) coordinate, IPiece piece)
+        public bool TrySpawnPiece((int column, int row) coordinate, IPiece piece)
         {
-            var hexagonExists = _coordinateSystem.TryGetHexagonAtCoordinate(coordinate, out Hexagon? hexagonAtDestination);
-            if (hexagonExists)
+            var allFreeAdjacentCoordinates = _coordinateSystem.GetAllFreeAdjacentCoordinates();
+
+            var isSpaceAvailable = allFreeAdjacentCoordinates.Contains(coordinate);
+            if (!isSpaceAvailable)
             {
                 return false;
             }
@@ -23,20 +25,20 @@ namespace Hive.Core
             return true;
         }
 
-        public bool MovePiece((int column, int row) startCoordinate, (int column, int row) endCoordinate)
+        public bool TryMovePiece((int column, int row) startCoordinate, (int column, int row) endCoordinate)
         {
             throw new NotImplementedException();
         }
 
         public List<(int column, int row)> GetValidSpawnPoints()
         {
-            var emptySpaces = new List<(int column, int row)>();
+            throw new NotImplementedException();
 
-            var listOfCoordinates = _coordinateSystem.GetListOfCoordinates();
+            //var allFreeAdjacentCoordinates = _coordinateSystem.GetAllFreeAdjacentCoordinates();
 
-            // TODO: use _coordinateSystem for this
 
-            return emptySpaces;
+
+            //return emptySpaces;
         }
 
 

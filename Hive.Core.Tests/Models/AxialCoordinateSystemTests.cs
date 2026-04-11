@@ -163,11 +163,11 @@ namespace Hive.Core.Tests.Models
 
             // THEN
             Assert.HasCount(1, freeAdjacents);
-            var expectedCoordinates = new List<(int column, int row)>() {
+            var expectedCoordinates = new HashSet<(int column, int row)>() {
                 (0, 0)
             };
 
-            CollectionAssert.AreEquivalent(expectedCoordinates, freeAdjacents);
+            Assert.IsTrue(expectedCoordinates.SetEquals(freeAdjacents));
         }
 
         /// <summary>
@@ -196,7 +196,7 @@ namespace Hive.Core.Tests.Models
 
             // THEN
             Assert.HasCount(6, freeAdjacents);
-            var expectedCoordinates = new List<(int column, int row)>() {
+            var expectedCoordinates = new HashSet<(int column, int row)>() {
                 ( 0,-1),
                 ( 1,-1),
                 (-1, 0),
@@ -205,7 +205,7 @@ namespace Hive.Core.Tests.Models
                 ( 0, 1)
             };
 
-            CollectionAssert.AreEquivalent(expectedCoordinates, freeAdjacents);
+            Assert.IsTrue(expectedCoordinates.SetEquals(freeAdjacents));
         }
 
         /// <summary>
@@ -239,7 +239,7 @@ namespace Hive.Core.Tests.Models
 
             // THEN
             Assert.HasCount(8, freeAdjacents);
-            var expectedCoordinates = new List<(int column, int row)>() {
+            var expectedCoordinates = new HashSet<(int column, int row)>() {
                 ( 0,-2),
                 ( 1,-2),
                 (-1,-1),
@@ -250,7 +250,7 @@ namespace Hive.Core.Tests.Models
                 ( 0, 1),
             };
 
-            CollectionAssert.AreEquivalent(expectedCoordinates, freeAdjacents);
+            Assert.IsTrue(expectedCoordinates.SetEquals(freeAdjacents));
         }
 
         /// <summary>
@@ -298,7 +298,7 @@ namespace Hive.Core.Tests.Models
 
             // THEN
             Assert.HasCount(13, freeAdjacents);
-            var expectedCoordinates = new List<(int column, int row)>() {
+            var expectedCoordinates = new HashSet<(int column, int row)>() {
                 ( 0,-2),
                 ( 1,-2),
                 ( 2,-2),
@@ -314,7 +314,7 @@ namespace Hive.Core.Tests.Models
                 ( 0, 2)
             };
 
-            CollectionAssert.AreEquivalent(expectedCoordinates, freeAdjacents);
+            Assert.IsTrue(expectedCoordinates.SetEquals(freeAdjacents));
         }
 
         /// <summary>

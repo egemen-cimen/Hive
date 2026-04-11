@@ -63,13 +63,13 @@
             }
         }
 
-        public List<(int column, int row)> GetListOfCoordinates() => [.. _hexagonalGrid.Keys];
+        public HashSet<(int column, int row)> GetListOfCoordinates() => [.. _hexagonalGrid.Keys];
 
         private static (int column, int row) SumTwoCoordinates((int column, int row) coordinate1,
                                                                (int column, int row) coordinate2)
             => (coordinate1.column + coordinate2.column, coordinate1.row + coordinate2.row);
 
-        public List<(int column, int row)> GetAllFreeAdjacentCoordinates()
+        public HashSet<(int column, int row)> GetAllFreeAdjacentCoordinates()
         {
             if (_hexagonalGrid.Count == 0)
             {
@@ -111,7 +111,7 @@
                     "was unable to reach all coordinates.");
             }
 
-            return [.. freeAdjacentCoordinates];
+            return freeAdjacentCoordinates;
         }
 
         private bool VerifyWhetherAllHexagonsConnected()

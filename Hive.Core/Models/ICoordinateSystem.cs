@@ -12,7 +12,9 @@
 
         public void RemoveHexagonFromCoordinate((int column, int row) coordinate);
 
-        public List<(int column, int row)> GetListOfCoordinates();
+        public HashSet<(int column, int row)> GetListOfCoordinates();
+
+        public HashSet<(int column, int row)> GetAllFreeAdjacentCoordinates();
 
         public bool VerifyWhetherAllHexagonsConnectedWithoutHexagon((int column, int row) coordinate);
 
