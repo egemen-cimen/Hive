@@ -63,7 +63,7 @@
             }
         }
 
-        public HashSet<(int column, int row)> GetListOfCoordinates() => [.. _hexagonalGrid.Keys];
+        public HashSet<(int column, int row)> GetAllCoordinates() => [.. _hexagonalGrid.Keys];
 
         private static (int column, int row) SumTwoCoordinates((int column, int row) coordinate1,
                                                                (int column, int row) coordinate2)

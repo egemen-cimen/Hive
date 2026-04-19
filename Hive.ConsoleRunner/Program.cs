@@ -11,7 +11,7 @@ hexagon2.PushPiece(new BeetlePiece(PlayerColor.BLACK));
 axialCoordinateSystem.AddHexagonToCoordinate(hexagon1, (0, 0));
 axialCoordinateSystem.AddHexagonToCoordinate(hexagon2, (0, 1));
 
-var allCoordinates = axialCoordinateSystem.GetListOfCoordinates();
+var allCoordinates = axialCoordinateSystem.GetAllCoordinates();
 foreach (var coordinate in allCoordinates)
 {
     axialCoordinateSystem.TryGetHexagonAtCoordinate(coordinate, out Hexagon? retrievedHexagon);

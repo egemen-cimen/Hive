@@ -430,7 +430,6 @@ namespace Hive.Core.Tests.Models
             Assert.IsFalse(isAllConnected);
         }
 
-
         /// <summary>
         /// A cycle with hexagons are connected after removing one.
         ///  
@@ -472,6 +471,32 @@ namespace Hive.Core.Tests.Models
 
             // THEN
             Assert.IsTrue(isAllConnected);
+        }
+
+        [TestMethod]
+        public void Given_CoordinateSystemRetrived_When_ChangesMadeToResult_Then_ChangesShouldNotAffectOriginal()
+        {
+            // GIVEN
+            var coordinateSystem = new AxialCoordinateSystem();
+            var hexagon1 = new Hexagon();
+            (int column, int row) coordinate1 = (0, -1);
+            var hexagon2 = new Hexagon();
+            (int column, int row) coordinate2 = (1, -1);
+
+            coordinateSystem.AddHexagonToCoordinate(hexagon1, coordinate1);
+            coordinateSystem.AddHexagonToCoordinate(hexagon2, coordinate2);
+
+            var retrievedCoordinateSystem = coordinateSystem.GetAllCoordinates();
+
+            // WHEN
+            retrievedCoordinateSystem.Add((-1, 0));
+            var anotherRetrievedCoordinateSystem = coordinateSystem.GetAllCoordinates();
+
+            // THEN
+            Assert.HasCount(2, anotherRetrievedCoordinateSystem);
+            Assert.IsTrue(anotherRetrievedCoordinateSystem.TryGetValue((0, -1), out _));
+            Assert.IsTrue(anotherRetrievedCoordinateSystem.TryGetValue((1, -1), out _));
+            Assert.IsFalse(anotherRetrievedCoordinateSystem.TryGetValue((-1, 0), out _));
         }
     }
 }

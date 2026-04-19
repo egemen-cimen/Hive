@@ -10,6 +10,7 @@ namespace Hive.Core.Tests.Models
         public void Given_GameBoardWithNoPieces_When_SpawnedPiece_Then_AddsHexagon()
         {
             // GIVEN
+            // TODO: remove the mocks for ICoordinateSystem and re-write tests
             var coordinateSystem = Substitute.For<ICoordinateSystem>();
             (int column, int row) coordinate = (0, 0);
             var freeCoordinates = new HashSet<(int column, int row)>() { coordinate };
