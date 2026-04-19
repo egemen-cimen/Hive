@@ -15,7 +15,7 @@ namespace Hive.Core.Rules
 
             if (piece.Color != playerTurnColor)
             {
-                return SpawnValidationResult.WRONG_COLOR_PLAYED;
+                return SpawnValidationResult.WRONG_COLOR_PLACED;
             }
 
             if (coordinates.Contains(spawnCoordinate))
@@ -23,9 +23,14 @@ namespace Hive.Core.Rules
                 return SpawnValidationResult.ANOTHER_PIECE_AT_DESTINATION;
             }
 
+            if (turnNumber == 1 && piece is QueenPiece)
+            {
+                return SpawnValidationResult.QUEEN_CANNOT_BE_PLACED_ON_FIRST_TURN;
+            }
+
             if (turnNumber == 4 && !RulesHelper.FindQueenForPlayerColor(coordinateSystem, playerTurnColor))
             {
-                return SpawnValidationResult.QUEEN_SHOULD_BE_PLAYED;
+                return SpawnValidationResult.QUEEN_MUST_BE_PLACED_UNTIL_FOURTH_TURN;
             }
 
             var allAdjacentCoordinates = coordinateSystem.GetAllFreeAdjacentCoordinates();

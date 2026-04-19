@@ -13,7 +13,7 @@ namespace Hive.Core.Rules
             {
                 coordinateSystem.TryGetHexagonAtCoordinate(coordinate, out var hexagon);
 
-                if (hexagon!.GetAllPieces().Any(p => p.Color == playerTurnColor && p.GetPieceName() == QueenPiece.Name))
+                if (hexagon!.GetAllPieces().Any(p => p.Color == playerTurnColor && p is QueenPiece))
                 {
                     isQueenPlayedForColor = true;
                     break;

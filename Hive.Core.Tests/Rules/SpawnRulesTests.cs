@@ -31,7 +31,7 @@ namespace Hive.Core.Tests.Rules
             var result = SpawnRules.ValidatePieceSpawn(piece, coordinateSystem, (0, 0), PlayerColor.WHITE, 1);
 
             // THEN
-            Assert.AreEqual(SpawnValidationResult.WRONG_COLOR_PLAYED, result);
+            Assert.AreEqual(SpawnValidationResult.WRONG_COLOR_PLACED, result);
         }
 
         [TestMethod]
@@ -99,7 +99,7 @@ namespace Hive.Core.Tests.Rules
             var result = SpawnRules.ValidatePieceSpawn(piece, coordinateSystem, (-2, 0), PlayerColor.WHITE, 4);
 
             // THEN
-            Assert.AreEqual(SpawnValidationResult.QUEEN_SHOULD_BE_PLAYED, result);
+            Assert.AreEqual(SpawnValidationResult.QUEEN_MUST_BE_PLACED_UNTIL_FOURTH_TURN, result);
         }
 
         [TestMethod]
@@ -134,7 +134,7 @@ namespace Hive.Core.Tests.Rules
             var result = SpawnRules.ValidatePieceSpawn(piece, coordinateSystem, (0, 3), PlayerColor.BLACK, 4);
 
             // THEN
-            Assert.AreEqual(SpawnValidationResult.QUEEN_SHOULD_BE_PLAYED, result);
+            Assert.AreEqual(SpawnValidationResult.QUEEN_MUST_BE_PLACED_UNTIL_FOURTH_TURN, result);
         }
 
         [TestMethod]
@@ -170,6 +170,37 @@ namespace Hive.Core.Tests.Rules
 
             // THEN
             Assert.AreEqual(SpawnValidationResult.PIECE_MUST_ONLY_TOUCH_FRIENDLY_PIECES, result);
+        }
+
+        [TestMethod]
+        public void Given_EmptyCoordinateSystem_When_QueenSpawnValidated_Then_ReturnsValidationFail()
+        {
+            // GIVEN
+            var coordinateSystem = new AxialCoordinateSystem();
+
+            // WHEN
+            var piece = new QueenPiece(PlayerColor.WHITE);
+            var result = SpawnRules.ValidatePieceSpawn(piece, coordinateSystem, (0, 0), PlayerColor.WHITE, 1);
+
+            // THEN
+            Assert.AreEqual(SpawnValidationResult.QUEEN_CANNOT_BE_PLACED_ON_FIRST_TURN, result);
+        }
+
+        [TestMethod]
+        public void Given_CoordinateSystemWithOnePiece_When_QueenSpawnValidated_Then_ReturnsValidationFail()
+        {
+            // GIVEN
+            var coordinateSystem = CreatePopulatedCoordinateSystem(
+            [
+                ((0, 0), typeof(SpiderPiece))
+            ]);
+
+            // WHEN
+            var piece = new QueenPiece(PlayerColor.BLACK);
+            var result = SpawnRules.ValidatePieceSpawn(piece, coordinateSystem, (0, 1), PlayerColor.BLACK, 1);
+
+            // THEN
+            Assert.AreEqual(SpawnValidationResult.QUEEN_CANNOT_BE_PLACED_ON_FIRST_TURN, result);
         }
 
         private static AxialCoordinateSystem CreatePopulatedCoordinateSystem(List<((int column, int row) coordinate, Type pieceType)> exampleMoves)

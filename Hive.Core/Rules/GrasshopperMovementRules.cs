@@ -1,10 +1,19 @@
-﻿namespace Hive.Core.Rules
+﻿using Hive.Core.Models;
+
+namespace Hive.Core.Rules
 {
     public class GrasshopperMovementRules : IMovementRules
     {
-        public MovementValidationResult ValidatePieceMovement((int column, int row) startCoordinate, (int column, int row) endCoordinate)
+        public MovementValidationResult ValidatePieceMovement(ICoordinateSystem coordinateSystem,
+            (int column, int row) startCoordinate,
+            (int column, int row) endCoordinate,
+            PlayerColor playerTurnColor,
+            int turnNumber
+            )
         {
             throw new NotImplementedException();
+
+
         }
     }
 }
