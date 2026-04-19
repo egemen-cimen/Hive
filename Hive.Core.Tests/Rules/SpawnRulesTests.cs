@@ -38,7 +38,7 @@ namespace Hive.Core.Tests.Rules
         public void Given_CoordinateSystemWithOnePiece_When_PieceSpawnOnAdjacentCoordinateValidated_Then_ReturnsValid()
         {
             // GIVEN
-            var coordinateSystem = CreatePopulatedCoordinateSystem(
+            var coordinateSystem = CoordinateSystemPopulationHelper.CreatePopulatedCoordinateSystem(
             [
                 ((0, 0), typeof(SpiderPiece))
             ]);
@@ -55,7 +55,7 @@ namespace Hive.Core.Tests.Rules
         public void Given_CoordinateSystemWithOnePiece_When_PieceSpawnOnSameCoordinateValidated_Then_ReturnsValidationFail()
         {
             // GIVEN
-            var coordinateSystem = CreatePopulatedCoordinateSystem(
+            var coordinateSystem = CoordinateSystemPopulationHelper.CreatePopulatedCoordinateSystem(
             [
                 ((0, 0), typeof(SpiderPiece))
             ]);
@@ -84,7 +84,7 @@ namespace Hive.Core.Tests.Rules
             //
             //          [BLK Q] [BLK G]
             //          [-1, 2] [ 0, 2]
-            var coordinateSystem = CreatePopulatedCoordinateSystem(
+            var coordinateSystem = CoordinateSystemPopulationHelper.CreatePopulatedCoordinateSystem(
             [
                 (( 0,  0), typeof(SpiderPiece)),
                 (( 0,  1), typeof(SpiderPiece)),
@@ -118,7 +118,7 @@ namespace Hive.Core.Tests.Rules
             //
             //                  [BLK A] [BLK G]
             //                  [-1, 2] [ 0, 2]
-            var coordinateSystem = CreatePopulatedCoordinateSystem(
+            var coordinateSystem = CoordinateSystemPopulationHelper.CreatePopulatedCoordinateSystem(
             [
                 (( 0,  0), typeof(SpiderPiece)),
                 (( 0,  1), typeof(SpiderPiece)),
@@ -141,7 +141,7 @@ namespace Hive.Core.Tests.Rules
         public void Given_PopulatedCoordinateSystem_When_UnreachablePieceSpawned_Then_ReturnsValidationFail()
         {
             // GIVEN
-            var coordinateSystem = CreatePopulatedCoordinateSystem(
+            var coordinateSystem = CoordinateSystemPopulationHelper.CreatePopulatedCoordinateSystem(
             [
                 ((0, 0), typeof(SpiderPiece))
             ]);
@@ -158,7 +158,7 @@ namespace Hive.Core.Tests.Rules
         public void Given_CoordinateSystemWithMoreThanTwoPiece_When_PieceSpawnedAdjacentToEnemyPieces_Then_ReturnsValidationFail()
         {
             // GIVEN
-            var coordinateSystem = CreatePopulatedCoordinateSystem(
+            var coordinateSystem = CoordinateSystemPopulationHelper.CreatePopulatedCoordinateSystem(
             [
                 ((0, 0), typeof(SpiderPiece)),
                 ((0, 1), typeof(SpiderPiece))
@@ -190,7 +190,7 @@ namespace Hive.Core.Tests.Rules
         public void Given_CoordinateSystemWithOnePiece_When_QueenSpawnValidated_Then_ReturnsValidationFail()
         {
             // GIVEN
-            var coordinateSystem = CreatePopulatedCoordinateSystem(
+            var coordinateSystem = CoordinateSystemPopulationHelper.CreatePopulatedCoordinateSystem(
             [
                 ((0, 0), typeof(SpiderPiece))
             ]);
@@ -201,48 +201,6 @@ namespace Hive.Core.Tests.Rules
 
             // THEN
             Assert.AreEqual(SpawnValidationResult.QUEEN_CANNOT_BE_PLACED_ON_FIRST_TURN, result);
-        }
-
-        private static AxialCoordinateSystem CreatePopulatedCoordinateSystem(List<((int column, int row) coordinate, Type pieceType)> exampleMoves)
-        {
-            var coordinateSystem = new AxialCoordinateSystem();
-            var currentColor = PlayerColor.WHITE;
-
-            foreach (var (coordinate, pieceType) in exampleMoves)
-            {
-                SpawnPiece(coordinateSystem, coordinate, pieceType, currentColor);
-                currentColor = currentColor == PlayerColor.WHITE ? PlayerColor.BLACK : PlayerColor.WHITE;
-            }
-
-            return coordinateSystem;
-        }
-
-        private static void SpawnPiece(AxialCoordinateSystem coordinateSystem, (int column, int row) coordinate, Type pieceType, PlayerColor pieceColor)
-        {
-            var hexagon = new Hexagon();
-
-            if (pieceType == typeof(AntPiece))
-            {
-                hexagon.PushPiece(new AntPiece(pieceColor));
-            }
-            else if (pieceType == typeof(BeetlePiece))
-            {
-                hexagon.PushPiece(new BeetlePiece(pieceColor));
-            }
-            else if (pieceType == typeof(GrasshopperPiece))
-            {
-                hexagon.PushPiece(new GrasshopperPiece(pieceColor));
-            }
-            else if (pieceType == typeof(QueenPiece))
-            {
-                hexagon.PushPiece(new QueenPiece(pieceColor));
-            }
-            else if (pieceType == typeof(SpiderPiece))
-            {
-                hexagon.PushPiece(new SpiderPiece(pieceColor));
-            }
-
-            coordinateSystem.AddHexagonToCoordinate(hexagon, coordinate);
         }
     }
 }
