@@ -14,7 +14,7 @@ namespace Hive.Core.Tests.Rules
 
             // WHEN
             var piece = new SpiderPiece(PlayerColor.WHITE);
-            var result = SpawnRules.ValidatePieceSpawn(piece, coordinateSystem, (0, 0));
+            var result = SpawnRules.ValidatePieceSpawn(piece, coordinateSystem, (0, 0), PlayerColor.WHITE, 1);
 
             // THEN
             Assert.AreEqual(SpawnValidationResult.VALID, result);
@@ -28,7 +28,7 @@ namespace Hive.Core.Tests.Rules
 
             // WHEN
             var piece = new SpiderPiece(PlayerColor.BLACK);
-            var result = SpawnRules.ValidatePieceSpawn(piece, coordinateSystem, (0, 0));
+            var result = SpawnRules.ValidatePieceSpawn(piece, coordinateSystem, (0, 0), PlayerColor.WHITE, 1);
 
             // THEN
             Assert.AreEqual(SpawnValidationResult.WRONG_COLOR_PLAYED, result);
@@ -45,7 +45,7 @@ namespace Hive.Core.Tests.Rules
 
             // WHEN
             var piece = new SpiderPiece(PlayerColor.BLACK);
-            var result = SpawnRules.ValidatePieceSpawn(piece, coordinateSystem, (0, 1));
+            var result = SpawnRules.ValidatePieceSpawn(piece, coordinateSystem, (0, 1), PlayerColor.BLACK, 1);
 
             // THEN
             Assert.AreEqual(SpawnValidationResult.VALID, result);
@@ -62,7 +62,7 @@ namespace Hive.Core.Tests.Rules
 
             // WHEN
             var piece = new BeetlePiece(PlayerColor.BLACK);
-            var result = SpawnRules.ValidatePieceSpawn(piece, coordinateSystem, (0, 0));
+            var result = SpawnRules.ValidatePieceSpawn(piece, coordinateSystem, (0, 0), PlayerColor.BLACK, 1);
 
             // THEN
             Assert.AreEqual(SpawnValidationResult.ANOTHER_PIECE_AT_DESTINATION, result);
@@ -96,7 +96,7 @@ namespace Hive.Core.Tests.Rules
 
             // WHEN
             var piece = new BeetlePiece(PlayerColor.WHITE);
-            var result = SpawnRules.ValidatePieceSpawn(piece, coordinateSystem, (-2, 0));
+            var result = SpawnRules.ValidatePieceSpawn(piece, coordinateSystem, (-2, 0), PlayerColor.WHITE, 4);
 
             // THEN
             Assert.AreEqual(SpawnValidationResult.QUEEN_SHOULD_BE_PLAYED, result);
@@ -131,7 +131,7 @@ namespace Hive.Core.Tests.Rules
 
             // WHEN
             var piece = new BeetlePiece(PlayerColor.BLACK);
-            var result = SpawnRules.ValidatePieceSpawn(piece, coordinateSystem, (0, 3));
+            var result = SpawnRules.ValidatePieceSpawn(piece, coordinateSystem, (0, 3), PlayerColor.BLACK, 4);
 
             // THEN
             Assert.AreEqual(SpawnValidationResult.QUEEN_SHOULD_BE_PLAYED, result);
@@ -148,7 +148,7 @@ namespace Hive.Core.Tests.Rules
 
             // WHEN
             var piece = new SpiderPiece(PlayerColor.BLACK);
-            var result = SpawnRules.ValidatePieceSpawn(piece, coordinateSystem, (0, 2));
+            var result = SpawnRules.ValidatePieceSpawn(piece, coordinateSystem, (0, 2), PlayerColor.BLACK, 1);
 
             // THEN
             Assert.AreEqual(SpawnValidationResult.PIECE_MUST_TOUCH_THE_HIVE, result);
@@ -166,7 +166,7 @@ namespace Hive.Core.Tests.Rules
 
             // WHEN
             var piece = new SpiderPiece(PlayerColor.WHITE);
-            var result = SpawnRules.ValidatePieceSpawn(piece, coordinateSystem, (0, 2));
+            var result = SpawnRules.ValidatePieceSpawn(piece, coordinateSystem, (0, 2), PlayerColor.WHITE, 2);
 
             // THEN
             Assert.AreEqual(SpawnValidationResult.PIECE_MUST_ONLY_TOUCH_FRIENDLY_PIECES, result);

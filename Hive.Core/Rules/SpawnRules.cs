@@ -6,15 +6,12 @@ namespace Hive.Core.Rules
     {
         public static SpawnValidationResult ValidatePieceSpawn(IPiece piece,
             ICoordinateSystem coordinateSystem,
-            (int column, int row) spawnCoordinate
+            (int column, int row) spawnCoordinate,
+            PlayerColor playerTurnColor,
+            int turnNumber
             )
         {
             var coordinates = coordinateSystem.GetAllCoordinates();
-
-            // White is the starting color
-            var playerTurnColor = coordinates.Count % 2 == 0 ? PlayerColor.WHITE : PlayerColor.BLACK;
-
-            int turnNumber = coordinates.Count / 2 + 1;
 
             if (piece.Color != playerTurnColor)
             {
