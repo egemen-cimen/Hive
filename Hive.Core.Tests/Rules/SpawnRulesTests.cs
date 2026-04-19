@@ -7,7 +7,7 @@ namespace Hive.Core.Tests.Rules
     public class SpawnRulesTests
     {
         [TestMethod]
-        public void Given_EmptyCoordinateSystem_When_FirstPieceSpawnValidated_Then_ReturnsValid ()
+        public void Given_EmptyCoordinateSystem_When_FirstPieceSpawnValidated_Then_ReturnsValid()
         {
             // GIVEN
             var coordinateSystem = new AxialCoordinateSystem();
@@ -69,7 +69,7 @@ namespace Hive.Core.Tests.Rules
         }
 
         [TestMethod]
-        public void Given_CoordinateSystemWithSixPiecesButNoQueenForWhite_When_NonQueenPieceSpawnValidated_Then_ReturnsFalse()
+        public void Given_CoordinateSystemWithSixPiecesButNoQueenForWhite_When_NonQueenPieceSpawnValidated_Then_ReturnsValidationFail()
         {
             // GIVEN
 
@@ -82,7 +82,7 @@ namespace Hive.Core.Tests.Rules
             //              [BLK S]
             //              [ 0, 1]
             //
-            //          [BLK A] [BLK G]
+            //          [BLK Q] [BLK G]
             //          [-1, 2] [ 0, 2]
             var coordinateSystem = CreatePopulatedCoordinateSystem(
             [
@@ -100,6 +100,76 @@ namespace Hive.Core.Tests.Rules
 
             // THEN
             Assert.AreEqual(SpawnValidationResult.QUEEN_SHOULD_BE_PLAYED, result);
+        }
+
+        [TestMethod]
+        public void Given_CoordinateSystemWithSevenPiecesButNoQueenForBlack_When_NonQueenPieceSpawnValidated_Then_ReturnsValidationFail()
+        {
+            // GIVEN
+
+            //                      [WHT B]
+            //                      [ 1,-1]
+            //
+            //  [WHT Q] [WHT A] [WHT S]
+            //  [-2, 0] [-1, 0] [ q, r]
+            //
+            //                      [BLK S]
+            //                      [ 0, 1]
+            //
+            //                  [BLK A] [BLK G]
+            //                  [-1, 2] [ 0, 2]
+            var coordinateSystem = CreatePopulatedCoordinateSystem(
+            [
+                (( 0,  0), typeof(SpiderPiece)),
+                (( 0,  1), typeof(SpiderPiece)),
+                ((-1,  0), typeof(AntPiece)),
+                (( 0,  2), typeof(GrasshopperPiece)),
+                (( 1, -1), typeof(BeetlePiece)),
+                ((-1,  2), typeof(AntPiece)),
+                ((-2,  0), typeof(QueenPiece))
+            ]);
+
+            // WHEN
+            var piece = new BeetlePiece(PlayerColor.BLACK);
+            var result = SpawnRules.ValidatePieceSpawn(piece, coordinateSystem, (0, 3));
+
+            // THEN
+            Assert.AreEqual(SpawnValidationResult.QUEEN_SHOULD_BE_PLAYED, result);
+        }
+
+        [TestMethod]
+        public void Given_PopulatedCoordinateSystem_When_UnreachablePieceSpawned_Then_ReturnsValidationFail()
+        {
+            // GIVEN
+            var coordinateSystem = CreatePopulatedCoordinateSystem(
+            [
+                ((0, 0), typeof(SpiderPiece))
+            ]);
+
+            // WHEN
+            var piece = new SpiderPiece(PlayerColor.BLACK);
+            var result = SpawnRules.ValidatePieceSpawn(piece, coordinateSystem, (0, 2));
+
+            // THEN
+            Assert.AreEqual(SpawnValidationResult.PIECE_MUST_TOUCH_THE_HIVE, result);
+        }
+
+        [TestMethod]
+        public void Given_CoordinateSystemWithMoreThanTwoPiece_When_PieceSpawnedAdjacentToEnemyPieces_Then_ReturnsValidationFail()
+        {
+            // GIVEN
+            var coordinateSystem = CreatePopulatedCoordinateSystem(
+            [
+                ((0, 0), typeof(SpiderPiece)),
+                ((0, 1), typeof(SpiderPiece))
+            ]);
+
+            // WHEN
+            var piece = new SpiderPiece(PlayerColor.WHITE);
+            var result = SpawnRules.ValidatePieceSpawn(piece, coordinateSystem, (0, 2));
+
+            // THEN
+            Assert.AreEqual(SpawnValidationResult.PIECE_MUST_ONLY_TOUCH_FRIENDLY_PIECES, result);
         }
 
         private static AxialCoordinateSystem CreatePopulatedCoordinateSystem(List<((int column, int row) coordinate, Type pieceType)> exampleMoves)
