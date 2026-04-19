@@ -23,13 +23,9 @@ namespace Hive.Core.Rules
                 return SpawnValidationResult.ANOTHER_PIECE_AT_DESTINATION;
             }
 
-            if (turnNumber == 4)
+            if (turnNumber == 4 && !RulesHelper.FindQueenForPlayerColor(coordinateSystem, playerTurnColor))
             {
-                bool isQueenPlayedForColor = FindQueenForPlayerColor(coordinateSystem, playerTurnColor);
-                if (!isQueenPlayedForColor)
-                {
-                    return SpawnValidationResult.QUEEN_SHOULD_BE_PLAYED;
-                }
+                return SpawnValidationResult.QUEEN_SHOULD_BE_PLAYED;
             }
 
             var allAdjacentCoordinates = coordinateSystem.GetAllFreeAdjacentCoordinates();
@@ -45,30 +41,6 @@ namespace Hive.Core.Rules
             }
 
             return SpawnValidationResult.VALID;
-        }
-
-        private static bool FindQueenForPlayerColor(ICoordinateSystem coordinateSystem, PlayerColor playerTurnColor)
-        {
-            var coordinates = coordinateSystem.GetAllCoordinates();
-            var isQueenPlayedForColor = false;
-
-            foreach (var coordinate in coordinates)
-            {
-                coordinateSystem.TryGetHexagonAtCoordinate(coordinate, out var hexagon);
-
-                if (hexagon == null)
-                {
-                    throw new Exception("Null hexagon encountered!");
-                }
-
-                if (hexagon.GetAllPieces().Any(p => p.Color == playerTurnColor && p.GetPieceName() == QueenPiece.Name))
-                {
-                    isQueenPlayedForColor = true;
-                    break;
-                }
-            }
-
-            return isQueenPlayedForColor;
         }
     }
 }
