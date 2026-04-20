@@ -30,20 +30,22 @@ namespace Hive.Core.Rules
 
             if (turnNumber == 4 && !RulesHelper.FindQueenForPlayerColor(coordinateSystem, playerTurnColor))
             {
-                return SpawnValidationResult.QUEEN_MUST_BE_PLACED_UNTIL_FOURTH_TURN;
+                return SpawnValidationResult.QUEEN_WAS_NOT_PLACED_UNTIL_FOURTH_TURN;
             }
 
             var allAdjacentCoordinates = coordinateSystem.GetAllFreeAdjacentCoordinates();
             if (!allAdjacentCoordinates.Any(c => c == spawnCoordinate))
             {
-                return SpawnValidationResult.PIECE_MUST_TOUCH_THE_HIVE;
+                return SpawnValidationResult.PIECE_DID_NOT_TOUCH_THE_HIVE;
             }
 
             var allNeighborsForSpawnCoordinate = coordinateSystem.GetPopulatedNeighborHexagonsForCoordinate(spawnCoordinate);
             if (turnNumber > 1 && allNeighborsForSpawnCoordinate.Any(n => n.GetColor() != playerTurnColor))
             {
-                return SpawnValidationResult.PIECE_MUST_ONLY_TOUCH_FRIENDLY_PIECES;
+                return SpawnValidationResult.PIECE_TOUCHED_ENEMY_PIECE;
             }
+
+            // TODO: check whether the player has that piece in their inventory
 
             return SpawnValidationResult.VALID;
         }

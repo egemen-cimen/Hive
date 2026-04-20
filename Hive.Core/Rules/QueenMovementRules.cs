@@ -14,7 +14,7 @@ namespace Hive.Core.Rules
             var isStartHexagonExists = coordinateSystem.TryGetHexagonAtCoordinate(startCoordinate, out var hexagonAtStart);
             if (!isStartHexagonExists)
             {
-                return MovementValidationResult.THERE_MUST_BE_A_PIECE_TO_MOVE;
+                return MovementValidationResult.NO_PIECE_TO_MOVE;
             }
 
             if (hexagonAtStart!.PeekPiece() is not QueenPiece)
@@ -31,7 +31,7 @@ namespace Hive.Core.Rules
 
             if (coordinateSystem.TryGetHexagonAtCoordinate(endCoordinate, out _))
             {
-                return MovementValidationResult.DESTINATION_MUST_BE_EMPTY;
+                return MovementValidationResult.DESTINATION_IS_NOT_EMPTY;
             }
 
             return MovementValidationResult.VALID;

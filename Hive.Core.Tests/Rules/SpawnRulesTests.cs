@@ -99,7 +99,7 @@ namespace Hive.Core.Tests.Rules
             var result = SpawnRules.ValidatePieceSpawn(piece, coordinateSystem, (-2, 0), PlayerColor.WHITE, 4);
 
             // THEN
-            Assert.AreEqual(SpawnValidationResult.QUEEN_MUST_BE_PLACED_UNTIL_FOURTH_TURN, result);
+            Assert.AreEqual(SpawnValidationResult.QUEEN_WAS_NOT_PLACED_UNTIL_FOURTH_TURN, result);
         }
 
         [TestMethod]
@@ -134,7 +134,7 @@ namespace Hive.Core.Tests.Rules
             var result = SpawnRules.ValidatePieceSpawn(piece, coordinateSystem, (0, 3), PlayerColor.BLACK, 4);
 
             // THEN
-            Assert.AreEqual(SpawnValidationResult.QUEEN_MUST_BE_PLACED_UNTIL_FOURTH_TURN, result);
+            Assert.AreEqual(SpawnValidationResult.QUEEN_WAS_NOT_PLACED_UNTIL_FOURTH_TURN, result);
         }
 
         [TestMethod]
@@ -151,7 +151,7 @@ namespace Hive.Core.Tests.Rules
             var result = SpawnRules.ValidatePieceSpawn(piece, coordinateSystem, (0, 2), PlayerColor.BLACK, 1);
 
             // THEN
-            Assert.AreEqual(SpawnValidationResult.PIECE_MUST_TOUCH_THE_HIVE, result);
+            Assert.AreEqual(SpawnValidationResult.PIECE_DID_NOT_TOUCH_THE_HIVE, result);
         }
 
         [TestMethod]
@@ -169,7 +169,7 @@ namespace Hive.Core.Tests.Rules
             var result = SpawnRules.ValidatePieceSpawn(piece, coordinateSystem, (0, 2), PlayerColor.WHITE, 2);
 
             // THEN
-            Assert.AreEqual(SpawnValidationResult.PIECE_MUST_ONLY_TOUCH_FRIENDLY_PIECES, result);
+            Assert.AreEqual(SpawnValidationResult.PIECE_TOUCHED_ENEMY_PIECE, result);
         }
 
         [TestMethod]
