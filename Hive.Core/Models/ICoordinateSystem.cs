@@ -16,6 +16,8 @@
 
         public HashSet<(int column, int row)> GetAllFreeAdjacentCoordinates();
 
+        public HashSet<(int column, int row)> GetAllFreeAdjacentCoordinatesWithoutHexagon((int column, int row) coordinate);
+
         public bool VerifyWhetherAllHexagonsConnectedWithoutHexagon((int column, int row) coordinate);
 
     }

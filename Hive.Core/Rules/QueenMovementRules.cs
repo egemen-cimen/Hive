@@ -6,7 +6,7 @@ namespace Hive.Core.Rules
     {
         public MovementValidationResult ValidatePieceMovement(ICoordinateSystem coordinateSystem,
             (int column, int row) startCoordinate,
-            (int column, int row) endCoordinate,
+            (int column, int row) destinationCoordinate,
             PlayerColor playerTurnColor,
             int turnNumber
             )
@@ -23,14 +23,25 @@ namespace Hive.Core.Rules
             }
 
             var adjacentCoordinates = coordinateSystem.GetAdjacentCoordinatesForCoordinate(startCoordinate);
-            if (!adjacentCoordinates.Contains(endCoordinate))
+            if (!adjacentCoordinates.Contains(destinationCoordinate))
             {
                 return MovementValidationResult.PIECE_CANNOT_REACH_DESTINATION;
             }
 
-            if (coordinateSystem.TryGetHexagonAtCoordinate(endCoordinate, out _))
+            if (coordinateSystem.TryGetHexagonAtCoordinate(destinationCoordinate, out _))
             {
                 return MovementValidationResult.DESTINATION_IS_NOT_EMPTY;
+            }
+
+            if (!coordinateSystem.VerifyWhetherAllHexagonsConnectedWithoutHexagon(startCoordinate))
+            {
+                return MovementValidationResult.BREAKS_ONE_HIVE;
+            }
+
+            var allFreeAdjacentCoordinatesWithout = coordinateSystem.GetAllFreeAdjacentCoordinatesWithoutHexagon(startCoordinate);
+            if (!allFreeAdjacentCoordinatesWithout.Contains(destinationCoordinate))
+            {
+                return MovementValidationResult.BREAKS_ONE_HIVE;
             }
 
             return MovementValidationResult.VALID;

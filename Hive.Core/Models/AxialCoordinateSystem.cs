@@ -114,6 +114,19 @@
             return freeAdjacentCoordinates;
         }
 
+        public HashSet<(int column, int row)> GetAllFreeAdjacentCoordinatesWithoutHexagon((int column, int row) coordinate)
+        {
+            var hexagon = GetHexagonAtCoordinate(coordinate);
+
+            RemoveHexagonFromCoordinate(coordinate);
+
+            var result = GetAllFreeAdjacentCoordinates();
+
+            AddHexagonToCoordinate(hexagon, coordinate);
+
+            return result;
+        }
+
         private bool VerifyWhetherAllHexagonsConnected()
         {
             if (_hexagonalGrid.Count == 0)

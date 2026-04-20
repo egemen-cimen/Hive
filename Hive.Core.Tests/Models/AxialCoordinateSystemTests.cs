@@ -346,6 +346,49 @@ namespace Hive.Core.Tests.Models
         }
 
         /// <summary>
+        /// Two hexagons without one should return all the empty spaces around the other.
+        /// 
+        ///     [ 0,-2] [ 1,-2]
+        /// 
+        /// [-1,-1] [ 0,-1] [ 1,-1]
+        /// 
+        ///     [-1, 0] [ q, r] [ 1, 0]
+        /// 
+        ///         [-1, 1] [ 0, 1]
+        /// 
+        /// Where q is column and r is row.
+        /// </summary>
+        [TestMethod]
+        public void Given_AddedTwoHexagons_When_RetrievedAllFreeAdjacentsWithoutOne_Then_ReturnsAllFreeCoordinates()
+        {
+            // GIVEN
+            var coordinateSystem = new AxialCoordinateSystem();
+            var hexagon1 = new Hexagon();
+            (int column, int row) coordinate1 = (0, 0);
+            var hexagon2 = new Hexagon();
+            (int column, int row) coordinate2 = (0, -1);
+
+            coordinateSystem.AddHexagonToCoordinate(hexagon1, coordinate1);
+            coordinateSystem.AddHexagonToCoordinate(hexagon2, coordinate2);
+
+            // WHEN
+            var freeAdjacents = coordinateSystem.GetAllFreeAdjacentCoordinatesWithoutHexagon(coordinate2);
+
+            // THEN
+            Assert.HasCount(6, freeAdjacents);
+            var expectedCoordinates = new HashSet<(int column, int row)>() {
+                ( 0,-1),
+                ( 1,-1),
+                (-1, 0),
+                ( 1, 0),
+                (-1, 1),
+                ( 0, 1)
+            };
+
+            Assert.IsTrue(expectedCoordinates.SetEquals(freeAdjacents));
+        }
+
+        /// <summary>
         /// Single hexagon in the middle.
         /// 
         /// [ q, r]
