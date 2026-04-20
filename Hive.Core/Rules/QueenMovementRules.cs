@@ -28,7 +28,6 @@ namespace Hive.Core.Rules
                 return MovementValidationResult.PIECE_CANNOT_REACH_DESTINATION;
             }
 
-
             if (coordinateSystem.TryGetHexagonAtCoordinate(endCoordinate, out _))
             {
                 return MovementValidationResult.DESTINATION_IS_NOT_EMPTY;
