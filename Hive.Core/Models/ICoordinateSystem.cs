@@ -8,6 +8,8 @@
 
         public List<Hexagon> GetPopulatedNeighborHexagonsForCoordinate((int column, int row) coordinate);
 
+        public List<Hexagon> GetSharedPopulatedNeighborHexagonsForCoordinates((int column, int row) coordinate1, (int column, int row) coordinate2);
+
         public List<(int column, int row)> GetAdjacentCoordinatesForCoordinate((int column, int row) coordinate);
 
         public void RemoveHexagonFromCoordinate((int column, int row) coordinate);

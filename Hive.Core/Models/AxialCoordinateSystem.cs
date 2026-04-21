@@ -42,6 +42,23 @@
             return neighbors;
         }
 
+        public List<Hexagon> GetSharedPopulatedNeighborHexagonsForCoordinates((int column, int row) coordinate1, (int column, int row) coordinate2)
+        {
+            var sharedNeighbors = new List<Hexagon>();
+            var allAdjacentCoordinatesForCoordinate1 = GetAdjacentCoordinatesForCoordinate(coordinate1);
+            var allAdjacentCoordinatesForCoordinate2 = GetAdjacentCoordinatesForCoordinate(coordinate2);
+
+            foreach (var commonAdjacentCoordinate in allAdjacentCoordinatesForCoordinate1.Intersect(allAdjacentCoordinatesForCoordinate2))
+            {
+                if (TryGetHexagonAtCoordinate(commonAdjacentCoordinate, out var sharedNeighbor))
+                {
+                    sharedNeighbors.Add(sharedNeighbor!);
+                }
+            }
+
+            return sharedNeighbors;
+        }
+
         public List<(int column, int row)> GetAdjacentCoordinatesForCoordinate((int column, int row) coordinate)
         {
             var adjacentCoordinates = new List<(int column, int row)>();

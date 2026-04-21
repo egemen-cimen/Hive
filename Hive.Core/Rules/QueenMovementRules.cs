@@ -11,6 +11,11 @@ namespace Hive.Core.Rules
             int turnNumber
             )
         {
+            if (startCoordinate == destinationCoordinate)
+            {
+                return MovementValidationResult.START_AND_DESTINATION_CANNOT_BE_THE_SAME;
+            }
+
             var isStartHexagonExists = coordinateSystem.TryGetHexagonAtCoordinate(startCoordinate, out var hexagonAtStart);
             if (!isStartHexagonExists)
             {
@@ -22,8 +27,8 @@ namespace Hive.Core.Rules
                 return MovementValidationResult.WRONG_VALIDATOR_FOR_PIECE_TYPE;
             }
 
-            var adjacentCoordinates = coordinateSystem.GetAdjacentCoordinatesForCoordinate(startCoordinate);
-            if (!adjacentCoordinates.Contains(destinationCoordinate))
+            var allAdjacentCoordinatesForStart = coordinateSystem.GetAdjacentCoordinatesForCoordinate(startCoordinate);
+            if (!allAdjacentCoordinatesForStart.Contains(destinationCoordinate))
             {
                 return MovementValidationResult.PIECE_CANNOT_REACH_DESTINATION;
             }
@@ -42,6 +47,17 @@ namespace Hive.Core.Rules
             if (!allFreeAdjacentCoordinatesWithout.Contains(destinationCoordinate))
             {
                 return MovementValidationResult.BREAKS_ONE_HIVE;
+            }
+
+            var sharedPopulatedNeighborHexagons = coordinateSystem.GetSharedPopulatedNeighborHexagonsForCoordinates(startCoordinate, destinationCoordinate);
+            if (sharedPopulatedNeighborHexagons.Count == 0)
+            {
+                return MovementValidationResult.PIECE_CANNOT_REACH_DESTINATION;
+            }
+
+            if (sharedPopulatedNeighborHexagons.Count == 2)
+            {
+                return MovementValidationResult.PIECE_CANNOT_SLIDE_INTO_SPACE;
             }
 
             return MovementValidationResult.VALID;

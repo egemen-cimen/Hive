@@ -541,5 +541,49 @@ namespace Hive.Core.Tests.Models
             Assert.IsTrue(anotherRetrievedCoordinateSystem.TryGetValue((1, -1), out _));
             Assert.IsFalse(anotherRetrievedCoordinateSystem.TryGetValue((-1, 0), out _));
         }
+
+        /// <summary>
+        /// A cycle with hexagons are connected and all have two neighbors.
+        ///  
+        ///     [ 0,-1] [ 1,-1]
+        /// 
+        /// [-1, 0] [ q, r] [ 1, 0]
+        /// 
+        ///     [-1, 1] [ 0, 1]
+        /// 
+        /// Where q is column and r is row.
+        /// </summary>
+        [TestMethod]
+        public void Given_AddedHexagonsInACycle_When_SharedPopulatedNeighborsRetrieved_Then_ReturnsCollection()
+        {
+            // GIVEN
+            var coordinateSystem = new AxialCoordinateSystem();
+            var hexagon1 = new Hexagon();
+            (int column, int row) coordinate1 = (0, -1);
+            var hexagon2 = new Hexagon();
+            (int column, int row) coordinate2 = (1, -1);
+            var hexagon3 = new Hexagon();
+            (int column, int row) coordinate3 = (-1, 0);
+            var hexagon4 = new Hexagon();
+            (int column, int row) coordinate4 = (1, 0);
+            var hexagon5 = new Hexagon();
+            (int column, int row) coordinate5 = (-1, 1);
+            var hexagon6 = new Hexagon();
+            (int column, int row) coordinate6 = (0, 1);
+
+            coordinateSystem.AddHexagonToCoordinate(hexagon1, coordinate1);
+            coordinateSystem.AddHexagonToCoordinate(hexagon2, coordinate2);
+            coordinateSystem.AddHexagonToCoordinate(hexagon3, coordinate3);
+            coordinateSystem.AddHexagonToCoordinate(hexagon4, coordinate4);
+            coordinateSystem.AddHexagonToCoordinate(hexagon5, coordinate5);
+            coordinateSystem.AddHexagonToCoordinate(hexagon6, coordinate6);
+
+            // WHEN
+            var sharedNighbors = coordinateSystem.GetSharedPopulatedNeighborHexagonsForCoordinates(coordinate3, coordinate2);
+
+            // THEN
+            Assert.HasCount(1, sharedNighbors);
+            Assert.AreEqual(hexagon1, sharedNighbors.First());
+        }
     }
 }
