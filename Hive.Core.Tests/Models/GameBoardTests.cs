@@ -22,7 +22,7 @@ namespace Hive.Core.Tests.Models
 
             // THEN
             Assert.IsTrue(result);
-            coordinateSystem.Received().AddHexagonToCoordinate(Arg.Any<Hexagon>(), coordinate);
+            coordinateSystem.Received().AddHexagon(Arg.Any<Hexagon>(), coordinate);
         }
     }
 }

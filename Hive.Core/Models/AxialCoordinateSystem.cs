@@ -13,10 +13,10 @@
 
         public AxialCoordinateSystem() => _hexagonalGrid = [];
 
-        public void AddHexagonToCoordinate(Hexagon hexagon, (int column, int row) coordinate)
+        public void AddHexagon(Hexagon hexagon, (int column, int row) coordinate)
             => _hexagonalGrid.Add(coordinate, hexagon);
 
-        public bool TryGetHexagonAtCoordinate((int column, int row) coordinate, out Hexagon? hexagon)
+        public bool TryGetHexagon((int column, int row) coordinate, out Hexagon? hexagon)
             => _hexagonalGrid.TryGetValue(coordinate, out hexagon);
 
         public Hexagon GetHexagonAtCoordinate((int column, int row) coordinate)
@@ -27,12 +27,12 @@
             return hexagon;
         }
 
-        public List<Hexagon> GetPopulatedNeighborHexagonsForCoordinate((int column, int row) coordinate)
+        public List<Hexagon> GetPopulatedNeighborHexagons((int column, int row) coordinate)
         {
             var neighbors = new List<Hexagon>();
             foreach (var direction in _adjacentDirections)
             {
-                TryGetHexagonAtCoordinate(SumTwoCoordinates(direction, coordinate), out Hexagon? neighborHexagon);
+                TryGetHexagon(SumTwoCoordinates(direction, coordinate), out Hexagon? neighborHexagon);
                 if (neighborHexagon != null)
                 {
                     neighbors.Add(neighborHexagon);
@@ -41,16 +41,32 @@
 
             return neighbors;
         }
+        public HashSet<(int column, int row)> GetPopulatedNeighborCoordinates((int column, int row) coordinate)
+        {
+            var populatedNeighborCoordinates = new HashSet<(int column, int row)>();
 
-        public List<Hexagon> GetSharedPopulatedNeighborHexagonsForCoordinates((int column, int row) coordinate1, (int column, int row) coordinate2)
+            foreach (var direction in _adjacentDirections)
+            {
+                var coordinateSum = SumTwoCoordinates(direction, coordinate);
+                TryGetHexagon(coordinateSum, out Hexagon? neighborHexagon);
+                if (neighborHexagon != null)
+                {
+                    populatedNeighborCoordinates.Add(coordinateSum);
+                }
+            }
+
+            return populatedNeighborCoordinates;
+        }
+
+        public List<Hexagon> GetSharedPopulatedNeighborHexagons((int column, int row) coordinate1, (int column, int row) coordinate2)
         {
             var sharedNeighbors = new List<Hexagon>();
-            var allAdjacentCoordinatesForCoordinate1 = GetAdjacentCoordinatesForCoordinate(coordinate1);
-            var allAdjacentCoordinatesForCoordinate2 = GetAdjacentCoordinatesForCoordinate(coordinate2);
+            var allAdjacentCoordinatesForCoordinate1 = GetAdjacentCoordinates(coordinate1);
+            var allAdjacentCoordinatesForCoordinate2 = GetAdjacentCoordinates(coordinate2);
 
             foreach (var commonAdjacentCoordinate in allAdjacentCoordinatesForCoordinate1.Intersect(allAdjacentCoordinatesForCoordinate2))
             {
-                if (TryGetHexagonAtCoordinate(commonAdjacentCoordinate, out var sharedNeighbor))
+                if (TryGetHexagon(commonAdjacentCoordinate, out var sharedNeighbor))
                 {
                     sharedNeighbors.Add(sharedNeighbor!);
                 }
@@ -59,7 +75,7 @@
             return sharedNeighbors;
         }
 
-        public List<(int column, int row)> GetAdjacentCoordinatesForCoordinate((int column, int row) coordinate)
+        public List<(int column, int row)> GetAdjacentCoordinates((int column, int row) coordinate)
         {
             var adjacentCoordinates = new List<(int column, int row)>();
             foreach (var direction in _adjacentDirections)
@@ -70,7 +86,32 @@
             return adjacentCoordinates;
         }
 
-        public void RemoveHexagonFromCoordinate((int column, int row) coordinate)
+        public HashSet<(int column, int row)> GetSharedFreeAdjacentCoordinates((int column, int row) coordinate1, (int column, int row) coordinate2)
+        {
+            var freeAdjacentCoordinates1 = GetFreeAdjacentCoordinates(coordinate1);
+            var freeAdjacentCoordinates2 = GetFreeAdjacentCoordinates(coordinate2);
+
+            return [.. freeAdjacentCoordinates1.Intersect(freeAdjacentCoordinates2)];
+        }
+
+        private HashSet<(int column, int row)> GetFreeAdjacentCoordinates((int column, int row) coordinate)
+        {
+            var adjacentCoordinates = new HashSet<(int column, int row)>();
+
+            foreach (var direction in _adjacentDirections)
+            {
+                var adjacentCoordinate = SumTwoCoordinates(direction, coordinate);
+
+                if (!TryGetHexagon(adjacentCoordinate, out _))
+                {
+                    adjacentCoordinates.Add(adjacentCoordinate);
+                }
+            }
+
+            return adjacentCoordinates;
+        }
+
+        public void RemoveHexagon((int column, int row) coordinate)
         {
             var isRemoved = _hexagonalGrid.Remove(coordinate);
 
@@ -108,7 +149,7 @@
                 foreach (var direction in _adjacentDirections)
                 {
                     var coordinateSummation = SumTwoCoordinates(direction, currentCoordinate);
-                    if (TryGetHexagonAtCoordinate(coordinateSummation, out _))
+                    if (TryGetHexagon(coordinateSummation, out _))
                     {
                         if (!visitedCoordinates.TryGetValue(coordinateSummation, out _))
                         {
@@ -135,11 +176,11 @@
         {
             var hexagon = GetHexagonAtCoordinate(coordinate);
 
-            RemoveHexagonFromCoordinate(coordinate);
+            RemoveHexagon(coordinate);
 
             var result = GetAllFreeAdjacentCoordinates();
 
-            AddHexagonToCoordinate(hexagon, coordinate);
+            AddHexagon(hexagon, coordinate);
 
             return result;
         }
@@ -164,7 +205,7 @@
                 foreach (var direction in _adjacentDirections)
                 {
                     var coordinateSummation = SumTwoCoordinates(direction, currentCoordinate);
-                    if (TryGetHexagonAtCoordinate(coordinateSummation, out _)
+                    if (TryGetHexagon(coordinateSummation, out _)
                         && !visitedCoordinates.TryGetValue(coordinateSummation, out _))
                     {
                         coordinatesToVisit.Push(coordinateSummation);
@@ -184,11 +225,11 @@
         {
             var hexagon = GetHexagonAtCoordinate(coordinate);
 
-            RemoveHexagonFromCoordinate(coordinate);
+            RemoveHexagon(coordinate);
 
             var result = VerifyWhetherAllHexagonsConnected();
 
-            AddHexagonToCoordinate(hexagon, coordinate);
+            AddHexagon(hexagon, coordinate);
 
             return result;
         }

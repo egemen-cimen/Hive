@@ -43,7 +43,7 @@ namespace Hive.Core.Tests.Rules
                 hexagon.PushPiece(new SpiderPiece(pieceColor));
             }
 
-            coordinateSystem.AddHexagonToCoordinate(hexagon, coordinate);
+            coordinateSystem.AddHexagon(hexagon, coordinate);
         }
     }
 }

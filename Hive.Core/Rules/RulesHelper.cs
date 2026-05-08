@@ -11,7 +11,7 @@ namespace Hive.Core.Rules
 
             foreach (var coordinate in coordinates)
             {
-                coordinateSystem.TryGetHexagonAtCoordinate(coordinate, out var hexagon);
+                coordinateSystem.TryGetHexagon(coordinate, out var hexagon);
 
                 if (hexagon!.GetAllPieces().Any(p => p.Color == playerTurnColor && p is QueenPiece))
                 {

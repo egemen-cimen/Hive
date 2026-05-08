@@ -39,7 +39,7 @@ namespace Hive.Core.Rules
                 return SpawnValidationResult.PIECE_DID_NOT_TOUCH_THE_HIVE;
             }
 
-            var allNeighborsForSpawnCoordinate = coordinateSystem.GetPopulatedNeighborHexagonsForCoordinate(spawnCoordinate);
+            var allNeighborsForSpawnCoordinate = coordinateSystem.GetPopulatedNeighborHexagons(spawnCoordinate);
             if (turnNumber > 1 && allNeighborsForSpawnCoordinate.Any(n => n.GetColor() != playerTurnColor))
             {
                 return SpawnValidationResult.PIECE_TOUCHED_ENEMY_PIECE;

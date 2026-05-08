@@ -13,7 +13,7 @@ namespace Hive.Core.Tests.Models
             var hexagon = new Hexagon();
             (int column, int row) coordinate = (0, 0);
 
-            coordinateSystem.AddHexagonToCoordinate(hexagon, coordinate);
+            coordinateSystem.AddHexagon(hexagon, coordinate);
 
             // WHEN
             var retrievedHexagon = coordinateSystem.GetHexagonAtCoordinate(coordinate);
@@ -33,10 +33,10 @@ namespace Hive.Core.Tests.Models
             var anotherHexagon = new Hexagon();
             (int column, int row) coordinate = (0, 0);
 
-            coordinateSystem.AddHexagonToCoordinate(hexagon, coordinate);
+            coordinateSystem.AddHexagon(hexagon, coordinate);
 
             // WHEN & THEN
-            Assert.Throws<ArgumentException>(() => coordinateSystem.AddHexagonToCoordinate(anotherHexagon, coordinate));
+            Assert.Throws<ArgumentException>(() => coordinateSystem.AddHexagon(anotherHexagon, coordinate));
         }
 
         [TestMethod]
@@ -51,10 +51,10 @@ namespace Hive.Core.Tests.Models
             var anotherHexagon = new Hexagon();
             (int column, int row) anotherCoordinate = (1, -1);
 
-            coordinateSystem.AddHexagonToCoordinate(hexagon, coordinate);
+            coordinateSystem.AddHexagon(hexagon, coordinate);
 
             // WHEN
-            coordinateSystem.AddHexagonToCoordinate(anotherHexagon, anotherCoordinate);
+            coordinateSystem.AddHexagon(anotherHexagon, anotherCoordinate);
 
             // THEN
             var retrievedHexagon = coordinateSystem.GetHexagonAtCoordinate(anotherCoordinate);
@@ -70,13 +70,13 @@ namespace Hive.Core.Tests.Models
             var hexagon = new Hexagon();
             (int column, int row) coordinate = (0, 0);
 
-            coordinateSystem.AddHexagonToCoordinate(hexagon, coordinate);
+            coordinateSystem.AddHexagon(hexagon, coordinate);
 
             // WHEN
-            coordinateSystem.RemoveHexagonFromCoordinate(coordinate);
+            coordinateSystem.RemoveHexagon(coordinate);
 
             // THEN
-            var hexagonExists = coordinateSystem.TryGetHexagonAtCoordinate(coordinate, out Hexagon? retrievedHexagon);
+            var hexagonExists = coordinateSystem.TryGetHexagon(coordinate, out Hexagon? retrievedHexagon);
             Assert.IsFalse(hexagonExists);
             Assert.IsNull(retrievedHexagon);
         }
@@ -90,7 +90,7 @@ namespace Hive.Core.Tests.Models
             (int column, int row) coordinate = (0, 0);
 
             // WHEN & THEN
-            Assert.Throws<ArgumentException>(() => coordinateSystem.RemoveHexagonFromCoordinate(coordinate));
+            Assert.Throws<ArgumentException>(() => coordinateSystem.RemoveHexagon(coordinate));
         }
 
         [TestMethod]
@@ -116,16 +116,66 @@ namespace Hive.Core.Tests.Models
             var neighborHexagon2 = new Hexagon();
             var notNeighborHexagon = new Hexagon();
 
-            coordinateSystem.AddHexagonToCoordinate(hexagon, coordinate);
-            coordinateSystem.AddHexagonToCoordinate(neighborHexagon1, (0, -1));
-            coordinateSystem.AddHexagonToCoordinate(neighborHexagon2, (1, 0));
-            coordinateSystem.AddHexagonToCoordinate(notNeighborHexagon, (2, 0));
+            coordinateSystem.AddHexagon(hexagon, coordinate);
+            coordinateSystem.AddHexagon(neighborHexagon1, (0, -1));
+            coordinateSystem.AddHexagon(neighborHexagon2, (1, 0));
+            coordinateSystem.AddHexagon(notNeighborHexagon, (2, 0));
 
             // WHEN
-            var neigborHexagons = coordinateSystem.GetPopulatedNeighborHexagonsForCoordinate(coordinate);
+            var neigborHexagons = coordinateSystem.GetPopulatedNeighborHexagons(coordinate);
 
             Assert.HasCount(2, neigborHexagons);
             CollectionAssert.AreEquivalent(new List<Hexagon>() { neighborHexagon1, neighborHexagon2 }, neigborHexagons);
+        }
+
+        [TestMethod]
+        public void Given_AddedHexagons_When_PopulatedNeighborsCoordinatesRetrieved_Then_RetrievalReturnsOnlyNeighborCoordinates()
+        {
+            // GIVEN
+            var coordinateSystem = new AxialCoordinateSystem();
+            var hexagon = new Hexagon();
+            (int column, int row) coordinate = (0, -1);
+
+            var neighborHexagon1 = new Hexagon();
+            var neighborHexagon2 = new Hexagon();
+            var notNeighborHexagon = new Hexagon();
+
+            coordinateSystem.AddHexagon(hexagon, coordinate);
+            coordinateSystem.AddHexagon(neighborHexagon1, (1, -1));
+            coordinateSystem.AddHexagon(neighborHexagon2, (0, 0));
+            coordinateSystem.AddHexagon(notNeighborHexagon, (0, 1));
+
+            // WHEN
+            var neigborHexagons = coordinateSystem.GetPopulatedNeighborCoordinates(coordinate);
+
+            Assert.HasCount(2, neigborHexagons);
+            Assert.IsTrue(new HashSet<(int column, int row)>() { (0, 0), (1, -1) }.SetEquals(neigborHexagons));
+        }
+
+        [TestMethod]
+        [DataRow(1, -1, 1, -2)]
+        [DataRow(0, 0, -1, 0)]
+        public void Given_AddedHexagons_When_SharedFreeAdjacentCoordinatesRetrieved_Then_RetrievalReturnsOnlyFreeAjacentCoordinates(int neighborColumn, int neighborRow, int freeAdjacentColumn, int freeAdjacentRow)
+        {
+            // GIVEN
+            var coordinateSystem = new AxialCoordinateSystem();
+            var hexagon = new Hexagon();
+            (int column, int row) coordinate = (0, -1);
+
+            var neighborHexagon1 = new Hexagon();
+            var neighborHexagon2 = new Hexagon();
+            var notNeighborHexagon = new Hexagon();
+
+            coordinateSystem.AddHexagon(hexagon, coordinate);
+            coordinateSystem.AddHexagon(neighborHexagon1, (1, -1));
+            coordinateSystem.AddHexagon(neighborHexagon2, (0, 0));
+            coordinateSystem.AddHexagon(notNeighborHexagon, (0, 1));
+
+            // WHEN
+            var neigborHexagons = coordinateSystem.GetSharedFreeAdjacentCoordinates(coordinate, (neighborColumn, neighborRow));
+
+            Assert.HasCount(1, neigborHexagons);
+            Assert.IsTrue(new HashSet<(int column, int row)>() { (freeAdjacentColumn, freeAdjacentRow) }.SetEquals(neigborHexagons));
         }
 
         [TestMethod]
@@ -136,7 +186,7 @@ namespace Hive.Core.Tests.Models
             (int column, int row) coordinate = (0, 0);
 
             // WHEN
-            var adjacentCoordinates = coordinateSystem.GetAdjacentCoordinatesForCoordinate(coordinate);
+            var adjacentCoordinates = coordinateSystem.GetAdjacentCoordinates(coordinate);
 
             // THEN
             Assert.HasCount(6, adjacentCoordinates);
@@ -189,7 +239,7 @@ namespace Hive.Core.Tests.Models
             var hexagon = new Hexagon();
             (int column, int row) coordinate = (0, 0);
 
-            coordinateSystem.AddHexagonToCoordinate(hexagon, coordinate);
+            coordinateSystem.AddHexagon(hexagon, coordinate);
 
             // WHEN
             var freeAdjacents = coordinateSystem.GetAllFreeAdjacentCoordinates();
@@ -231,8 +281,8 @@ namespace Hive.Core.Tests.Models
             var hexagon2 = new Hexagon();
             (int column, int row) coordinate2 = (0, -1);
 
-            coordinateSystem.AddHexagonToCoordinate(hexagon1, coordinate1);
-            coordinateSystem.AddHexagonToCoordinate(hexagon2, coordinate2);
+            coordinateSystem.AddHexagon(hexagon1, coordinate1);
+            coordinateSystem.AddHexagon(hexagon2, coordinate2);
 
             // WHEN
             var freeAdjacents = coordinateSystem.GetAllFreeAdjacentCoordinates();
@@ -286,12 +336,12 @@ namespace Hive.Core.Tests.Models
             var hexagon6 = new Hexagon();
             (int column, int row) coordinate6 = (0, 1);
 
-            coordinateSystem.AddHexagonToCoordinate(hexagon1, coordinate1);
-            coordinateSystem.AddHexagonToCoordinate(hexagon2, coordinate2);
-            coordinateSystem.AddHexagonToCoordinate(hexagon3, coordinate3);
-            coordinateSystem.AddHexagonToCoordinate(hexagon4, coordinate4);
-            coordinateSystem.AddHexagonToCoordinate(hexagon5, coordinate5);
-            coordinateSystem.AddHexagonToCoordinate(hexagon6, coordinate6);
+            coordinateSystem.AddHexagon(hexagon1, coordinate1);
+            coordinateSystem.AddHexagon(hexagon2, coordinate2);
+            coordinateSystem.AddHexagon(hexagon3, coordinate3);
+            coordinateSystem.AddHexagon(hexagon4, coordinate4);
+            coordinateSystem.AddHexagon(hexagon5, coordinate5);
+            coordinateSystem.AddHexagon(hexagon6, coordinate6);
 
             // WHEN
             var freeAdjacents = coordinateSystem.GetAllFreeAdjacentCoordinates();
@@ -338,8 +388,8 @@ namespace Hive.Core.Tests.Models
             var hexagon2 = new Hexagon();
             (int column, int row) coordinate2 = (0, -2);
 
-            coordinateSystem.AddHexagonToCoordinate(hexagon1, coordinate1);
-            coordinateSystem.AddHexagonToCoordinate(hexagon2, coordinate2);
+            coordinateSystem.AddHexagon(hexagon1, coordinate1);
+            coordinateSystem.AddHexagon(hexagon2, coordinate2);
 
             // WHEN & THEN
             Assert.Throws<InvalidOperationException>(coordinateSystem.GetAllFreeAdjacentCoordinates);
@@ -368,8 +418,8 @@ namespace Hive.Core.Tests.Models
             var hexagon2 = new Hexagon();
             (int column, int row) coordinate2 = (0, -1);
 
-            coordinateSystem.AddHexagonToCoordinate(hexagon1, coordinate1);
-            coordinateSystem.AddHexagonToCoordinate(hexagon2, coordinate2);
+            coordinateSystem.AddHexagon(hexagon1, coordinate1);
+            coordinateSystem.AddHexagon(hexagon2, coordinate2);
 
             // WHEN
             var freeAdjacents = coordinateSystem.GetAllFreeAdjacentCoordinatesWithoutHexagon(coordinate2);
@@ -403,7 +453,7 @@ namespace Hive.Core.Tests.Models
             var hexagon = new Hexagon();
             (int column, int row) coordinate = (0, 0);
 
-            coordinateSystem.AddHexagonToCoordinate(hexagon, coordinate);
+            coordinateSystem.AddHexagon(hexagon, coordinate);
 
             // WHEN
             var isAllConnected = coordinateSystem.VerifyWhetherAllHexagonsConnectedWithoutHexagon(coordinate);
@@ -430,8 +480,8 @@ namespace Hive.Core.Tests.Models
             var hexagon2 = new Hexagon();
             (int column, int row) coordinate2 = (0, 0);
 
-            coordinateSystem.AddHexagonToCoordinate(hexagon1, coordinate1);
-            coordinateSystem.AddHexagonToCoordinate(hexagon2, coordinate2);
+            coordinateSystem.AddHexagon(hexagon1, coordinate1);
+            coordinateSystem.AddHexagon(hexagon2, coordinate2);
 
             // WHEN
             var isAllConnected = coordinateSystem.VerifyWhetherAllHexagonsConnectedWithoutHexagon(coordinate2);
@@ -462,9 +512,9 @@ namespace Hive.Core.Tests.Models
             var hexagon3 = new Hexagon();
             (int column, int row) coordinate3 = (0, 0);
 
-            coordinateSystem.AddHexagonToCoordinate(hexagon1, coordinate1);
-            coordinateSystem.AddHexagonToCoordinate(hexagon2, coordinate2);
-            coordinateSystem.AddHexagonToCoordinate(hexagon3, coordinate3);
+            coordinateSystem.AddHexagon(hexagon1, coordinate1);
+            coordinateSystem.AddHexagon(hexagon2, coordinate2);
+            coordinateSystem.AddHexagon(hexagon3, coordinate3);
 
             // WHEN
             var isAllConnected = coordinateSystem.VerifyWhetherAllHexagonsConnectedWithoutHexagon(coordinate2);
@@ -502,12 +552,12 @@ namespace Hive.Core.Tests.Models
             var hexagon6 = new Hexagon();
             (int column, int row) coordinate6 = (0, 1);
 
-            coordinateSystem.AddHexagonToCoordinate(hexagon1, coordinate1);
-            coordinateSystem.AddHexagonToCoordinate(hexagon2, coordinate2);
-            coordinateSystem.AddHexagonToCoordinate(hexagon3, coordinate3);
-            coordinateSystem.AddHexagonToCoordinate(hexagon4, coordinate4);
-            coordinateSystem.AddHexagonToCoordinate(hexagon5, coordinate5);
-            coordinateSystem.AddHexagonToCoordinate(hexagon6, coordinate6);
+            coordinateSystem.AddHexagon(hexagon1, coordinate1);
+            coordinateSystem.AddHexagon(hexagon2, coordinate2);
+            coordinateSystem.AddHexagon(hexagon3, coordinate3);
+            coordinateSystem.AddHexagon(hexagon4, coordinate4);
+            coordinateSystem.AddHexagon(hexagon5, coordinate5);
+            coordinateSystem.AddHexagon(hexagon6, coordinate6);
 
             // WHEN
             var isAllConnected = coordinateSystem.VerifyWhetherAllHexagonsConnectedWithoutHexagon(coordinate2);
@@ -526,8 +576,8 @@ namespace Hive.Core.Tests.Models
             var hexagon2 = new Hexagon();
             (int column, int row) coordinate2 = (1, -1);
 
-            coordinateSystem.AddHexagonToCoordinate(hexagon1, coordinate1);
-            coordinateSystem.AddHexagonToCoordinate(hexagon2, coordinate2);
+            coordinateSystem.AddHexagon(hexagon1, coordinate1);
+            coordinateSystem.AddHexagon(hexagon2, coordinate2);
 
             var retrievedCoordinateSystem = coordinateSystem.GetAllCoordinates();
 
@@ -571,15 +621,15 @@ namespace Hive.Core.Tests.Models
             var hexagon6 = new Hexagon();
             (int column, int row) coordinate6 = (0, 1);
 
-            coordinateSystem.AddHexagonToCoordinate(hexagon1, coordinate1);
-            coordinateSystem.AddHexagonToCoordinate(hexagon2, coordinate2);
-            coordinateSystem.AddHexagonToCoordinate(hexagon3, coordinate3);
-            coordinateSystem.AddHexagonToCoordinate(hexagon4, coordinate4);
-            coordinateSystem.AddHexagonToCoordinate(hexagon5, coordinate5);
-            coordinateSystem.AddHexagonToCoordinate(hexagon6, coordinate6);
+            coordinateSystem.AddHexagon(hexagon1, coordinate1);
+            coordinateSystem.AddHexagon(hexagon2, coordinate2);
+            coordinateSystem.AddHexagon(hexagon3, coordinate3);
+            coordinateSystem.AddHexagon(hexagon4, coordinate4);
+            coordinateSystem.AddHexagon(hexagon5, coordinate5);
+            coordinateSystem.AddHexagon(hexagon6, coordinate6);
 
             // WHEN
-            var sharedNighbors = coordinateSystem.GetSharedPopulatedNeighborHexagonsForCoordinates(coordinate3, coordinate2);
+            var sharedNighbors = coordinateSystem.GetSharedPopulatedNeighborHexagons(coordinate3, coordinate2);
 
             // THEN
             Assert.HasCount(1, sharedNighbors);

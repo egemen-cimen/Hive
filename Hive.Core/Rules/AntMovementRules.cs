@@ -6,7 +6,7 @@ namespace Hive.Core.Rules
     {
         public MovementValidationResult ValidatePieceMovement(ICoordinateSystem coordinateSystem,
             (int column, int row) startCoordinate,
-            (int column, int row) endCoordinate,
+            (int column, int row) destinationCoordinate,
             PlayerColor playerTurnColor,
             int turnNumber
             )

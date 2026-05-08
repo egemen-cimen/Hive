@@ -20,7 +20,7 @@ namespace Hive.Core
 
             var hexagon = new Hexagon();
             hexagon.PushPiece(piece);
-            _coordinateSystem.AddHexagonToCoordinate(hexagon, coordinate);
+            _coordinateSystem.AddHexagon(hexagon, coordinate);
 
             return true;
         }
