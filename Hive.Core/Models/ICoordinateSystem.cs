@@ -12,7 +12,7 @@
 
         public List<Hexagon> GetSharedPopulatedNeighborHexagons((int column, int row) coordinate1, (int column, int row) coordinate2);
 
-        public List<(int column, int row)> GetAdjacentCoordinates((int column, int row) coordinate);
+        public HashSet<(int column, int row)> GetAdjacentCoordinates((int column, int row) coordinate);
 
         public HashSet<(int column, int row)> GetSharedFreeAdjacentCoordinates((int column, int row) coordinate1, (int column, int row) coordinate2);
 

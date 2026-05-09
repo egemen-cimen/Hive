@@ -190,7 +190,7 @@ namespace Hive.Core.Tests.Models
 
             // THEN
             Assert.HasCount(6, adjacentCoordinates);
-            var expectedCoordinates = new List<(int column, int row)>() {
+            var expectedCoordinates = new HashSet<(int column, int row)>() {
                 (0, -1),
                 (1, -1),
                 (-1, 0),
@@ -199,7 +199,7 @@ namespace Hive.Core.Tests.Models
                 (0, 1)
             };
 
-            CollectionAssert.AreEquivalent(expectedCoordinates, adjacentCoordinates);
+            Assert.IsTrue(expectedCoordinates.SetEquals(adjacentCoordinates));
         }
 
         [TestMethod]

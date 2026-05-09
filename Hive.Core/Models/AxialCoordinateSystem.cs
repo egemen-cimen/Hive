@@ -75,9 +75,9 @@
             return sharedNeighbors;
         }
 
-        public List<(int column, int row)> GetAdjacentCoordinates((int column, int row) coordinate)
+        public HashSet<(int column, int row)> GetAdjacentCoordinates((int column, int row) coordinate)
         {
-            var adjacentCoordinates = new List<(int column, int row)>();
+            var adjacentCoordinates = new HashSet<(int column, int row)>();
             foreach (var direction in _adjacentDirections)
             {
                 adjacentCoordinates.Add(SumTwoCoordinates(direction, coordinate));
