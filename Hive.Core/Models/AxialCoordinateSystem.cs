@@ -41,6 +41,7 @@
 
             return neighbors;
         }
+
         public HashSet<(int column, int row)> GetPopulatedNeighborCoordinates((int column, int row) coordinate)
         {
             var populatedNeighborCoordinates = new HashSet<(int column, int row)>();
