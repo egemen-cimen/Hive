@@ -282,15 +282,15 @@ namespace Hive.Core.Tests.Rules
 
             // Movement doesn't have continious contact with the hive
             //
-            // 	            [ 1,-2] [ 2,-2]
-            // 
-            //     [-1,-1]                 [ 2,-1]
-            // 
-            // [-2, 0]                         [ 2, 0]
-            // 
-            //     [-2, 1]                 [ 1, 1]
-            // 
-            //         [-2, 2] [-1, 2] [ 0, 2]
+            //  	            [ 1,-2] [ 2,-2]
+            //
+            //      [-1,-1]                 [ 2,-1]
+            //
+            //  [-2, 0]                         [ 2, 0]
+            //
+            //      [-2, 1]                 [ 1, 1]
+            //
+            //          [-2, 2] [-1, 2] [ 0, 2]
             //
             // Queen is at [-1,-1] and it cannot move to [ 0,-2]
             var coordinateSystem = CoordinateSystemPopulationHelper.CreatePopulatedCoordinateSystem(
@@ -323,11 +323,11 @@ namespace Hive.Core.Tests.Rules
 
             // Queen cannot move/slide into the center
             //
-            //     [ 0,-1] [ 1,-1]
-            // 
-            // [-1, 0]         [ 1, 0]
-            // 
-            //     [-1, 1] [ 0, 1]
+            //      [ 0,-1] [ 1,-1]
+            //
+            //  [-1, 0]         [ 1, 0]
+            //
+            //      [-1, 1] [ 0, 1]
             var coordinateSystem = CoordinateSystemPopulationHelper.CreatePopulatedCoordinateSystem(
             [
                 (( 0,-1), typeof(QueenPiece)),
