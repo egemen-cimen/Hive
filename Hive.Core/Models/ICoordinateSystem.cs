@@ -43,7 +43,7 @@
         /// Gets all possible adjacent coordinates of the given coordinate. Does not check if it's populated or not.
         /// </summary>
         /// <param name="coordinate"></param>
-        /// <returns>Collection of coordinates</returns>
+        /// <returns>Collection of all adjacent coordinates</returns>
         public HashSet<(int column, int row)> GetAdjacentCoordinates((int column, int row) coordinate);
 
         /// <summary>
@@ -51,7 +51,7 @@
         /// </summary>
         /// <param name="coordinate1"></param>
         /// <param name="coordinate2"></param>
-        /// <returns>Collection of coordinates</returns>
+        /// <returns>Collection of free coordinates</returns>
         public HashSet<(int column, int row)> GetSharedFreeAdjacentCoordinates((int column, int row) coordinate1, (int column, int row) coordinate2);
 
         /// <summary>
@@ -63,20 +63,20 @@
         /// <summary>
         /// Gets all the coordinates from the coordinate system.
         /// </summary>
-        /// <returns>Collection of coordinates</returns>
+        /// <returns>Collection of all coordinates</returns>
         public HashSet<(int column, int row)> GetAllCoordinates();
 
         /// <summary>
         /// Gets all free adjacent coordinates for the entire coordinate system.
         /// </summary>
-        /// <returns>Collection of coordinates</returns>
+        /// <returns>Collection of free coordinates</returns>
         public HashSet<(int column, int row)> GetAllFreeAdjacentCoordinates();
 
         /// <summary>
         /// Gets all free adjacent coordinates for the entire coordinate system if the hexagon at the coordinate was free.
         /// </summary>
         /// <param name="coordinate"></param>
-        /// <returns>Collection of coordinates</returns>
+        /// <returns>Collection of free coordinates</returns>
         public HashSet<(int column, int row)> GetAllFreeAdjacentCoordinatesWithoutHexagon((int column, int row) coordinate);
 
         /// <summary>
