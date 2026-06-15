@@ -47,7 +47,13 @@ namespace Hive.Core.Tests.Rules
         [DataRow(2, -2)]
         [DataRow(-1, 0)]
         [DataRow(-1, 1)]
-        public void Given_PopulatedCoordinateSystem_When_SpiderLessNotThreeSpaceMomementIsValidated_Then_ReturnsValidationFail(int endColumn, int endRow)
+        [DataRow(-2, 3)]
+        [DataRow(-1, 3)]
+        [DataRow(0, 3)]
+        [DataRow(1, 2)]
+        [DataRow(1, 1)]
+        [DataRow(1, 0)]
+        public void Given_PopulatedCoordinateSystem_When_SpiderNotThreeSpaceMomementIsValidated_Then_ReturnsValidationFail(int endColumn, int endRow)
         {
             // GIVEN
 

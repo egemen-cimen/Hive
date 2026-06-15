@@ -234,5 +234,18 @@
 
             return result;
         }
+
+        public HashSet<(int column, int row)> GetPopulatedNeighborCoordinatesWithoutHexagon((int column, int row) coordinate, (int column, int row) hexagonCoordinate)
+        {
+            var hexagon = GetHexagonAtCoordinate(hexagonCoordinate);
+
+            RemoveHexagon(hexagonCoordinate);
+
+            var result = GetPopulatedNeighborCoordinates(coordinate);
+
+            AddHexagon(hexagon, hexagonCoordinate);
+
+            return result;
+        }
     }
 }

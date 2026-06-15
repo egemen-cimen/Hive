@@ -11,33 +11,39 @@ namespace Hive.Core.Rules
             int turnNumber
             )
         {
-            var currentCoordinate = startCoordinate;
             var visitedCoordinates = new HashSet<(int column, int row)>();
             var validDestinationCoordinates = new HashSet<(int column, int row)>();
+            var nextStepAndCoordinates = new Stack<(int step, (int column, int row))>();
+            nextStepAndCoordinates.Push((0, startCoordinate));
 
-            // ---
-
-            for (var step = 1; step <= 3; step++)
+            while (nextStepAndCoordinates.Count > 0)
             {
-                visitedCoordinates.Add(currentCoordinate);
-                var directContactNeighborHexagons = coordinateSystem.GetPopulatedNeighborCoordinates(currentCoordinate);
-                directContactNeighborHexagons.ExceptWith(visitedCoordinates);
-                var sharedFreeCoordinates = GetSharedFreeAdjacentsWithNeighbors(coordinateSystem, currentCoordinate, directContactNeighborHexagons);
-                var nextStepDestinationCoordinate = sharedFreeCoordinates.First(); // TODO: also branch to other option
-                currentCoordinate = nextStepDestinationCoordinate;
-
+                var (step, currentCoordinate) = nextStepAndCoordinates.Pop();
                 if (step == 3)
                 {
                     validDestinationCoordinates.Add(currentCoordinate);
+                    continue;
+                }
+
+                visitedCoordinates.Add(currentCoordinate);
+
+                var directContactNeighborHexagons = coordinateSystem.GetPopulatedNeighborCoordinatesWithoutHexagon(currentCoordinate, startCoordinate);
+
+                var sharedFreeCoordinates = GetSharedFreeAdjacentsWithNeighbors(coordinateSystem, currentCoordinate, directContactNeighborHexagons);
+                sharedFreeCoordinates.ExceptWith(visitedCoordinates);
+
+                foreach (var sharedFreeCoordinate in sharedFreeCoordinates)
+                {
+                    nextStepAndCoordinates.Push((step + 1, sharedFreeCoordinate)); 
                 }
             }
- 
+
             if (validDestinationCoordinates.Contains(destinationCoordinate))
             {
-                return MovementValidationResult.VALID; 
+                return MovementValidationResult.VALID;
             }
 
-            return MovementValidationResult.PIECE_CANNOT_REACH_DESTINATION; 
+            return MovementValidationResult.PIECE_CANNOT_REACH_DESTINATION;
 
             static HashSet<(int column, int row)> GetSharedFreeAdjacentsWithNeighbors(ICoordinateSystem coordinateSystem, (int column, int row) currentCoordinate, HashSet<(int column, int row)> directContactNeighborHexagons)
             {

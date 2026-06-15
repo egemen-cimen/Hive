@@ -31,6 +31,8 @@
         /// <returns>Collection of populated neighbor coordinates</returns>
         public HashSet<(int column, int row)> GetPopulatedNeighborCoordinates((int column, int row) coordinate);
 
+        public HashSet<(int column, int row)> GetPopulatedNeighborCoordinatesWithoutHexagon((int column, int row) coordinate, (int column, int row) hexagonCoordinate);
+
         /// <summary>
         /// Gets only the neighbor hexagons common for given coordinates.
         /// </summary>
