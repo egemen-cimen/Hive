@@ -1,0 +1,14 @@
+﻿namespace Hive.Core.Rules
+{
+    public enum SpawnValidationResult
+    {
+        VALID,
+        WRONG_COLOR_PLACED,
+        QUEEN_WAS_NOT_PLACED_UNTIL_FOURTH_TURN,
+        QUEEN_CANNOT_BE_PLACED_ON_FIRST_TURN,
+        ANOTHER_PIECE_AT_DESTINATION,
+        PIECE_DID_NOT_TOUCH_THE_HIVE,
+        PIECE_TOUCHED_ENEMY_PIECE,
+        MORE_THAN_AVAILABLE_PIECES_SPAWNED
+    }
+}

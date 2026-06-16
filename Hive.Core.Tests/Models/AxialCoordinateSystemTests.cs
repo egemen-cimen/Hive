@@ -13,7 +13,7 @@ namespace Hive.Core.Tests.Models
             var hexagon = new Hexagon();
             (int column, int row) coordinate = (0, 0);
 
-            coordinateSystem.AddHexagonToCoordinate(hexagon, coordinate);
+            coordinateSystem.AddHexagon(hexagon, coordinate);
 
             // WHEN
             var retrievedHexagon = coordinateSystem.GetHexagonAtCoordinate(coordinate);
@@ -33,10 +33,10 @@ namespace Hive.Core.Tests.Models
             var anotherHexagon = new Hexagon();
             (int column, int row) coordinate = (0, 0);
 
-            coordinateSystem.AddHexagonToCoordinate(hexagon, coordinate);
+            coordinateSystem.AddHexagon(hexagon, coordinate);
 
             // WHEN & THEN
-            Assert.Throws<ArgumentException>(() => coordinateSystem.AddHexagonToCoordinate(anotherHexagon, coordinate));
+            Assert.Throws<ArgumentException>(() => coordinateSystem.AddHexagon(anotherHexagon, coordinate));
         }
 
         [TestMethod]
@@ -51,10 +51,10 @@ namespace Hive.Core.Tests.Models
             var anotherHexagon = new Hexagon();
             (int column, int row) anotherCoordinate = (1, -1);
 
-            coordinateSystem.AddHexagonToCoordinate(hexagon, coordinate);
+            coordinateSystem.AddHexagon(hexagon, coordinate);
 
             // WHEN
-            coordinateSystem.AddHexagonToCoordinate(anotherHexagon, anotherCoordinate);
+            coordinateSystem.AddHexagon(anotherHexagon, anotherCoordinate);
 
             // THEN
             var retrievedHexagon = coordinateSystem.GetHexagonAtCoordinate(anotherCoordinate);
@@ -70,13 +70,13 @@ namespace Hive.Core.Tests.Models
             var hexagon = new Hexagon();
             (int column, int row) coordinate = (0, 0);
 
-            coordinateSystem.AddHexagonToCoordinate(hexagon, coordinate);
+            coordinateSystem.AddHexagon(hexagon, coordinate);
 
             // WHEN
-            coordinateSystem.RemoveHexagonFromCoordinate(coordinate);
+            coordinateSystem.RemoveHexagon(coordinate);
 
             // THEN
-            var hexagonExists = coordinateSystem.TryGetHexagonAtCoordinate(coordinate, out Hexagon? retrievedHexagon);
+            var hexagonExists = coordinateSystem.TryGetHexagon(coordinate, out Hexagon? retrievedHexagon);
             Assert.IsFalse(hexagonExists);
             Assert.IsNull(retrievedHexagon);
         }
@@ -90,7 +90,7 @@ namespace Hive.Core.Tests.Models
             (int column, int row) coordinate = (0, 0);
 
             // WHEN & THEN
-            Assert.Throws<ArgumentException>(() => coordinateSystem.RemoveHexagonFromCoordinate(coordinate));
+            Assert.Throws<ArgumentException>(() => coordinateSystem.RemoveHexagon(coordinate));
         }
 
         [TestMethod]
@@ -116,16 +116,78 @@ namespace Hive.Core.Tests.Models
             var neighborHexagon2 = new Hexagon();
             var notNeighborHexagon = new Hexagon();
 
-            coordinateSystem.AddHexagonToCoordinate(hexagon, coordinate);
-            coordinateSystem.AddHexagonToCoordinate(neighborHexagon1, (0, -1));
-            coordinateSystem.AddHexagonToCoordinate(neighborHexagon2, (1, 0));
-            coordinateSystem.AddHexagonToCoordinate(notNeighborHexagon, (2, 0));
+            coordinateSystem.AddHexagon(hexagon, coordinate);
+            coordinateSystem.AddHexagon(neighborHexagon1, (0, -1));
+            coordinateSystem.AddHexagon(neighborHexagon2, (1, 0));
+            coordinateSystem.AddHexagon(notNeighborHexagon, (2, 0));
 
             // WHEN
-            var neigborHexagons = coordinateSystem.GetPopulatedNeighborHexagonsForCoordinate(coordinate);
+            var neigborHexagons = coordinateSystem.GetPopulatedNeighborHexagons(coordinate);
 
             Assert.HasCount(2, neigborHexagons);
             CollectionAssert.AreEquivalent(new List<Hexagon>() { neighborHexagon1, neighborHexagon2 }, neigborHexagons);
+        }
+
+        [TestMethod]
+        public void Given_AddedHexagons_When_PopulatedNeighborsCoordinatesRetrieved_Then_RetrievalReturnsOnlyNeighborCoordinates()
+        {
+            // GIVEN
+            var coordinateSystem = new AxialCoordinateSystem();
+            var hexagon = new Hexagon();
+            (int column, int row) coordinate = (0, -1);
+
+            var neighborHexagon1 = new Hexagon();
+            var neighborHexagon2 = new Hexagon();
+            var notNeighborHexagon = new Hexagon();
+
+            coordinateSystem.AddHexagon(hexagon, coordinate);
+            coordinateSystem.AddHexagon(neighborHexagon1, (1, -1));
+            coordinateSystem.AddHexagon(neighborHexagon2, (0, 0));
+            coordinateSystem.AddHexagon(notNeighborHexagon, (0, 1));
+
+            // WHEN
+            var neigborHexagons = coordinateSystem.GetPopulatedNeighborCoordinates(coordinate);
+
+            Assert.HasCount(2, neigborHexagons);
+            Assert.IsTrue(new HashSet<(int column, int row)>() { (0, 0), (1, -1) }.SetEquals(neigborHexagons));
+        }
+
+        [TestMethod]
+        [DataRow(1, -1, 1, -2)]
+        [DataRow(0, 0, -1, 0)]
+        public void Given_AddedHexagons_When_SharedFreeAdjacentCoordinatesRetrieved_Then_RetrievalReturnsOnlyFreeAjacentCoordinates(int neighborColumn, int neighborRow, int freeAdjacentColumn, int freeAdjacentRow)
+        {
+            // GIVEN
+
+            // Three hexagons in a line.
+            //
+            //              [ 1,-2]
+            //
+            //          [ 0,-1] [ 1,-1]
+            //
+            //      [-1, 0] [ q, r]
+            //
+            //                  [ 0, 1]
+            //
+            // Where q is column and r is row.
+            var coordinateSystem = new AxialCoordinateSystem();
+            var hexagon = new Hexagon();
+            (int column, int row) coordinate = (0, -1);
+
+            var neighborHexagon1 = new Hexagon();
+            var neighborHexagon2 = new Hexagon();
+            var notNeighborHexagon = new Hexagon();
+
+            coordinateSystem.AddHexagon(hexagon, coordinate);
+            coordinateSystem.AddHexagon(neighborHexagon1, (1, -1));
+            coordinateSystem.AddHexagon(neighborHexagon2, (0, 0));
+            coordinateSystem.AddHexagon(notNeighborHexagon, (0, 1));
+
+            // WHEN
+            var neigborHexagons = coordinateSystem.GetSharedFreeAdjacentCoordinates(coordinate, (neighborColumn, neighborRow));
+
+            Assert.HasCount(1, neigborHexagons);
+            Assert.IsTrue(new HashSet<(int column, int row)>() { (freeAdjacentColumn, freeAdjacentRow) }.SetEquals(neigborHexagons));
         }
 
         [TestMethod]
@@ -136,11 +198,11 @@ namespace Hive.Core.Tests.Models
             (int column, int row) coordinate = (0, 0);
 
             // WHEN
-            var adjacentCoordinates = coordinateSystem.GetAdjacentCoordinatesForCoordinate(coordinate);
+            var adjacentCoordinates = coordinateSystem.GetAdjacentCoordinates(coordinate);
 
             // THEN
             Assert.HasCount(6, adjacentCoordinates);
-            var expectedCoordinates = new List<(int column, int row)>() {
+            var expectedCoordinates = new HashSet<(int column, int row)>() {
                 (0, -1),
                 (1, -1),
                 (-1, 0),
@@ -149,7 +211,7 @@ namespace Hive.Core.Tests.Models
                 (0, 1)
             };
 
-            CollectionAssert.AreEquivalent(expectedCoordinates, adjacentCoordinates);
+            Assert.IsTrue(expectedCoordinates.SetEquals(adjacentCoordinates));
         }
 
         [TestMethod]
@@ -170,26 +232,25 @@ namespace Hive.Core.Tests.Models
             Assert.IsTrue(expectedCoordinates.SetEquals(freeAdjacents));
         }
 
-        /// <summary>
-        /// Single hexagon in the middle should return all the spaces around it.
-        /// 
-        ///     [ 0,-1] [ 1,-1]
-        /// 
-        /// [-1, 0] [ q, r] [ 1, 0]
-        /// 
-        ///     [-1, 1] [ 0, 1]
-        /// 
-        /// Where q is column and r is row.
-        /// </summary>
         [TestMethod]
         public void Given_AddedHexagon_When_RetrievedAllFreeAdjacents_Then_ReturnsSixCoordinates()
         {
             // GIVEN
+
+            // Single hexagon in the middle should return all the spaces around it.
+            //
+            //      [ 0,-1] [ 1,-1]
+            //
+            //  [-1, 0] [ q, r] [ 1, 0]
+            //
+            //      [-1, 1] [ 0, 1]
+            //
+            // Where q is column and r is row.
             var coordinateSystem = new AxialCoordinateSystem();
             var hexagon = new Hexagon();
             (int column, int row) coordinate = (0, 0);
 
-            coordinateSystem.AddHexagonToCoordinate(hexagon, coordinate);
+            coordinateSystem.AddHexagon(hexagon, coordinate);
 
             // WHEN
             var freeAdjacents = coordinateSystem.GetAllFreeAdjacentCoordinates();
@@ -208,31 +269,30 @@ namespace Hive.Core.Tests.Models
             Assert.IsTrue(expectedCoordinates.SetEquals(freeAdjacents));
         }
 
-        /// <summary>
-        /// Two hexagons in should return all the empty spaces around it.
-        /// 
-        ///     [ 0,-2] [ 1,-2]
-        /// 
-        /// [-1,-1] [ 0,-1] [ 1,-1]
-        /// 
-        ///     [-1, 0] [ q, r] [ 1, 0]
-        /// 
-        ///         [-1, 1] [ 0, 1]
-        /// 
-        /// Where q is column and r is row.
-        /// </summary>
         [TestMethod]
         public void Given_AddedHexagons_When_RetrievedAllFreeAdjacents_Then_ReturnsAllFreeCoordinates()
         {
             // GIVEN
+
+            // Two hexagons in should return all the empty spaces around it.
+            //
+            //      [ 0,-2] [ 1,-2]
+            //
+            //  [-1,-1] [ 0,-1] [ 1,-1]
+            //
+            //      [-1, 0] [ q, r] [ 1, 0]
+            //
+            //          [-1, 1] [ 0, 1]
+            //
+            // Where q is column and r is row.
             var coordinateSystem = new AxialCoordinateSystem();
             var hexagon1 = new Hexagon();
             (int column, int row) coordinate1 = (0, 0);
             var hexagon2 = new Hexagon();
             (int column, int row) coordinate2 = (0, -1);
 
-            coordinateSystem.AddHexagonToCoordinate(hexagon1, coordinate1);
-            coordinateSystem.AddHexagonToCoordinate(hexagon2, coordinate2);
+            coordinateSystem.AddHexagon(hexagon1, coordinate1);
+            coordinateSystem.AddHexagon(hexagon2, coordinate2);
 
             // WHEN
             var freeAdjacents = coordinateSystem.GetAllFreeAdjacentCoordinates();
@@ -253,25 +313,24 @@ namespace Hive.Core.Tests.Models
             Assert.IsTrue(expectedCoordinates.SetEquals(freeAdjacents));
         }
 
-        /// <summary>
-        /// A cycle with hexagons should return all the free spaces around and inside it.
-        /// 
-        /// 	    [ 0,-2] [ 1,-2] [ 2,-2]
-        /// 
-        ///     [-1,-1] [ 0,-1] [ 1,-1] [ 2,-1]
-        /// 
-        /// [-2, 0] [-1, 0] [ q, r] [ 1, 0] [ 2, 0]
-        /// 
-        ///     [-2, 1] [-1, 1] [ 0, 1] [ 1, 1]
-        /// 
-        ///         [-2, 2] [-1, 2] [ 0, 2]
-        /// 
-        /// Where q is column and r is row.
-        /// </summary>
         [TestMethod]
         public void Given_AddedHexagonsInACycle_When_RetrievedAllFreeAdjacents_Then_ReturnsAllFreeCoordinates()
         {
             // GIVEN
+
+            // A cycle with hexagons should return all the free spaces around and inside it.
+            //
+            //  	    [ 0,-2] [ 1,-2] [ 2,-2]
+            //
+            //      [-1,-1] [ 0,-1] [ 1,-1] [ 2,-1]
+            //
+            //  [-2, 0] [-1, 0] [ q, r] [ 1, 0] [ 2, 0]
+            //
+            //      [-2, 1] [-1, 1] [ 0, 1] [ 1, 1]
+            //
+            //          [-2, 2] [-1, 2] [ 0, 2]
+            //
+            // Where q is column and r is row.
             var coordinateSystem = new AxialCoordinateSystem();
             var hexagon1 = new Hexagon();
             (int column, int row) coordinate1 = (0, -1);
@@ -286,12 +345,12 @@ namespace Hive.Core.Tests.Models
             var hexagon6 = new Hexagon();
             (int column, int row) coordinate6 = (0, 1);
 
-            coordinateSystem.AddHexagonToCoordinate(hexagon1, coordinate1);
-            coordinateSystem.AddHexagonToCoordinate(hexagon2, coordinate2);
-            coordinateSystem.AddHexagonToCoordinate(hexagon3, coordinate3);
-            coordinateSystem.AddHexagonToCoordinate(hexagon4, coordinate4);
-            coordinateSystem.AddHexagonToCoordinate(hexagon5, coordinate5);
-            coordinateSystem.AddHexagonToCoordinate(hexagon6, coordinate6);
+            coordinateSystem.AddHexagon(hexagon1, coordinate1);
+            coordinateSystem.AddHexagon(hexagon2, coordinate2);
+            coordinateSystem.AddHexagon(hexagon3, coordinate3);
+            coordinateSystem.AddHexagon(hexagon4, coordinate4);
+            coordinateSystem.AddHexagon(hexagon5, coordinate5);
+            coordinateSystem.AddHexagon(hexagon6, coordinate6);
 
             // WHEN
             var freeAdjacents = coordinateSystem.GetAllFreeAdjacentCoordinates();
@@ -317,50 +376,90 @@ namespace Hive.Core.Tests.Models
             Assert.IsTrue(expectedCoordinates.SetEquals(freeAdjacents));
         }
 
-        /// <summary>
-        /// Two hexagons are NOT connected.
-        /// 
-        /// [ 0,-2]
-        /// 
-        /// 
-        /// 
-        ///         [ q, r]
-        /// 
-        /// Where q is column and r is row.
-        /// </summary>
         [TestMethod]
         public void Given_AddedUnreachableHexagons_When_RetrievedAllFreeAdjacents_Then_ThrowsException()
         {
             // GIVEN
+
+            // Two hexagons are NOT connected.
+            //
+            //  [ 0,-2]
+            //
+            //
+            //
+            //          [ q, r]
+            //
+            // Where q is column and r is row.
             var coordinateSystem = new AxialCoordinateSystem();
             var hexagon1 = new Hexagon();
             (int column, int row) coordinate1 = (0, 0);
             var hexagon2 = new Hexagon();
             (int column, int row) coordinate2 = (0, -2);
 
-            coordinateSystem.AddHexagonToCoordinate(hexagon1, coordinate1);
-            coordinateSystem.AddHexagonToCoordinate(hexagon2, coordinate2);
+            coordinateSystem.AddHexagon(hexagon1, coordinate1);
+            coordinateSystem.AddHexagon(hexagon2, coordinate2);
 
             // WHEN & THEN
             Assert.Throws<InvalidOperationException>(coordinateSystem.GetAllFreeAdjacentCoordinates);
         }
 
-        /// <summary>
-        /// Single hexagon in the middle.
-        /// 
-        /// [ q, r]
-        /// 
-        /// Where q is column and r is row.
-        /// </summary>
+        [TestMethod]
+        public void Given_AddedTwoHexagons_When_RetrievedAllFreeAdjacentsWithoutOne_Then_ReturnsAllFreeCoordinates()
+        {
+            // GIVEN
+
+            // Two hexagons without one should return all the empty spaces around the other.
+            //
+            //      [ 0,-2] [ 1,-2]
+            //
+            //  [-1,-1] [ 0,-1] [ 1,-1]
+            //
+            //      [-1, 0] [ q, r] [ 1, 0]
+            //
+            //          [-1, 1] [ 0, 1]
+            //
+            // Where q is column and r is row.
+            var coordinateSystem = new AxialCoordinateSystem();
+            var hexagon1 = new Hexagon();
+            (int column, int row) coordinate1 = (0, 0);
+            var hexagon2 = new Hexagon();
+            (int column, int row) coordinate2 = (0, -1);
+
+            coordinateSystem.AddHexagon(hexagon1, coordinate1);
+            coordinateSystem.AddHexagon(hexagon2, coordinate2);
+
+            // WHEN
+            var freeAdjacents = coordinateSystem.GetAllFreeAdjacentCoordinatesWithoutHexagon(coordinate2);
+
+            // THEN
+            Assert.HasCount(6, freeAdjacents);
+            var expectedCoordinates = new HashSet<(int column, int row)>() {
+                ( 0,-1),
+                ( 1,-1),
+                (-1, 0),
+                ( 1, 0),
+                (-1, 1),
+                ( 0, 1)
+            };
+
+            Assert.IsTrue(expectedCoordinates.SetEquals(freeAdjacents));
+        }
+
         [TestMethod]
         public void Given_AddedHexagon_When_CheckedWhetherAllConnectedWithoutIt_Then_ReturnsTrue()
         {
             // GIVEN
+
+            // Single hexagon in the middle.
+            //
+            //  [ q, r]
+            //
+            // Where q is column and r is row.
             var coordinateSystem = new AxialCoordinateSystem();
             var hexagon = new Hexagon();
             (int column, int row) coordinate = (0, 0);
 
-            coordinateSystem.AddHexagonToCoordinate(hexagon, coordinate);
+            coordinateSystem.AddHexagon(hexagon, coordinate);
 
             // WHEN
             var isAllConnected = coordinateSystem.VerifyWhetherAllHexagonsConnectedWithoutHexagon(coordinate);
@@ -369,26 +468,26 @@ namespace Hive.Core.Tests.Models
             Assert.IsTrue(isAllConnected);
         }
 
-        /// <summary>
-        /// Hexagon is connected after removing one of them.
-        /// 
-        /// [ 0,-1]
-        /// 
-        ///     [ q, r]
-        /// 
-        /// Where q is column and r is row.
         [TestMethod]
         public void Given_AddedHexagons_When_CheckedWhetherAllConnectedWithoutOne_Then_ReturnsTrue()
         {
             // GIVEN
+
+            // Hexagon is connected after removing one of them.
+            //
+            //  [ 0,-1]
+            //
+            //      [ q, r]
+            //
+            // Where q is column and r is row.
             var coordinateSystem = new AxialCoordinateSystem();
             var hexagon1 = new Hexagon();
             (int column, int row) coordinate1 = (0, -1);
             var hexagon2 = new Hexagon();
             (int column, int row) coordinate2 = (0, 0);
 
-            coordinateSystem.AddHexagonToCoordinate(hexagon1, coordinate1);
-            coordinateSystem.AddHexagonToCoordinate(hexagon2, coordinate2);
+            coordinateSystem.AddHexagon(hexagon1, coordinate1);
+            coordinateSystem.AddHexagon(hexagon2, coordinate2);
 
             // WHEN
             var isAllConnected = coordinateSystem.VerifyWhetherAllHexagonsConnectedWithoutHexagon(coordinate2);
@@ -397,20 +496,20 @@ namespace Hive.Core.Tests.Models
             Assert.IsTrue(isAllConnected);
         }
 
-        /// <summary>
-        /// Two hexagons are NOT connected after removing the middle one.
-        /// 
-        /// [ 0,-2]
-        /// 
-        ///     [ 0,-1]
-        /// 
-        ///         [ q, r]
-        /// 
-        /// Where q is column and r is row.
         [TestMethod]
         public void Given_AddedHexagons_When_CheckedWhetherAllConnectedWithoutMiddleOne_Then_ReturnsFalse()
         {
             // GIVEN
+
+            // Two hexagons are NOT connected after removing the middle one.
+            //
+            //  [ 0,-2]
+            //
+            //      [ 0,-1]
+            //
+            //          [ q, r]
+            //
+            // Where q is column and r is row.
             var coordinateSystem = new AxialCoordinateSystem();
             var hexagon1 = new Hexagon();
             (int column, int row) coordinate1 = (0, -2);
@@ -419,9 +518,9 @@ namespace Hive.Core.Tests.Models
             var hexagon3 = new Hexagon();
             (int column, int row) coordinate3 = (0, 0);
 
-            coordinateSystem.AddHexagonToCoordinate(hexagon1, coordinate1);
-            coordinateSystem.AddHexagonToCoordinate(hexagon2, coordinate2);
-            coordinateSystem.AddHexagonToCoordinate(hexagon3, coordinate3);
+            coordinateSystem.AddHexagon(hexagon1, coordinate1);
+            coordinateSystem.AddHexagon(hexagon2, coordinate2);
+            coordinateSystem.AddHexagon(hexagon3, coordinate3);
 
             // WHEN
             var isAllConnected = coordinateSystem.VerifyWhetherAllHexagonsConnectedWithoutHexagon(coordinate2);
@@ -430,22 +529,20 @@ namespace Hive.Core.Tests.Models
             Assert.IsFalse(isAllConnected);
         }
 
-
-        /// <summary>
-        /// A cycle with hexagons are connected after removing one.
-        ///  
-        ///     [ 0,-1] [ 1,-1]
-        /// 
-        /// [-1, 0] [ q, r] [ 1, 0]
-        /// 
-        ///     [-1, 1] [ 0, 1]
-        /// 
-        /// Where q is column and r is row.
-        /// </summary>
         [TestMethod]
         public void Given_AddedHexagonsInACycle_When_CheckedWhetherAllConnectedWithoutOne_Then_ReturnsTrue()
         {
             // GIVEN
+
+            // A cycle with hexagons are connected after removing one.
+            //
+            //      [ 0,-1] [ 1,-1]
+            //
+            //  [-1, 0] [ q, r] [ 1, 0]
+            //
+            //      [-1, 1] [ 0, 1]
+            //
+            // Where q is column and r is row.
             var coordinateSystem = new AxialCoordinateSystem();
             var hexagon1 = new Hexagon();
             (int column, int row) coordinate1 = (0, -1);
@@ -460,18 +557,87 @@ namespace Hive.Core.Tests.Models
             var hexagon6 = new Hexagon();
             (int column, int row) coordinate6 = (0, 1);
 
-            coordinateSystem.AddHexagonToCoordinate(hexagon1, coordinate1);
-            coordinateSystem.AddHexagonToCoordinate(hexagon2, coordinate2);
-            coordinateSystem.AddHexagonToCoordinate(hexagon3, coordinate3);
-            coordinateSystem.AddHexagonToCoordinate(hexagon4, coordinate4);
-            coordinateSystem.AddHexagonToCoordinate(hexagon5, coordinate5);
-            coordinateSystem.AddHexagonToCoordinate(hexagon6, coordinate6);
+            coordinateSystem.AddHexagon(hexagon1, coordinate1);
+            coordinateSystem.AddHexagon(hexagon2, coordinate2);
+            coordinateSystem.AddHexagon(hexagon3, coordinate3);
+            coordinateSystem.AddHexagon(hexagon4, coordinate4);
+            coordinateSystem.AddHexagon(hexagon5, coordinate5);
+            coordinateSystem.AddHexagon(hexagon6, coordinate6);
 
             // WHEN
             var isAllConnected = coordinateSystem.VerifyWhetherAllHexagonsConnectedWithoutHexagon(coordinate2);
 
             // THEN
             Assert.IsTrue(isAllConnected);
+        }
+
+        [TestMethod]
+        public void Given_CoordinateSystemRetrived_When_ChangesMadeToResult_Then_ChangesShouldNotAffectOriginal()
+        {
+            // GIVEN
+            var coordinateSystem = new AxialCoordinateSystem();
+            var hexagon1 = new Hexagon();
+            (int column, int row) coordinate1 = (0, -1);
+            var hexagon2 = new Hexagon();
+            (int column, int row) coordinate2 = (1, -1);
+
+            coordinateSystem.AddHexagon(hexagon1, coordinate1);
+            coordinateSystem.AddHexagon(hexagon2, coordinate2);
+
+            var retrievedCoordinateSystem = coordinateSystem.GetAllCoordinates();
+
+            // WHEN
+            retrievedCoordinateSystem.Add((-1, 0));
+            var anotherRetrievedCoordinateSystem = coordinateSystem.GetAllCoordinates();
+
+            // THEN
+            Assert.HasCount(2, anotherRetrievedCoordinateSystem);
+            Assert.IsTrue(anotherRetrievedCoordinateSystem.TryGetValue((0, -1), out _));
+            Assert.IsTrue(anotherRetrievedCoordinateSystem.TryGetValue((1, -1), out _));
+            Assert.IsFalse(anotherRetrievedCoordinateSystem.TryGetValue((-1, 0), out _));
+        }
+
+        [TestMethod]
+        public void Given_AddedHexagonsInACycle_When_SharedPopulatedNeighborsRetrieved_Then_ReturnsCollection()
+        {
+            // GIVEN
+
+            // A cycle with hexagons are connected and all have two neighbors.
+            //
+            //      [ 0,-1] [ 1,-1]
+            //
+            //  [-1, 0] [ q, r] [ 1, 0]
+            //
+            //      [-1, 1] [ 0, 1]
+            //
+            // Where q is column and r is row.
+            var coordinateSystem = new AxialCoordinateSystem();
+            var hexagon1 = new Hexagon();
+            (int column, int row) coordinate1 = (0, -1);
+            var hexagon2 = new Hexagon();
+            (int column, int row) coordinate2 = (1, -1);
+            var hexagon3 = new Hexagon();
+            (int column, int row) coordinate3 = (-1, 0);
+            var hexagon4 = new Hexagon();
+            (int column, int row) coordinate4 = (1, 0);
+            var hexagon5 = new Hexagon();
+            (int column, int row) coordinate5 = (-1, 1);
+            var hexagon6 = new Hexagon();
+            (int column, int row) coordinate6 = (0, 1);
+
+            coordinateSystem.AddHexagon(hexagon1, coordinate1);
+            coordinateSystem.AddHexagon(hexagon2, coordinate2);
+            coordinateSystem.AddHexagon(hexagon3, coordinate3);
+            coordinateSystem.AddHexagon(hexagon4, coordinate4);
+            coordinateSystem.AddHexagon(hexagon5, coordinate5);
+            coordinateSystem.AddHexagon(hexagon6, coordinate6);
+
+            // WHEN
+            var sharedNighbors = coordinateSystem.GetSharedPopulatedNeighborHexagons(coordinate3, coordinate2);
+
+            // THEN
+            Assert.HasCount(1, sharedNighbors);
+            Assert.AreEqual(hexagon1, sharedNighbors.First());
         }
     }
 }

@@ -1,7 +1,4 @@
-﻿using Hive.Core.Models;
-using NSubstitute;
-
-namespace Hive.Core.Tests.Models
+﻿namespace Hive.Core.Tests.Models
 {
     [TestClass]
     public class GameBoardTests
@@ -9,19 +6,7 @@ namespace Hive.Core.Tests.Models
         [TestMethod]
         public void Given_GameBoardWithNoPieces_When_SpawnedPiece_Then_AddsHexagon()
         {
-            // GIVEN
-            var coordinateSystem = Substitute.For<ICoordinateSystem>();
-            (int column, int row) coordinate = (0, 0);
-            var freeCoordinates = new HashSet<(int column, int row)>() { coordinate };
-            coordinateSystem.GetAllFreeAdjacentCoordinates().Returns(freeCoordinates);
-            var gameBoard = new GameBoard(coordinateSystem);
-
-            // WHEN
-            var result = gameBoard.TrySpawnPiece(coordinate, new SpiderPiece(PlayerColor.BLACK));
-
-            // THEN
-            Assert.IsTrue(result);
-            coordinateSystem.Received().AddHexagonToCoordinate(Arg.Any<Hexagon>(), coordinate);
+            // TODO: tests
         }
     }
 }

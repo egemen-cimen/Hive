@@ -8,6 +8,8 @@
 
         public IPiece PopPiece() => Pieces.Pop();
 
+        public IPiece PeekPiece() => Pieces.Peek();
+
         public PlayerColor GetColor() => Pieces.Peek().Color;
 
         public int GetPieceCount() => Pieces.Count;
