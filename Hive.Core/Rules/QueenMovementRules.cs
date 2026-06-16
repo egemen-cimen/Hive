@@ -22,9 +22,15 @@ namespace Hive.Core.Rules
                 return MovementValidationResult.NO_PIECE_TO_MOVE;
             }
 
-            if (hexagonAtStart!.PeekPiece() is not QueenPiece)
+            var topPiece = hexagonAtStart!.PeekPiece();
+            if (topPiece is not QueenPiece)
             {
                 return MovementValidationResult.WRONG_VALIDATOR_FOR_PIECE_TYPE;
+            }
+
+            if (topPiece.Color != playerTurnColor)
+            {
+                return MovementValidationResult.WRONG_COLORED_PIECE;
             }
 
             var allAdjacentCoordinatesForStart = coordinateSystem.GetAdjacentCoordinates(startCoordinate);
@@ -55,9 +61,10 @@ namespace Hive.Core.Rules
                 return MovementValidationResult.PIECE_CANNOT_REACH_DESTINATION;
             }
 
+            // Two shared populated neighbors mean that the piece cannot slide into the space.
             if (sharedPopulatedNeighborHexagons.Count == 2)
             {
-                return MovementValidationResult.PIECE_CANNOT_SLIDE_INTO_SPACE;
+                return MovementValidationResult.PIECE_CANNOT_REACH_DESTINATION;
             }
 
             return MovementValidationResult.VALID;

@@ -276,11 +276,11 @@ namespace Hive.Core.Tests.Rules
         }
 
         [TestMethod]
-        public void Given_CoordinateSystemWithPiecesInACShape_When_QueenMomementToOtherSizeIsValidated_Then_ReturnsValidationFail()
+        public void Given_CoordinateSystemWithPiecesInACShape_When_QueenMomementToOtherSideIsValidated_Then_ReturnsValidationFail()
         {
             // GIVEN
 
-            // Movement doesn't have continious contact with the hive
+            // Movement doesn't have continuous contact with the hive
             //
             //  	            [ 1,-2] [ 2,-2]
             //
@@ -343,7 +343,35 @@ namespace Hive.Core.Tests.Rules
             var result = queenMovementRules.ValidatePieceMovement(coordinateSystem, (0, -1), (0, 0), PlayerColor.WHITE, 20);
 
             // THEN
-            Assert.AreEqual(MovementValidationResult.PIECE_CANNOT_SLIDE_INTO_SPACE, result);
+            Assert.AreEqual(MovementValidationResult.PIECE_CANNOT_REACH_DESTINATION, result);
+        }
+
+        [TestMethod]
+        public void Given_CoordinateSystem_When_WrongColoredQueenMomementValidated_Then_ReturnsValidationFail()
+        {
+            // GIVEN
+
+            //      [ 0,-1] [ 1,-1]
+            //
+            //  [-1, 0]         [ 1, 0]
+            //
+            //      [-1, 1] [ 0, 1]
+            var coordinateSystem = CoordinateSystemPopulationHelper.CreatePopulatedCoordinateSystem(
+            [
+                (( 0,-1), typeof(QueenPiece)),
+                (( 1,-1), typeof(QueenPiece)),
+                (( 1, 0), typeof(SpiderPiece)),
+                (( 0, 1), typeof(SpiderPiece)),
+                ((-1, 1), typeof(AntPiece)),
+                ((-1, 0), typeof(AntPiece))
+            ]);
+            var queenMovementRules = new QueenMovementRules();
+
+            // WHEN
+            var result = queenMovementRules.ValidatePieceMovement(coordinateSystem, (1, -1), (1, -2), PlayerColor.WHITE, 20);
+
+            // THEN
+            Assert.AreEqual(MovementValidationResult.WRONG_COLORED_PIECE, result);
         }
     }
 }
