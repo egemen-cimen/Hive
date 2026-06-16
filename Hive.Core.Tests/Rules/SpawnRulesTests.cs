@@ -202,5 +202,122 @@ namespace Hive.Core.Tests.Rules
             // THEN
             Assert.AreEqual(SpawnValidationResult.QUEEN_CANNOT_BE_PLACED_ON_FIRST_TURN, result);
         }
+
+        [TestMethod]
+        public void Given_CoordinateSystemWithOneWhiteQueen_When_AnotherQueenPieceSpawnValidated_Then_ReturnsValidationFail()
+        {
+            // GIVEN
+
+            var coordinateSystem = CoordinateSystemPopulationHelper.CreatePopulatedCoordinateSystem(
+            [
+                (( 0,  0), typeof(SpiderPiece)),
+                (( 0,  1), typeof(SpiderPiece)),
+                (( 0, -1), typeof(QueenPiece)),
+                (( 0,  2), typeof(QueenPiece))
+            ]);
+
+            // WHEN
+            var piece = new QueenPiece(PlayerColor.WHITE);
+            var result = SpawnRules.ValidatePieceSpawn(piece, coordinateSystem, (0, -2), PlayerColor.WHITE, 3);
+
+            // THEN
+            Assert.AreEqual(SpawnValidationResult.MORE_THAN_AVAILABLE_PIECES_SPAWNED, result);
+        }
+
+        [TestMethod]
+        public void Given_CoordinateSystemWithTwoWhiteSpiderPieces_When_AnotherSpiderPieceSpawnValidated_Then_ReturnsValidationFail()
+        {
+            // GIVEN
+
+            var coordinateSystem = CoordinateSystemPopulationHelper.CreatePopulatedCoordinateSystem(
+            [
+                (( 0,  0), typeof(SpiderPiece)),
+                (( 0,  1), typeof(SpiderPiece)),
+                (( 0, -1), typeof(QueenPiece)),
+                (( 0,  2), typeof(QueenPiece)),
+                (( 0, -2), typeof(SpiderPiece)),
+                (( 0,  3), typeof(SpiderPiece))
+            ]);
+
+            // WHEN
+            var piece = new SpiderPiece(PlayerColor.WHITE);
+            var result = SpawnRules.ValidatePieceSpawn(piece, coordinateSystem, (0, -3), PlayerColor.WHITE, 4);
+
+            // THEN
+            Assert.AreEqual(SpawnValidationResult.MORE_THAN_AVAILABLE_PIECES_SPAWNED, result);
+        }
+
+        [TestMethod]
+        public void Given_CoordinateSystemWithTwoWhiteBeetlePieces_When_AnotherBeetlePieceSpawnValidated_Then_ReturnsValidationFail()
+        {
+            // GIVEN
+
+            var coordinateSystem = CoordinateSystemPopulationHelper.CreatePopulatedCoordinateSystem(
+            [
+                (( 0,  0), typeof(BeetlePiece)),
+                (( 0,  1), typeof(BeetlePiece)),
+                (( 0, -1), typeof(QueenPiece)),
+                (( 0,  2), typeof(QueenPiece)),
+                (( 0, -2), typeof(BeetlePiece)),
+                (( 0,  3), typeof(BeetlePiece))
+            ]);
+
+            // WHEN
+            var piece = new BeetlePiece(PlayerColor.WHITE);
+            var result = SpawnRules.ValidatePieceSpawn(piece, coordinateSystem, (0, -3), PlayerColor.WHITE, 4);
+
+            // THEN
+            Assert.AreEqual(SpawnValidationResult.MORE_THAN_AVAILABLE_PIECES_SPAWNED, result);
+        }
+
+        [TestMethod]
+        public void Given_CoordinateSystemWithThreeWhiteGrasshopperPieces_When_AnotherGrasshopperPieceSpawnValidated_Then_ReturnsValidationFail()
+        {
+            // GIVEN
+
+            var coordinateSystem = CoordinateSystemPopulationHelper.CreatePopulatedCoordinateSystem(
+            [
+                (( 0,  0), typeof(GrasshopperPiece)),
+                (( 0,  1), typeof(GrasshopperPiece)),
+                (( 0, -1), typeof(QueenPiece)),
+                (( 0,  2), typeof(QueenPiece)),
+                (( 0, -2), typeof(GrasshopperPiece)),
+                (( 0,  3), typeof(GrasshopperPiece)),
+                (( 0, -3), typeof(GrasshopperPiece)),
+                (( 0,  4), typeof(GrasshopperPiece))
+            ]);
+
+            // WHEN
+            var piece = new GrasshopperPiece(PlayerColor.WHITE);
+            var result = SpawnRules.ValidatePieceSpawn(piece, coordinateSystem, (0, -4), PlayerColor.WHITE, 5);
+
+            // THEN
+            Assert.AreEqual(SpawnValidationResult.MORE_THAN_AVAILABLE_PIECES_SPAWNED, result);
+        }
+
+        [TestMethod]
+        public void Given_CoordinateSystemWithThreeWhiteAntPieces_When_AnotherAntPieceSpawnValidated_Then_ReturnsValidationFail()
+        {
+            // GIVEN
+
+            var coordinateSystem = CoordinateSystemPopulationHelper.CreatePopulatedCoordinateSystem(
+            [
+                (( 0,  0), typeof(AntPiece)),
+                (( 0,  1), typeof(AntPiece)),
+                (( 0, -1), typeof(QueenPiece)),
+                (( 0,  2), typeof(QueenPiece)),
+                (( 0, -2), typeof(AntPiece)),
+                (( 0,  3), typeof(AntPiece)),
+                (( 0, -3), typeof(AntPiece)),
+                (( 0,  4), typeof(AntPiece))
+            ]);
+
+            // WHEN
+            var piece = new AntPiece(PlayerColor.WHITE);
+            var result = SpawnRules.ValidatePieceSpawn(piece, coordinateSystem, (0, -4), PlayerColor.WHITE, 5);
+
+            // THEN
+            Assert.AreEqual(SpawnValidationResult.MORE_THAN_AVAILABLE_PIECES_SPAWNED, result);
+        }
     }
 }

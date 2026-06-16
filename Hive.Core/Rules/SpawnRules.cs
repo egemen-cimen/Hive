@@ -4,6 +4,15 @@ namespace Hive.Core.Rules
 {
     public class SpawnRules
     {
+        private static readonly Dictionary<string, int> AVAILABLE_PIECE_COUNTS = new()
+        {
+            [QueenPiece.Name] = 1,
+            [SpiderPiece.Name] = 2,
+            [BeetlePiece.Name] = 2,
+            [GrasshopperPiece.Name] = 3,
+            [AntPiece.Name] = 3,
+        };
+
         public static SpawnValidationResult ValidatePieceSpawn(IPiece piece,
             ICoordinateSystem coordinateSystem,
             (int column, int row) spawnCoordinate,
@@ -45,9 +54,48 @@ namespace Hive.Core.Rules
                 return SpawnValidationResult.PIECE_TOUCHED_ENEMY_PIECE;
             }
 
-            // TODO: check whether the player has that piece in their inventory
+            // Check whether the player has that piece in their inventory.
+            var allPlayerPieces = CountSpawnedPlayerPieces(coordinateSystem, playerTurnColor);
+            if (allPlayerPieces.TryGetValue(piece.GetPieceName(), out int pieceCount))
+            {
+                if (pieceCount + 1 > AVAILABLE_PIECE_COUNTS[piece.GetPieceName()])
+                {
+                    return SpawnValidationResult.MORE_THAN_AVAILABLE_PIECES_SPAWNED;
+                }
+            }
 
             return SpawnValidationResult.VALID;
+
+            static Dictionary<string, int> CountSpawnedPlayerPieces(ICoordinateSystem coordinateSystem, PlayerColor playerTurnColor)
+            {
+                var allPlayerPieces = new Dictionary<string, int>();
+
+                var allCoordinates = coordinateSystem.GetAllCoordinates();
+                foreach (var populatedCoordinate in allCoordinates)
+                {
+                    coordinateSystem.TryGetHexagon(populatedCoordinate, out var hexagon);
+
+                    var allHexagonPieces = hexagon!.GetAllPieces();
+                    foreach (var piece in allHexagonPieces)
+                    {
+                        if (piece.Color != playerTurnColor)
+                        {
+                            continue;
+                        }
+
+                        if (allPlayerPieces.TryGetValue(piece.GetPieceName(), out var count))
+                        {
+                            allPlayerPieces[piece.GetPieceName()] = count + 1;
+                        }
+                        else
+                        {
+                            allPlayerPieces[piece.GetPieceName()] = 1;
+                        }
+                    }
+                }
+
+                return allPlayerPieces;
+            }
         }
     }
 }

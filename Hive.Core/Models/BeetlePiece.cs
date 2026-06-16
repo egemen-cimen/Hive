@@ -3,11 +3,7 @@
     public class BeetlePiece(PlayerColor color) : IPiece
     {
         public PlayerColor Color { get; } = color;
-        private static string Name => "Beetle";
-
-        public string GetPieceName()
-        {
-            return Name;
-        }
+        public static string Name => "Beetle";
+        public string GetPieceName() => Name;
     }
 }

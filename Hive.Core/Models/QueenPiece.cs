@@ -3,11 +3,7 @@
     public class QueenPiece(PlayerColor color) : IPiece
     {
         public PlayerColor Color { get; } = color;
-        private static string Name => "Queen";
-
-        public string GetPieceName()
-        {
-            return Name;
-        }
+        public static string Name => "Queen";
+        public string GetPieceName() => Name;
     }
 }
