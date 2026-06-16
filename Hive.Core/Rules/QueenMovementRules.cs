@@ -30,7 +30,7 @@ namespace Hive.Core.Rules
 
             if (topPiece.Color != playerTurnColor)
             {
-                return MovementValidationResult.WRONG_COLORED_PIECE;
+                return MovementValidationResult.WRONG_COLOR_MOVED;
             }
 
             var allAdjacentCoordinatesForStart = coordinateSystem.GetAdjacentCoordinates(startCoordinate);

@@ -421,7 +421,7 @@ namespace Hive.Core.Tests.Rules
             var result = spiderMovementRules.ValidatePieceMovement(coordinateSystem, (0, 1), (-2, 1), PlayerColor.WHITE, 20);
 
             // THEN
-            Assert.AreEqual(MovementValidationResult.WRONG_COLORED_PIECE, result);
+            Assert.AreEqual(MovementValidationResult.WRONG_COLOR_MOVED, result);
         }
     }
 }

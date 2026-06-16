@@ -371,7 +371,7 @@ namespace Hive.Core.Tests.Rules
             var result = queenMovementRules.ValidatePieceMovement(coordinateSystem, (1, -1), (1, -2), PlayerColor.WHITE, 20);
 
             // THEN
-            Assert.AreEqual(MovementValidationResult.WRONG_COLORED_PIECE, result);
+            Assert.AreEqual(MovementValidationResult.WRONG_COLOR_MOVED, result);
         }
     }
 }
