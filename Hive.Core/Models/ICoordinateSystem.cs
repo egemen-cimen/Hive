@@ -31,6 +31,12 @@
         /// <returns>Collection of populated neighbor coordinates</returns>
         public HashSet<(int column, int row)> GetPopulatedNeighborCoordinates((int column, int row) coordinate);
 
+        /// <summary>
+        /// Gets the coordinates for the neighbor hexagons of the first coordinate if the hexagon at the second coordinate was free.
+        /// </summary>
+        /// <param name="coordinate"></param>
+        /// <param name="hexagonCoordinate"></param>
+        /// <returns></returns>
         public HashSet<(int column, int row)> GetPopulatedNeighborCoordinatesWithoutHexagon((int column, int row) coordinate, (int column, int row) hexagonCoordinate);
 
         /// <summary>
@@ -87,6 +93,5 @@
         /// <param name="coordinate"></param>
         /// <returns>true if all the hexagons would be connected; otherwise, false</returns>
         public bool VerifyWhetherAllHexagonsConnectedWithoutHexagon((int column, int row) coordinate);
-
     }
 }
