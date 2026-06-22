@@ -9,7 +9,7 @@ namespace Hive.Core.Tests.Rules
         [TestMethod]
         [DataRow(2, -1)]
         [DataRow(-2, 2)]
-        public void Given_PopulatedCoordinateSystem_When_SpiderThreeSpaceMomementIsValidated_Then_ReturnsValid(int endColumn, int endRow)
+        public void Given_PopulatedCoordinateSystem_When_SpiderThreeSpaceMovementIsValidated_Then_ReturnsValid(int endColumn, int endRow)
         {
             // GIVEN
 
@@ -53,7 +53,7 @@ namespace Hive.Core.Tests.Rules
         [DataRow(1, 2)]
         [DataRow(1, 1)]
         [DataRow(1, 0)]
-        public void Given_PopulatedCoordinateSystem_When_SpiderNotThreeSpaceMomementIsValidated_Then_ReturnsValidationFail(int endColumn, int endRow)
+        public void Given_PopulatedCoordinateSystem_When_SpiderNotThreeSpaceMovementIsValidated_Then_ReturnsValidationFail(int endColumn, int endRow)
         {
             // GIVEN
 
@@ -87,7 +87,7 @@ namespace Hive.Core.Tests.Rules
         }
 
         [TestMethod]
-        public void Given_PopulatedCoordinateSystem_When_SpiderThreeSpaceMomementToOccupiedSpaceIsValidated_Then_ReturnsValidationFail()
+        public void Given_PopulatedCoordinateSystem_When_SpiderThreeSpaceMovementToOccupiedSpaceIsValidated_Then_ReturnsValidationFail()
         {
             // GIVEN
 
@@ -155,7 +155,7 @@ namespace Hive.Core.Tests.Rules
         }
 
         [TestMethod]
-        public void Given_PopulatedCoordinateSystem_When_EmptySpaceMomementIsValidated_Then_ReturnsValidationFail()
+        public void Given_PopulatedCoordinateSystem_When_EmptySpaceMovementIsValidated_Then_ReturnsValidationFail()
         {
             // GIVEN
 
@@ -187,7 +187,7 @@ namespace Hive.Core.Tests.Rules
         }
 
         [TestMethod]
-        public void Given_PopulatedCoordinateSystem_When_MiddlePieceMomementIsValidated_Then_ReturnsValidationFail()
+        public void Given_PopulatedCoordinateSystem_When_MiddlePieceMovementIsValidated_Then_ReturnsValidationFail()
         {
             // GIVEN
 
@@ -224,7 +224,7 @@ namespace Hive.Core.Tests.Rules
         }
 
         [TestMethod]
-        public void Given_PopulatedCoordinateSystem_When_SpiderOneSpaceMomementToUnconnectedSpaceIsValidated_Then_ReturnsValidationFail()
+        public void Given_PopulatedCoordinateSystem_When_SpiderOneSpaceMovementToUnconnectedSpaceIsValidated_Then_ReturnsValidationFail()
         {
             // GIVEN
 
@@ -258,7 +258,7 @@ namespace Hive.Core.Tests.Rules
         }
 
         [TestMethod]
-        public void Given_PopulatedCoordinateSystem_When_SpiderMomementWithSameCoordinatesIsValidated_Then_ReturnsValidationFail()
+        public void Given_PopulatedCoordinateSystem_When_SpiderMovementWithSameCoordinatesIsValidated_Then_ReturnsValidationFail()
         {
             // GIVEN
 
@@ -292,7 +292,7 @@ namespace Hive.Core.Tests.Rules
         }
 
         [TestMethod]
-        public void Given_CoordinateSystemWithPiecesInACShape_When_SpiderMomementToOtherSideIsValidated_Then_ReturnsValidationFail()
+        public void Given_CoordinateSystemWithPiecesInACShape_When_SpiderMovementToOtherSideIsValidated_Then_ReturnsValidationFail()
         {
             // GIVEN
 
@@ -333,7 +333,7 @@ namespace Hive.Core.Tests.Rules
         }
 
         [TestMethod]
-        public void Given_CoordinateSystemWithPiecesInACShape_When_SpiderMomementToCenterOfCircleValidated_Then_ReturnsValidationFail()
+        public void Given_CoordinateSystemWithPiecesInACShape_When_SpiderMovementToCenterOfCircleValidated_Then_ReturnsValidationFail()
         {
             // GIVEN
 
@@ -365,7 +365,7 @@ namespace Hive.Core.Tests.Rules
         }
 
         [TestMethod]
-        public void Given_PopulatedCoordinateSystemWithNoQueen_WhenSpiderMomementIsValidated_Then_ReturnsValidationFail()
+        public void Given_PopulatedCoordinateSystemWithNoQueen_WhenSpiderMovementIsValidated_Then_ReturnsValidationFail()
         {
             // GIVEN
 
@@ -397,7 +397,7 @@ namespace Hive.Core.Tests.Rules
         }
 
         [TestMethod]
-        public void Given_PopulatedCoordinateSystem_When_WrongColoredSpiderMomementIsValidated_Then_ReturnsValidationFail()
+        public void Given_PopulatedCoordinateSystem_When_WrongColoredSpiderMovementIsValidated_Then_ReturnsValidationFail()
         {
             // GIVEN
 

@@ -9,7 +9,7 @@ namespace Hive.Core.Tests.Rules
         [TestMethod]
         [DataRow(0, -1)]
         [DataRow(1, 0)]
-        public void Given_PopulatedCoordinateSystem_When_QueenOneSpaceMomementIsValidated_Then_ReturnsValid(int endColumn, int endRow)
+        public void Given_PopulatedCoordinateSystem_When_QueenOneSpaceMovementIsValidated_Then_ReturnsValid(int endColumn, int endRow)
         {
             // GIVEN
 
@@ -45,7 +45,7 @@ namespace Hive.Core.Tests.Rules
         [DataRow(-1, 1)]
         [DataRow(-1, 2)]
         [DataRow(1, 1)]
-        public void Given_PopulatedCoordinateSystem_When_QueenTwoSpaceMomementIsValidated_Then_ReturnsValidationFail(int endColumn, int endRow)
+        public void Given_PopulatedCoordinateSystem_When_QueenTwoSpaceMovementIsValidated_Then_ReturnsValidationFail(int endColumn, int endRow)
         {
             // GIVEN
 
@@ -77,7 +77,7 @@ namespace Hive.Core.Tests.Rules
         }
 
         [TestMethod]
-        public void Given_PopulatedCoordinateSystem_When_QueenOneSpaceMomementToOccupiedSpaceIsValidated_Then_ReturnsValidationFail()
+        public void Given_PopulatedCoordinateSystem_When_QueenOneSpaceMovementToOccupiedSpaceIsValidated_Then_ReturnsValidationFail()
         {
             // GIVEN
 
@@ -143,7 +143,7 @@ namespace Hive.Core.Tests.Rules
         }
 
         [TestMethod]
-        public void Given_PopulatedCoordinateSystem_When_EmptySpaceMomementIsValidated_Then_ReturnsValidationFail()
+        public void Given_PopulatedCoordinateSystem_When_EmptySpaceMovementIsValidated_Then_ReturnsValidationFail()
         {
             // GIVEN
 
@@ -175,7 +175,7 @@ namespace Hive.Core.Tests.Rules
         }
 
         [TestMethod]
-        public void Given_PopulatedCoordinateSystem_When_MiddlePieceMomementIsValidated_Then_ReturnsValidationFail()
+        public void Given_PopulatedCoordinateSystem_When_MiddlePieceMovementIsValidated_Then_ReturnsValidationFail()
         {
             // GIVEN
 
@@ -212,7 +212,7 @@ namespace Hive.Core.Tests.Rules
         }
 
         [TestMethod]
-        public void Given_PopulatedCoordinateSystem_When_QueenOneSpaceMomementToUnconnectedSpaceIsValidated_Then_ReturnsValidationFail()
+        public void Given_PopulatedCoordinateSystem_When_QueenOneSpaceMovementToUnconnectedSpaceIsValidated_Then_ReturnsValidationFail()
         {
             // GIVEN
 
@@ -244,7 +244,7 @@ namespace Hive.Core.Tests.Rules
         }
 
         [TestMethod]
-        public void Given_PopulatedCoordinateSystem_When_QueenMomementWithSameCoordinatesIsValidated_Then_ReturnsValidationFail()
+        public void Given_PopulatedCoordinateSystem_When_QueenMovementWithSameCoordinatesIsValidated_Then_ReturnsValidationFail()
         {
             // GIVEN
 
@@ -276,7 +276,7 @@ namespace Hive.Core.Tests.Rules
         }
 
         [TestMethod]
-        public void Given_CoordinateSystemWithPiecesInACShape_When_QueenMomementToOtherSideIsValidated_Then_ReturnsValidationFail()
+        public void Given_CoordinateSystemWithPiecesInACShape_When_QueenMovementToOtherSideIsValidated_Then_ReturnsValidationFail()
         {
             // GIVEN
 
@@ -317,7 +317,7 @@ namespace Hive.Core.Tests.Rules
         }
 
         [TestMethod]
-        public void Given_CoordinateSystemWithPiecesInACircle_When_QueenMomementToCenterOfCircleValidated_Then_ReturnsValidationFail()
+        public void Given_CoordinateSystemWithPiecesInACircle_When_QueenMovementToCenterOfCircleValidated_Then_ReturnsValidationFail()
         {
             // GIVEN
 
@@ -347,7 +347,7 @@ namespace Hive.Core.Tests.Rules
         }
 
         [TestMethod]
-        public void Given_CoordinateSystem_When_WrongColoredQueenMomementValidated_Then_ReturnsValidationFail()
+        public void Given_CoordinateSystem_When_WrongColoredQueenMovementValidated_Then_ReturnsValidationFail()
         {
             // GIVEN
 
