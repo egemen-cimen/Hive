@@ -32,33 +32,34 @@ namespace Hive.Core.Rules
                 return MovementValidationResult.WRONG_COLOR_MOVED;
             }
 
-            if (coordinateSystem.TryGetHexagon(destinationCoordinate, out _))
+            // Validation for non-beetle pieces
+            if (typeof(T) != typeof(BeetlePiece))
             {
-                return MovementValidationResult.DESTINATION_IS_NOT_EMPTY;
-            }
+                if (coordinateSystem.TryGetHexagon(destinationCoordinate, out _))
+                {
+                    return MovementValidationResult.DESTINATION_IS_NOT_EMPTY;
+                }
 
-            if (!coordinateSystem.VerifyWhetherAllHexagonsConnectedWithoutHexagon(startCoordinate))
-            {
-                return MovementValidationResult.BREAKS_ONE_HIVE;
-            }
+                if (!coordinateSystem.VerifyWhetherAllHexagonsConnectedWithoutHexagon(startCoordinate))
+                {
+                    return MovementValidationResult.BREAKS_ONE_HIVE;
+                }
 
-            var allFreeAdjacentCoordinatesWithout = coordinateSystem.GetAllFreeAdjacentCoordinatesWithoutHexagon(startCoordinate);
-            if (!allFreeAdjacentCoordinatesWithout.Contains(destinationCoordinate))
-            {
-                return MovementValidationResult.BREAKS_ONE_HIVE;
-            }
-
-            if (typeof(T) == typeof(QueenPiece))
-            {
-                return MovementValidationResult.VALID;
+                var allFreeAdjacentCoordinatesWithout = coordinateSystem.GetAllFreeAdjacentCoordinatesWithoutHexagon(startCoordinate);
+                if (!allFreeAdjacentCoordinatesWithout.Contains(destinationCoordinate))
+                {
+                    return MovementValidationResult.BREAKS_ONE_HIVE;
+                }
             }
 
             // Validation for non-queen pieces
-
-            var queenExists = VerifyWhetherQueenIsSpawned(coordinateSystem, playerTurnColor);
-            if (!queenExists)
+            if (typeof(T) != typeof(QueenPiece))
             {
-                return MovementValidationResult.CANNOT_MOVE_WITHOUT_QUEEN;
+                var queenExists = VerifyWhetherQueenIsSpawned(coordinateSystem, playerTurnColor);
+                if (!queenExists)
+                {
+                    return MovementValidationResult.CANNOT_MOVE_WITHOUT_QUEEN;
+                }
             }
 
             return MovementValidationResult.VALID;
