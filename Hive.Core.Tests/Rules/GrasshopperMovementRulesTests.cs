@@ -310,7 +310,7 @@ namespace Hive.Core.Tests.Rules
             //
             //          [-2, 2] [-1, 2] [ 0, 2]
             //
-            // Grasshopper is at [-1,-1] and it cannot move to [ 2,-3]
+            // Grasshopper is at [-1,-1] and it cannot move to [ 0,-2]
             var coordinateSystem = CoordinateSystemPopulationHelper.CreatePopulatedCoordinateSystem(
             [
                 ((-1,-1), typeof(GrasshopperPiece)),
@@ -328,7 +328,7 @@ namespace Hive.Core.Tests.Rules
             var grasshopperMovementRules = new GrasshopperMovementRules();
 
             // WHEN
-            var result = grasshopperMovementRules.ValidatePieceMovement(coordinateSystem, (-1, -1), (2, -3), PlayerColor.WHITE);
+            var result = grasshopperMovementRules.ValidatePieceMovement(coordinateSystem, (-1, -1), (0, -2), PlayerColor.WHITE);
 
             // THEN
             Assert.AreEqual(MovementValidationResult.PIECE_CANNOT_REACH_DESTINATION, result);

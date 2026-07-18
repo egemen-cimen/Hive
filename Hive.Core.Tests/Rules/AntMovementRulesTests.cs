@@ -155,7 +155,7 @@ namespace Hive.Core.Tests.Rules
             var antMovementRules = new AntMovementRules();
 
             // WHEN
-            var result = antMovementRules.ValidatePieceMovement(coordinateSystem, (0, -1), (-1, 2), PlayerColor.WHITE);
+            var result = antMovementRules.ValidatePieceMovement(coordinateSystem, (0, -1), (0, 0), PlayerColor.WHITE);
 
             // THEN
             Assert.AreEqual(MovementValidationResult.DESTINATION_IS_NOT_EMPTY, result);
