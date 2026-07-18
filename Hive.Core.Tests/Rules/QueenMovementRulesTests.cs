@@ -276,7 +276,7 @@ namespace Hive.Core.Tests.Rules
         }
 
         [TestMethod]
-        public void Given_CoordinateSystemWithPiecesInACShape_When_QueenMovementToOtherSideIsValidated_Then_ReturnsValidationFail()
+        public void Given_CoordinateSystemWithPiecesInABigCShape_When_QueenMovementToOtherSideIsValidated_Then_ReturnsValidationFail()
         {
             // GIVEN
 

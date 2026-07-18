@@ -294,23 +294,136 @@ namespace Hive.Core.Tests.Rules
         }
 
         [TestMethod]
-        public void Given_CoordinateSystemWithPiecesInACShape_When_GrasshopperMovementToOtherSideIsValidated_Then_ReturnsValidationFail()
+        public void Given_CoordinateSystemWithPiecesInABigCShape_When_GrasshopperMovementToOtherSideIsValidated_Then_ReturnsValidationFail()
         {
+            // GIVEN
+
+            // Movement doesn't have continuous contact with the hive
+            //
+            //  	            [ 1,-2] [ 2,-2]
+            //
+            //      [-1,-1]                 [ 2,-1]
+            //
+            //  [-2, 0]                         [ 2, 0]
+            //
+            //      [-2, 1]                 [ 1, 1]
+            //
+            //          [-2, 2] [-1, 2] [ 0, 2]
+            //
+            // Grasshopper is at [-1,-1] and it cannot move to [ 2,-3]
+            var coordinateSystem = CoordinateSystemPopulationHelper.CreatePopulatedCoordinateSystem(
+            [
+                ((-1,-1), typeof(GrasshopperPiece)),
+                ((-2, 0), typeof(SpiderPiece)),
+                ((-2, 1), typeof(QueenPiece)),
+                ((-2, 2), typeof(QueenPiece)),
+                ((-1, 2), typeof(AntPiece)),
+                (( 0, 2), typeof(AntPiece)),
+                (( 1, 1), typeof(AntPiece)),
+                (( 2, 0), typeof(AntPiece)),
+                (( 2,-1), typeof(BeetlePiece)),
+                (( 2,-2), typeof(BeetlePiece)),
+                (( 1,-2), typeof(BeetlePiece))
+            ]);
+            var grasshopperMovementRules = new GrasshopperMovementRules();
+
+            // WHEN
+            var result = grasshopperMovementRules.ValidatePieceMovement(coordinateSystem, (-1, -1), (2, -3), PlayerColor.WHITE);
+
+            // THEN
+            Assert.AreEqual(MovementValidationResult.PIECE_CANNOT_REACH_DESTINATION, result);
         }
 
         [TestMethod]
         public void Given_CoordinateSystemWithPiecesInACShape_When_SpiderMovementToCenterOfCircleValidated_Then_ReturnsValid()
         {
+            // GIVEN
+
+            // Grasshopper can move/jump into the center
+            //
+            //                  [ 2,-2]
+            //
+            //      [ 0,-1] [ 1,-1]
+            //
+            //  [-1, 0]            
+            //
+            //      [-1, 1] [ 0, 1]
+            var coordinateSystem = CoordinateSystemPopulationHelper.CreatePopulatedCoordinateSystem(
+            [
+                (( 2,-2), typeof(GrasshopperPiece)),
+                (( 0,-1), typeof(QueenPiece)),
+                (( 1,-1), typeof(QueenPiece)),
+                (( 0, 1), typeof(SpiderPiece)),
+                ((-1, 1), typeof(AntPiece)),
+                ((-1, 0), typeof(AntPiece))
+            ]);
+            var grasshopperMovementRules = new GrasshopperMovementRules();
+
+            // WHEN
+            var result = grasshopperMovementRules.ValidatePieceMovement(coordinateSystem, (2, -2), (0, 0), PlayerColor.WHITE);
+
+            // THEN
+            Assert.AreEqual(MovementValidationResult.VALID, result);
         }
 
         [TestMethod]
         public void Given_PopulatedCoordinateSystemWithNoQueen_WhenGrasshopperMovementIsValidated_Then_ReturnsValidationFail()
         {
+            // GIVEN
+
+            //      [WHT G]
+            //      [ 1,-1]
+            //
+            //  [WHT S]
+            //  [ q, r]
+            //
+            //      [BLK S]
+            //      [ 0, 1]
+            //
+            //          [BLK A]
+            //          [ 0, 2]
+            var coordinateSystem = CoordinateSystemPopulationHelper.CreatePopulatedCoordinateSystem(
+            [
+                (( 0, 0), typeof(SpiderPiece)),
+                (( 0, 1), typeof(SpiderPiece)),
+                (( 1,-1), typeof(GrasshopperPiece)),
+                (( 0, 2), typeof(AntPiece))
+            ]);
+            var grasshopperMovementRules = new GrasshopperMovementRules();
+
+            // WHEN
+            var result = grasshopperMovementRules.ValidatePieceMovement(coordinateSystem, (1, -1), (0, -1), PlayerColor.WHITE);
+
+            // THEN
+            Assert.AreEqual(MovementValidationResult.CANNOT_MOVE_WITHOUT_QUEEN, result);
         }
 
         [TestMethod]
         public void Given_PopulatedCoordinateSystem_When_WrongColoredGrasshopperMovementIsValidated_Then_ReturnsValidationFail()
         {
+            // GIVEN
+
+            //      [ 0,-1] [ 1,-1]
+            //
+            //  [-1, 0]         [ 1, 0]
+            //
+            //      [-1, 1] [ 0, 1]
+            var coordinateSystem = CoordinateSystemPopulationHelper.CreatePopulatedCoordinateSystem(
+            [
+                (( 0,-1), typeof(QueenPiece)),
+                (( 1,-1), typeof(QueenPiece)),
+                (( 1, 0), typeof(GrasshopperPiece)),
+                (( 0, 1), typeof(GrasshopperPiece)),
+                ((-1, 1), typeof(AntPiece)),
+                ((-1, 0), typeof(AntPiece))
+            ]);
+            var grasshopperMovementRules = new GrasshopperMovementRules();
+
+            // WHEN
+            var result = grasshopperMovementRules.ValidatePieceMovement(coordinateSystem, (0, 1), (2, -1), PlayerColor.WHITE);
+
+            // THEN
+            Assert.AreEqual(MovementValidationResult.WRONG_COLOR_MOVED, result);
         }
     }
 }
