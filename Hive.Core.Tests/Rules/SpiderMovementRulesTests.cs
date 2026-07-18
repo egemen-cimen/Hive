@@ -36,7 +36,7 @@ namespace Hive.Core.Tests.Rules
             var spiderMovementRules = new SpiderMovementRules();
 
             // WHEN
-            var result = spiderMovementRules.ValidatePieceMovement(coordinateSystem, (0, -1), (endColumn, endRow), PlayerColor.WHITE, 3);
+            var result = spiderMovementRules.ValidatePieceMovement(coordinateSystem, (0, -1), (endColumn, endRow), PlayerColor.WHITE);
 
             // THEN
             Assert.AreEqual(MovementValidationResult.VALID, result);
@@ -80,7 +80,7 @@ namespace Hive.Core.Tests.Rules
             var spiderMovementRules = new SpiderMovementRules();
 
             // WHEN
-            var result = spiderMovementRules.ValidatePieceMovement(coordinateSystem, (0, -1), (endColumn, endRow), PlayerColor.WHITE, 4);
+            var result = spiderMovementRules.ValidatePieceMovement(coordinateSystem, (0, -1), (endColumn, endRow), PlayerColor.WHITE);
 
             // THEN
             Assert.AreEqual(MovementValidationResult.PIECE_CANNOT_REACH_DESTINATION, result);
@@ -114,7 +114,7 @@ namespace Hive.Core.Tests.Rules
             var spiderMovementRules = new SpiderMovementRules();
 
             // WHEN
-            var result = spiderMovementRules.ValidatePieceMovement(coordinateSystem, (0, -1), (-1, 2), PlayerColor.WHITE, 4);
+            var result = spiderMovementRules.ValidatePieceMovement(coordinateSystem, (0, -1), (-1, 2), PlayerColor.WHITE);
 
             // THEN
             Assert.AreEqual(MovementValidationResult.DESTINATION_IS_NOT_EMPTY, result);
@@ -148,7 +148,7 @@ namespace Hive.Core.Tests.Rules
             var spiderMovementRules = new SpiderMovementRules();
 
             // WHEN
-            var result = spiderMovementRules.ValidatePieceMovement(coordinateSystem, (1, -1), (1, 2), PlayerColor.WHITE, 4);
+            var result = spiderMovementRules.ValidatePieceMovement(coordinateSystem, (1, -1), (1, 2), PlayerColor.WHITE);
 
             // THEN
             Assert.AreEqual(MovementValidationResult.WRONG_VALIDATOR_FOR_PIECE_TYPE, result);
@@ -180,7 +180,7 @@ namespace Hive.Core.Tests.Rules
             var spiderMovementRules = new SpiderMovementRules();
 
             // WHEN
-            var result = spiderMovementRules.ValidatePieceMovement(coordinateSystem, (1, 0), (1, 1), PlayerColor.WHITE, 3);
+            var result = spiderMovementRules.ValidatePieceMovement(coordinateSystem, (1, 0), (1, 1), PlayerColor.WHITE);
 
             // THEN
             Assert.AreEqual(MovementValidationResult.NO_PIECE_TO_MOVE, result);
@@ -217,7 +217,7 @@ namespace Hive.Core.Tests.Rules
             var spiderMovementRules = new SpiderMovementRules();
 
             // WHEN
-            var result = spiderMovementRules.ValidatePieceMovement(coordinateSystem, (0, 0), (2, -3), PlayerColor.WHITE, 3);
+            var result = spiderMovementRules.ValidatePieceMovement(coordinateSystem, (0, 0), (2, -3), PlayerColor.WHITE);
 
             // THEN
             Assert.AreEqual(MovementValidationResult.BREAKS_ONE_HIVE, result);
@@ -251,7 +251,7 @@ namespace Hive.Core.Tests.Rules
             var spiderMovementRules = new SpiderMovementRules();
 
             // WHEN
-            var result = spiderMovementRules.ValidatePieceMovement(coordinateSystem, (0, -1), (3, -2), PlayerColor.WHITE, 4);
+            var result = spiderMovementRules.ValidatePieceMovement(coordinateSystem, (0, -1), (3, -2), PlayerColor.WHITE);
 
             // THEN
             Assert.AreEqual(MovementValidationResult.BREAKS_ONE_HIVE, result);
@@ -285,7 +285,7 @@ namespace Hive.Core.Tests.Rules
             var spiderMovementRules = new SpiderMovementRules();
 
             // WHEN
-            var result = spiderMovementRules.ValidatePieceMovement(coordinateSystem, (0, -1), (0, -1), PlayerColor.WHITE, 4);
+            var result = spiderMovementRules.ValidatePieceMovement(coordinateSystem, (0, -1), (0, -1), PlayerColor.WHITE);
 
             // THEN
             Assert.AreEqual(MovementValidationResult.START_AND_DESTINATION_CANNOT_BE_THE_SAME, result);
@@ -326,7 +326,7 @@ namespace Hive.Core.Tests.Rules
             var spiderMovementRules = new SpiderMovementRules();
 
             // WHEN
-            var result = spiderMovementRules.ValidatePieceMovement(coordinateSystem, (-1, -1), (2, -3), PlayerColor.WHITE, 20);
+            var result = spiderMovementRules.ValidatePieceMovement(coordinateSystem, (-1, -1), (2, -3), PlayerColor.WHITE);
 
             // THEN
             Assert.AreEqual(MovementValidationResult.PIECE_CANNOT_REACH_DESTINATION, result);
@@ -358,7 +358,7 @@ namespace Hive.Core.Tests.Rules
             var spiderMovementRules = new SpiderMovementRules();
 
             // WHEN
-            var result = spiderMovementRules.ValidatePieceMovement(coordinateSystem, (2, -2), (0, 0), PlayerColor.WHITE, 20);
+            var result = spiderMovementRules.ValidatePieceMovement(coordinateSystem, (2, -2), (0, 0), PlayerColor.WHITE);
 
             // THEN
             Assert.AreEqual(MovementValidationResult.PIECE_CANNOT_REACH_DESTINATION, result);
@@ -390,7 +390,7 @@ namespace Hive.Core.Tests.Rules
             var spiderMovementRules = new SpiderMovementRules();
 
             // WHEN
-            var result = spiderMovementRules.ValidatePieceMovement(coordinateSystem, (1, -1), (1, 2), PlayerColor.WHITE, 3);
+            var result = spiderMovementRules.ValidatePieceMovement(coordinateSystem, (1, -1), (1, 2), PlayerColor.WHITE);
 
             // THEN
             Assert.AreEqual(MovementValidationResult.CANNOT_MOVE_WITHOUT_QUEEN, result);
@@ -418,7 +418,7 @@ namespace Hive.Core.Tests.Rules
             var spiderMovementRules = new SpiderMovementRules();
 
             // WHEN
-            var result = spiderMovementRules.ValidatePieceMovement(coordinateSystem, (0, 1), (-2, 1), PlayerColor.WHITE, 20);
+            var result = spiderMovementRules.ValidatePieceMovement(coordinateSystem, (0, 1), (-2, 1), PlayerColor.WHITE);
 
             // THEN
             Assert.AreEqual(MovementValidationResult.WRONG_COLOR_MOVED, result);
