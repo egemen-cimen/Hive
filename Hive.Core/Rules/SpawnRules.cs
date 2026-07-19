@@ -2,7 +2,7 @@
 
 namespace Hive.Core.Rules
 {
-    public class SpawnRules
+    public static class SpawnRules
     {
         private static readonly Dictionary<Type, int> AVAILABLE_PIECE_COUNTS = new()
         {
@@ -43,7 +43,7 @@ namespace Hive.Core.Rules
             }
 
             var allAdjacentCoordinates = coordinateSystem.GetAllFreeAdjacentCoordinates();
-            if (!allAdjacentCoordinates.Any(c => c == spawnCoordinate))
+            if (!allAdjacentCoordinates.Contains(spawnCoordinate))
             {
                 return SpawnValidationResult.PIECE_DID_NOT_TOUCH_THE_HIVE;
             }
@@ -56,12 +56,9 @@ namespace Hive.Core.Rules
 
             // Check whether the player has that piece in their inventory.
             var allPlayerPieces = CountSpawnedPlayerPieces(coordinateSystem, playerTurnColor);
-            if (allPlayerPieces.TryGetValue(piece.GetType(), out int pieceCount))
+            if (allPlayerPieces.TryGetValue(piece.GetType(), out int pieceCount) && pieceCount + 1 > AVAILABLE_PIECE_COUNTS[piece.GetType()])
             {
-                if (pieceCount + 1 > AVAILABLE_PIECE_COUNTS[piece.GetType()])
-                {
-                    return SpawnValidationResult.MORE_THAN_AVAILABLE_PIECES_SPAWNED;
-                }
+                return SpawnValidationResult.MORE_THAN_AVAILABLE_PIECES_SPAWNED;
             }
 
             return SpawnValidationResult.VALID;

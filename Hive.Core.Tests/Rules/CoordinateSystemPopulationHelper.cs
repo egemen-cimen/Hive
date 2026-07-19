@@ -2,7 +2,7 @@
 
 namespace Hive.Core.Tests.Rules
 {
-    internal class CoordinateSystemPopulationHelper
+    internal static class CoordinateSystemPopulationHelper
     {
         internal static AxialCoordinateSystem CreatePopulatedCoordinateSystem(List<((int column, int row) coordinate, Type pieceType)> exampleMoves)
         {

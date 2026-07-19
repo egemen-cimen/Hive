@@ -2,7 +2,7 @@
 
 namespace Hive.Core.Rules
 {
-    public class RulesHelper
+    public static class RulesHelper
     {
         public static bool VerifyWhetherQueenIsSpawned(ICoordinateSystem coordinateSystem, PlayerColor playerTurnColor)
         {
