@@ -4,13 +4,13 @@ namespace Hive.Core.Rules
 {
     public class SpawnRules
     {
-        private static readonly Dictionary<string, int> AVAILABLE_PIECE_COUNTS = new()
+        private static readonly Dictionary<Type, int> AVAILABLE_PIECE_COUNTS = new()
         {
-            [QueenPiece.Name] = 1,
-            [SpiderPiece.Name] = 2,
-            [BeetlePiece.Name] = 2,
-            [GrasshopperPiece.Name] = 3,
-            [AntPiece.Name] = 3,
+            [typeof(QueenPiece)] = 1,
+            [typeof(SpiderPiece)] = 2,
+            [typeof(BeetlePiece)] = 2,
+            [typeof(GrasshopperPiece)] = 3,
+            [typeof(AntPiece)] = 3,
         };
 
         public static SpawnValidationResult ValidatePieceSpawn(IPiece piece,
@@ -56,9 +56,9 @@ namespace Hive.Core.Rules
 
             // Check whether the player has that piece in their inventory.
             var allPlayerPieces = CountSpawnedPlayerPieces(coordinateSystem, playerTurnColor);
-            if (allPlayerPieces.TryGetValue(piece.GetPieceName(), out int pieceCount))
+            if (allPlayerPieces.TryGetValue(piece.GetType(), out int pieceCount))
             {
-                if (pieceCount + 1 > AVAILABLE_PIECE_COUNTS[piece.GetPieceName()])
+                if (pieceCount + 1 > AVAILABLE_PIECE_COUNTS[piece.GetType()])
                 {
                     return SpawnValidationResult.MORE_THAN_AVAILABLE_PIECES_SPAWNED;
                 }
@@ -66,9 +66,9 @@ namespace Hive.Core.Rules
 
             return SpawnValidationResult.VALID;
 
-            static Dictionary<string, int> CountSpawnedPlayerPieces(ICoordinateSystem coordinateSystem, PlayerColor playerTurnColor)
+            static Dictionary<Type, int> CountSpawnedPlayerPieces(ICoordinateSystem coordinateSystem, PlayerColor playerTurnColor)
             {
-                var allPlayerPieces = new Dictionary<string, int>();
+                var allPlayerPieces = new Dictionary<Type, int>();
 
                 var allCoordinates = coordinateSystem.GetAllCoordinates();
                 foreach (var populatedCoordinate in allCoordinates)
@@ -83,13 +83,13 @@ namespace Hive.Core.Rules
                             continue;
                         }
 
-                        if (allPlayerPieces.TryGetValue(piece.GetPieceName(), out var count))
+                        if (allPlayerPieces.TryGetValue(piece.GetType(), out var count))
                         {
-                            allPlayerPieces[piece.GetPieceName()] = count + 1;
+                            allPlayerPieces[piece.GetType()] = count + 1;
                         }
                         else
                         {
-                            allPlayerPieces[piece.GetPieceName()] = 1;
+                            allPlayerPieces[piece.GetType()] = 1;
                         }
                     }
                 }

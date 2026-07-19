@@ -9,7 +9,7 @@ namespace Hive.Core.Tests.Rules
         [TestMethod]
         [DataRow(2, -1)]
         [DataRow(-2, 2)]
-        public void Given_PopulatedCoordinateSystem_When_SpiderThreeSpaceMomementIsValidated_Then_ReturnsValid(int endColumn, int endRow)
+        public void Given_PopulatedCoordinateSystem_When_SpiderThreeSpaceMovementIsValidated_Then_ReturnsValid(int endColumn, int endRow)
         {
             // GIVEN
 
@@ -36,7 +36,7 @@ namespace Hive.Core.Tests.Rules
             var spiderMovementRules = new SpiderMovementRules();
 
             // WHEN
-            var result = spiderMovementRules.ValidatePieceMovement(coordinateSystem, (0, -1), (endColumn, endRow), PlayerColor.WHITE, 3);
+            var result = spiderMovementRules.ValidatePieceMovement(coordinateSystem, (0, -1), (endColumn, endRow), PlayerColor.WHITE);
 
             // THEN
             Assert.AreEqual(MovementValidationResult.VALID, result);
@@ -53,7 +53,7 @@ namespace Hive.Core.Tests.Rules
         [DataRow(1, 2)]
         [DataRow(1, 1)]
         [DataRow(1, 0)]
-        public void Given_PopulatedCoordinateSystem_When_SpiderNotThreeSpaceMomementIsValidated_Then_ReturnsValidationFail(int endColumn, int endRow)
+        public void Given_PopulatedCoordinateSystem_When_SpiderNotThreeSpaceMovementIsValidated_Then_ReturnsValidationFail(int endColumn, int endRow)
         {
             // GIVEN
 
@@ -80,14 +80,14 @@ namespace Hive.Core.Tests.Rules
             var spiderMovementRules = new SpiderMovementRules();
 
             // WHEN
-            var result = spiderMovementRules.ValidatePieceMovement(coordinateSystem, (0, -1), (endColumn, endRow), PlayerColor.WHITE, 4);
+            var result = spiderMovementRules.ValidatePieceMovement(coordinateSystem, (0, -1), (endColumn, endRow), PlayerColor.WHITE);
 
             // THEN
             Assert.AreEqual(MovementValidationResult.PIECE_CANNOT_REACH_DESTINATION, result);
         }
 
         [TestMethod]
-        public void Given_PopulatedCoordinateSystem_When_SpiderThreeSpaceMomementToOccupiedSpaceIsValidated_Then_ReturnsValidationFail()
+        public void Given_PopulatedCoordinateSystem_When_SpiderThreeSpaceMovementToOccupiedSpaceIsValidated_Then_ReturnsValidationFail()
         {
             // GIVEN
 
@@ -114,7 +114,7 @@ namespace Hive.Core.Tests.Rules
             var spiderMovementRules = new SpiderMovementRules();
 
             // WHEN
-            var result = spiderMovementRules.ValidatePieceMovement(coordinateSystem, (0, -1), (-1, 2), PlayerColor.WHITE, 4);
+            var result = spiderMovementRules.ValidatePieceMovement(coordinateSystem, (0, -1), (-1, 2), PlayerColor.WHITE);
 
             // THEN
             Assert.AreEqual(MovementValidationResult.DESTINATION_IS_NOT_EMPTY, result);
@@ -148,14 +148,14 @@ namespace Hive.Core.Tests.Rules
             var spiderMovementRules = new SpiderMovementRules();
 
             // WHEN
-            var result = spiderMovementRules.ValidatePieceMovement(coordinateSystem, (1, -1), (1, 2), PlayerColor.WHITE, 4);
+            var result = spiderMovementRules.ValidatePieceMovement(coordinateSystem, (1, -1), (1, 2), PlayerColor.WHITE);
 
             // THEN
             Assert.AreEqual(MovementValidationResult.WRONG_VALIDATOR_FOR_PIECE_TYPE, result);
         }
 
         [TestMethod]
-        public void Given_PopulatedCoordinateSystem_When_EmptySpaceMomementIsValidated_Then_ReturnsValidationFail()
+        public void Given_PopulatedCoordinateSystem_When_EmptySpaceMovementIsValidated_Then_ReturnsValidationFail()
         {
             // GIVEN
 
@@ -180,14 +180,14 @@ namespace Hive.Core.Tests.Rules
             var spiderMovementRules = new SpiderMovementRules();
 
             // WHEN
-            var result = spiderMovementRules.ValidatePieceMovement(coordinateSystem, (1, 0), (1, 1), PlayerColor.WHITE, 3);
+            var result = spiderMovementRules.ValidatePieceMovement(coordinateSystem, (1, 0), (1, 1), PlayerColor.WHITE);
 
             // THEN
             Assert.AreEqual(MovementValidationResult.NO_PIECE_TO_MOVE, result);
         }
 
         [TestMethod]
-        public void Given_PopulatedCoordinateSystem_When_MiddlePieceMomementIsValidated_Then_ReturnsValidationFail()
+        public void Given_PopulatedCoordinateSystem_When_MiddlePieceMovementIsValidated_Then_ReturnsValidationFail()
         {
             // GIVEN
 
@@ -217,14 +217,14 @@ namespace Hive.Core.Tests.Rules
             var spiderMovementRules = new SpiderMovementRules();
 
             // WHEN
-            var result = spiderMovementRules.ValidatePieceMovement(coordinateSystem, (0, 0), (2, -3), PlayerColor.WHITE, 3);
+            var result = spiderMovementRules.ValidatePieceMovement(coordinateSystem, (0, 0), (2, -3), PlayerColor.WHITE);
 
             // THEN
             Assert.AreEqual(MovementValidationResult.BREAKS_ONE_HIVE, result);
         }
 
         [TestMethod]
-        public void Given_PopulatedCoordinateSystem_When_SpiderOneSpaceMomementToUnconnectedSpaceIsValidated_Then_ReturnsValidationFail()
+        public void Given_PopulatedCoordinateSystem_When_SpiderOneSpaceMovementToUnconnectedSpaceIsValidated_Then_ReturnsValidationFail()
         {
             // GIVEN
 
@@ -251,14 +251,14 @@ namespace Hive.Core.Tests.Rules
             var spiderMovementRules = new SpiderMovementRules();
 
             // WHEN
-            var result = spiderMovementRules.ValidatePieceMovement(coordinateSystem, (0, -1), (3, -2), PlayerColor.WHITE, 4);
+            var result = spiderMovementRules.ValidatePieceMovement(coordinateSystem, (0, -1), (3, -2), PlayerColor.WHITE);
 
             // THEN
             Assert.AreEqual(MovementValidationResult.BREAKS_ONE_HIVE, result);
         }
 
         [TestMethod]
-        public void Given_PopulatedCoordinateSystem_When_SpiderMomementWithSameCoordinatesIsValidated_Then_ReturnsValidationFail()
+        public void Given_PopulatedCoordinateSystem_When_SpiderMovementWithSameCoordinatesIsValidated_Then_ReturnsValidationFail()
         {
             // GIVEN
 
@@ -285,14 +285,14 @@ namespace Hive.Core.Tests.Rules
             var spiderMovementRules = new SpiderMovementRules();
 
             // WHEN
-            var result = spiderMovementRules.ValidatePieceMovement(coordinateSystem, (0, -1), (0, -1), PlayerColor.WHITE, 4);
+            var result = spiderMovementRules.ValidatePieceMovement(coordinateSystem, (0, -1), (0, -1), PlayerColor.WHITE);
 
             // THEN
             Assert.AreEqual(MovementValidationResult.START_AND_DESTINATION_CANNOT_BE_THE_SAME, result);
         }
 
         [TestMethod]
-        public void Given_CoordinateSystemWithPiecesInACShape_When_SpiderMomementToOtherSideIsValidated_Then_ReturnsValidationFail()
+        public void Given_CoordinateSystemWithPiecesInABigCShape_When_SpiderMovementToOtherSideIsValidated_Then_ReturnsValidationFail()
         {
             // GIVEN
 
@@ -326,14 +326,14 @@ namespace Hive.Core.Tests.Rules
             var spiderMovementRules = new SpiderMovementRules();
 
             // WHEN
-            var result = spiderMovementRules.ValidatePieceMovement(coordinateSystem, (-1, -1), (2, -3), PlayerColor.WHITE, 20);
+            var result = spiderMovementRules.ValidatePieceMovement(coordinateSystem, (-1, -1), (2, -3), PlayerColor.WHITE);
 
             // THEN
             Assert.AreEqual(MovementValidationResult.PIECE_CANNOT_REACH_DESTINATION, result);
         }
 
         [TestMethod]
-        public void Given_CoordinateSystemWithPiecesInACShape_When_SpiderMomementToCenterOfCircleValidated_Then_ReturnsValidationFail()
+        public void Given_CoordinateSystemWithPiecesInACShape_When_SpiderMovementToCenterOfCircleValidated_Then_ReturnsValidationFail()
         {
             // GIVEN
 
@@ -343,7 +343,7 @@ namespace Hive.Core.Tests.Rules
             //
             //      [ 0,-1] [ 1,-1]
             //
-            //  [-1, 0]            
+            //  [-1, 0]
             //
             //      [-1, 1] [ 0, 1]
             var coordinateSystem = CoordinateSystemPopulationHelper.CreatePopulatedCoordinateSystem(
@@ -358,14 +358,14 @@ namespace Hive.Core.Tests.Rules
             var spiderMovementRules = new SpiderMovementRules();
 
             // WHEN
-            var result = spiderMovementRules.ValidatePieceMovement(coordinateSystem, (2, -2), (0, 0), PlayerColor.WHITE, 20);
+            var result = spiderMovementRules.ValidatePieceMovement(coordinateSystem, (2, -2), (0, 0), PlayerColor.WHITE);
 
             // THEN
             Assert.AreEqual(MovementValidationResult.PIECE_CANNOT_REACH_DESTINATION, result);
         }
 
         [TestMethod]
-        public void Given_PopulatedCoordinateSystemWithNoQueen_WhenSpiderMomementIsValidated_Then_ReturnsValidationFail()
+        public void Given_PopulatedCoordinateSystemWithNoQueen_WhenSpiderMovementIsValidated_Then_ReturnsValidationFail()
         {
             // GIVEN
 
@@ -390,14 +390,14 @@ namespace Hive.Core.Tests.Rules
             var spiderMovementRules = new SpiderMovementRules();
 
             // WHEN
-            var result = spiderMovementRules.ValidatePieceMovement(coordinateSystem, (1, -1), (1, 2), PlayerColor.WHITE, 3);
+            var result = spiderMovementRules.ValidatePieceMovement(coordinateSystem, (1, -1), (1, 2), PlayerColor.WHITE);
 
             // THEN
             Assert.AreEqual(MovementValidationResult.CANNOT_MOVE_WITHOUT_QUEEN, result);
         }
 
         [TestMethod]
-        public void Given_PopulatedCoordinateSystem_When_WrongColoredSpiderMomementIsValidated_Then_ReturnsValidationFail()
+        public void Given_PopulatedCoordinateSystem_When_WrongColoredSpiderMovementIsValidated_Then_ReturnsValidationFail()
         {
             // GIVEN
 
@@ -418,7 +418,7 @@ namespace Hive.Core.Tests.Rules
             var spiderMovementRules = new SpiderMovementRules();
 
             // WHEN
-            var result = spiderMovementRules.ValidatePieceMovement(coordinateSystem, (0, 1), (-2, 1), PlayerColor.WHITE, 20);
+            var result = spiderMovementRules.ValidatePieceMovement(coordinateSystem, (0, 1), (-2, 1), PlayerColor.WHITE);
 
             // THEN
             Assert.AreEqual(MovementValidationResult.WRONG_COLOR_MOVED, result);
