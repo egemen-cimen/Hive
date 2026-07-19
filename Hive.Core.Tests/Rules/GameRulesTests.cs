@@ -1,10 +1,10 @@
 ﻿namespace Hive.Core.Tests.Rules
 {
     [TestClass]
-    public class RulesValidatorTests
+    public class GameRulesTests
     {
         [TestMethod]
-        public void Given_()
+        public void Given_GameState_When_()
         {
             // TODO: tests
         }
