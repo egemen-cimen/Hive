@@ -4,23 +4,21 @@ namespace Hive.Core.Rules
 {
     public class RulesHelper
     {
-        public static bool FindQueenForPlayerColor(ICoordinateSystem coordinateSystem, PlayerColor playerTurnColor)
+        public static bool VerifyWhetherQueenIsSpawned(ICoordinateSystem coordinateSystem, PlayerColor playerTurnColor)
         {
-            var coordinates = coordinateSystem.GetAllCoordinates();
-            var isQueenPlayedForColor = false;
-
-            foreach (var coordinate in coordinates)
+            var queenExists = false;
+            var allCoordinates = coordinateSystem.GetAllCoordinates();
+            foreach (var populatedCoordinate in allCoordinates)
             {
-                coordinateSystem.TryGetHexagon(coordinate, out var hexagon);
-
-                if (hexagon!.GetAllPieces().Any(p => p.Color == playerTurnColor && p is QueenPiece))
+                coordinateSystem.TryGetHexagon(populatedCoordinate, out var hexagon);
+                queenExists = hexagon!.GetAllPieces().Any(p => p.Color == playerTurnColor && p is QueenPiece);
+                if (queenExists)
                 {
-                    isQueenPlayedForColor = true;
                     break;
                 }
             }
 
-            return isQueenPlayedForColor;
+            return queenExists;
         }
     }
 }

@@ -55,7 +55,7 @@ namespace Hive.Core.Rules
             // Validation for non-queen pieces
             if (typeof(T) != typeof(QueenPiece))
             {
-                var queenExists = VerifyWhetherQueenIsSpawned(coordinateSystem, playerTurnColor);
+                var queenExists = RulesHelper.VerifyWhetherQueenIsSpawned(coordinateSystem, playerTurnColor);
                 if (!queenExists)
                 {
                     return MovementValidationResult.CANNOT_MOVE_WITHOUT_QUEEN;
@@ -63,23 +63,6 @@ namespace Hive.Core.Rules
             }
 
             return MovementValidationResult.VALID;
-        }
-
-        private static bool VerifyWhetherQueenIsSpawned(ICoordinateSystem coordinateSystem, PlayerColor playerTurnColor)
-        {
-            var queenExists = false;
-            var allCoordinates = coordinateSystem.GetAllCoordinates();
-            foreach (var populatedCoordinate in allCoordinates)
-            {
-                coordinateSystem.TryGetHexagon(populatedCoordinate, out var hexagon);
-                queenExists = hexagon!.GetAllPieces().Any(p => p.Color == playerTurnColor && p is QueenPiece);
-                if (queenExists)
-                {
-                    break;
-                }
-            }
-
-            return queenExists;
         }
     }
 }
