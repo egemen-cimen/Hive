@@ -2,7 +2,7 @@
 
 namespace Hive.Core.Rules
 {
-    public static class CommonMovementRuleHelper
+    public static class CommonMovementRules
     {
         public static MovementValidationResult ValidateCommonMovementRules<T>(ICoordinateSystem coordinateSystem,
             (int column, int row) startCoordinate,
