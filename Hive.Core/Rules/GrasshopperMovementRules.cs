@@ -37,7 +37,7 @@ namespace Hive.Core.Rules
 
                 foreach (var populatedNeighborCoordinate in populatedNeighborCoordinates)
                 {
-                    var direction = SubstractCoordinates(populatedNeighborCoordinate, startCoordinate);
+                    var direction = SubtractCoordinates(populatedNeighborCoordinate, startCoordinate);
 
                     var nextCoordinate = SumCoordinates(startCoordinate, direction);
 
@@ -57,7 +57,7 @@ namespace Hive.Core.Rules
                 return (coordinate1.column + coordinate2.column, coordinate1.row + coordinate2.row);
             }
 
-            static (int column, int row) SubstractCoordinates((int column, int row) coordinate1, (int column, int row) coordinate2)
+            static (int column, int row) SubtractCoordinates((int column, int row) coordinate1, (int column, int row) coordinate2)
             {
                 return (coordinate1.column - coordinate2.column, coordinate1.row - coordinate2.row);
             }

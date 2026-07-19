@@ -379,33 +379,81 @@ namespace Hive.Core.Tests.Rules
         }
 
         [TestMethod]
-        public void Given_CoordinateSystemWithPiecesInACShape_When_BeetleMovementToCenterOfCircleValidated_Then_ReturnsValidationFail()
+        [DataRow(0, 0, 1, 1, MovementValidationResult.PIECE_CANNOT_REACH_DESTINATION)]
+        [DataRow(0, 0, 1, 0, MovementValidationResult.VALID)]
+        [DataRow(0, 0, 0, 1, MovementValidationResult.VALID)]
+        [DataRow(0, 1, 0, 0, MovementValidationResult.VALID)]
+        [DataRow(0, 1, 1, 1, MovementValidationResult.VALID)]
+        [DataRow(0, 1, 2, 2, MovementValidationResult.PIECE_CANNOT_REACH_DESTINATION)]
+        [DataRow(0, 1, 2, 1, MovementValidationResult.VALID)]
+        [DataRow(0, 1, 1, 2, MovementValidationResult.VALID)]
+        [DataRow(1, 0, 0, 0, MovementValidationResult.VALID)]
+        [DataRow(1, 1, 1, 1, MovementValidationResult.VALID)]
+        [DataRow(1, 1, 2, 1, MovementValidationResult.VALID)]
+        [DataRow(1, 1, 1, 2, MovementValidationResult.VALID)]
+        [DataRow(1, 1, 2, 2, MovementValidationResult.PIECE_CANNOT_REACH_DESTINATION)]
+        [DataRow(1, 2, 2, 2, MovementValidationResult.VALID)]
+
+        public void Given_CoordinateSystemWithPiecesInACircle_When_BeetleMovementToCenterOfCircleValidated_Then_ReturnsValidation(int startHeight,
+            int destinationHeight,
+            int leftNeighborHeight,
+            int rightNeighborHeight,
+            MovementValidationResult validationResult
+            )
         {
             // GIVEN
 
             // Beetle cannot move/slide into the center in one move
             //
-            //      [ 0,-1] [ 1,-1]
+            //      [WHT Q] [.....]
+            //      [ 0,-1] [.....]
             //
-            //  [-1, 0]         [ 1, 0]        
+            //  [BLK A] [.....] [WHT B]
+            //  [-1, 0] [.....] [ 1, 0]        
             //
-            //      [-1, 1] [ 0, 1]
+            //      [BLK A] [.....]
+            //      [-1, 1] [.....]
             var coordinateSystem = CoordinateSystemPopulationHelper.CreatePopulatedCoordinateSystem(
             [
                 (( 1, 0), typeof(BeetlePiece)),
+                ((-1, 0), typeof(AntPiece)),
                 (( 0,-1), typeof(QueenPiece)),
-                (( 1,-1), typeof(QueenPiece)),
-                (( 0, 1), typeof(SpiderPiece)),
-                ((-1, 1), typeof(AntPiece)),
-                ((-1, 0), typeof(AntPiece))
+                ((-1, 1), typeof(AntPiece))
             ]);
+            coordinateSystem.TryGetHexagon((1, 0), out var startHexagon);
+            for (var i = 0; i < startHeight; i++)
+            {
+                startHexagon!.PushPiece(new BeetlePiece(PlayerColor.WHITE));
+            }
+
+            var destinationHexagon = new Hexagon();
+            coordinateSystem.AddHexagon(destinationHexagon, (0, 0));
+            for (var i = 0; i < destinationHeight; i++)
+            {
+                destinationHexagon.PushPiece(new BeetlePiece(PlayerColor.BLACK));
+            }
+
+            var leftNeighborHexagon = new Hexagon();
+            coordinateSystem.AddHexagon(leftNeighborHexagon, (0, 1));
+            for (var i = 0; i < leftNeighborHeight; i++)
+            {
+                leftNeighborHexagon.PushPiece(new BeetlePiece(PlayerColor.BLACK));
+            }
+
+            var rightNeighborHexagon = new Hexagon();
+            coordinateSystem.AddHexagon(rightNeighborHexagon, (1, -1));
+            for (var i = 0; i < rightNeighborHeight; i++)
+            {
+                rightNeighborHexagon.PushPiece(new BeetlePiece(PlayerColor.BLACK));
+            }
+
             var beetleMovementRules = new BeetleMovementRules();
 
             // WHEN
             var result = beetleMovementRules.ValidatePieceMovement(coordinateSystem, (1, 0), (0, 0), PlayerColor.WHITE);
 
             // THEN
-            Assert.AreEqual(MovementValidationResult.PIECE_CANNOT_REACH_DESTINATION, result);
+            Assert.AreEqual(validationResult, result);
         }
 
         [TestMethod]
