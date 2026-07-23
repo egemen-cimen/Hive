@@ -87,7 +87,7 @@ namespace Hive.Core.Tests.Rules
         {
             // GIVEN
             var gameState = GameRules.CreateFreshGameState();
-            // Spawn the all 22 pieces
+            // Spawn all 22 pieces
             for (var i = 0; i < 22; i++)
             {
                 var actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).First(a => a.GetType() == typeof(PlayerSpawnAction));
