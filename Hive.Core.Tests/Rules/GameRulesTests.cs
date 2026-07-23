@@ -30,7 +30,7 @@ namespace Hive.Core.Tests.Rules
             // THEN
             CollectionAssert.AllItemsAreInstancesOfType(availableActions, typeof(PlayerSpawnAction));
             Assert.HasCount(4, availableActions);
-            foreach(var action in availableActions.Cast<PlayerSpawnAction>())
+            foreach (var action in availableActions.Cast<PlayerSpawnAction>())
             {
                 Assert.AreEqual(PlayerColor.WHITE, action.PieceToSpawn.Color);
                 Assert.IsNotInstanceOfType<QueenPiece>(action.PieceToSpawn);
@@ -51,10 +51,76 @@ namespace Hive.Core.Tests.Rules
             // THEN
             CollectionAssert.AllItemsAreInstancesOfType(availableActions, typeof(PlayerSpawnAction));
             Assert.HasCount(24, availableActions);
-            foreach(var action in availableActions.Cast<PlayerSpawnAction>())
+            foreach (var action in availableActions.Cast<PlayerSpawnAction>())
             {
                 Assert.AreEqual(PlayerColor.BLACK, action.PieceToSpawn.Color);
                 Assert.IsNotInstanceOfType<QueenPiece>(action.PieceToSpawn);
+            }
+        }
+
+        [TestMethod]
+        public void Given_GameStateWithTwoSpawnedPieces_When_AllAvailableActionsRetrieved_Then_ReturnsAllPossibleSpawnActions()
+        {
+            // GIVEN
+            var gameState = GameRules.CreateFreshGameState();
+            // Spawn the first piece
+            var appliedAction = GameRules.GetAllAvailablePlayerActions(gameState).Cast<PlayerSpawnAction>().First();
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, appliedAction);
+            // Spawn the second piece
+            appliedAction = GameRules.GetAllAvailablePlayerActions(gameState).Cast<PlayerSpawnAction>().First();
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, appliedAction);
+
+            // WHEN
+            var availableActions = GameRules.GetAllAvailablePlayerActions(gameState);
+
+            // THEN
+            CollectionAssert.AllItemsAreInstancesOfType(availableActions, typeof(PlayerSpawnAction));
+            Assert.HasCount(15, availableActions);
+            foreach (var action in availableActions.Cast<PlayerSpawnAction>())
+            {
+                Assert.AreEqual(PlayerColor.WHITE, action.PieceToSpawn.Color);
+            }
+        }
+
+        [TestMethod]
+        public void Given_ReveredGameState_When_AllAvailableActionsRetrieved_Then_ReturnsAllPossibleSpawnActions()
+        {
+            // GIVEN
+            var gameState = GameRules.CreateFreshGameState();
+            // Spawn the first piece
+            var actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).Cast<PlayerSpawnAction>().First();
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
+            // Spawn the second piece
+            actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).Cast<PlayerSpawnAction>().First();
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
+            // Spawn the third piece
+            actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).Cast<PlayerSpawnAction>().First();
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
+            // Record count of available actions for this state (should be 15)
+            var firstAvailableActions = GameRules.GetAllAvailablePlayerActions(gameState);
+            var availableActionsCount = firstAvailableActions.Count;
+            // Undo the last move
+            gameState = GameRules.UndoLastMoveFromGameState(gameState);
+            // Spawn the third piece again
+            actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).Cast<PlayerSpawnAction>().First();
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
+
+            // WHEN
+            var secondAvailableActions = GameRules.GetAllAvailablePlayerActions(gameState);
+
+            // THEN
+            CollectionAssert.AllItemsAreInstancesOfType(firstAvailableActions, typeof(PlayerSpawnAction));
+            CollectionAssert.AllItemsAreInstancesOfType(secondAvailableActions, typeof(PlayerSpawnAction));
+            Assert.HasCount(firstAvailableActions.Count, secondAvailableActions);
+            Assert.HasCount(15, secondAvailableActions);
+            foreach (var action in firstAvailableActions.Cast<PlayerSpawnAction>())
+            {
+                Assert.AreEqual(PlayerColor.BLACK, action.PieceToSpawn.Color);
+            }
+
+            foreach (var action in secondAvailableActions.Cast<PlayerSpawnAction>())
+            {
+                Assert.AreEqual(PlayerColor.BLACK, action.PieceToSpawn.Color);
             }
         }
 

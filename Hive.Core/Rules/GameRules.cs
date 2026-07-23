@@ -145,7 +145,6 @@ namespace Hive.Core.Rules
         /// Reverts the last player action from the given game state.
         /// </summary>
         /// <param name="gameState"></param>
-        /// <param name="playerAction"></param>
         /// <returns>A new game state but reuses the coordinate system and past move stack from the original.</returns>
         public static GameState UndoLastMoveFromGameState(GameState gameState)
         {
