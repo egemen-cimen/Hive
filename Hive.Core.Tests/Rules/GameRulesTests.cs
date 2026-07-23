@@ -83,6 +83,26 @@ namespace Hive.Core.Tests.Rules
         }
 
         [TestMethod]
+        public void Given_GameStateWithAllPiecesSpawned_When_AllAvailableActionsRetrieved_Then_ReturnsOnlyMovementActions()
+        {
+            // GIVEN
+            var gameState = GameRules.CreateFreshGameState();
+            // Spawn the all 22 pieces
+            for (var i = 0; i < 22; i++)
+            {
+                var actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).First(a => a.GetType() == typeof(PlayerSpawnAction));
+                gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
+            }
+
+            // WHEN
+            var availableActions = GameRules.GetAllAvailablePlayerActions(gameState);
+
+            // THEN
+            CollectionAssert.AllItemsAreInstancesOfType(availableActions, typeof(PlayerMovementAction));
+            Assert.AreEqual(0, availableActions.Count(a => a.GetType() == typeof(PlayerSpawnAction)));
+        }
+
+        [TestMethod]
         public void Given_ReveredGameState_When_AllAvailableActionsRetrieved_Then_ReturnsAllPossibleSpawnActions()
         {
             // GIVEN
