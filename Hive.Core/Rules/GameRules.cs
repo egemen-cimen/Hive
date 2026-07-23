@@ -21,36 +21,40 @@ namespace Hive.Core.Rules
         /// <returns></returns>
         public static List<IPlayerAction> GetAllAvailablePlayerActions(GameState gameState)
         {
-            var allCoordinates = gameState.CoordinateSystem.GetAllCoordinates();
             var allAvailableActions = new List<IPlayerAction>();
-            if (allCoordinates.Count == 0)
+
+            List<IPiece> allPossiblePieces = [new AntPiece(gameState.CurrentPlayerTurnColor),
+                new BeetlePiece(gameState.CurrentPlayerTurnColor),
+                new GrasshopperPiece(gameState.CurrentPlayerTurnColor),
+                new QueenPiece(gameState.CurrentPlayerTurnColor),
+                new SpiderPiece(gameState.CurrentPlayerTurnColor)
+                ];
+
+            var possibleSpawnCoordinates = gameState.CoordinateSystem.GetAllFreeAdjacentCoordinates();
+            foreach (var spawnCoordinate in possibleSpawnCoordinates)
             {
-                List<IPiece> allPossiblePieces = [new AntPiece(PlayerColor.WHITE),
-                    new BeetlePiece(PlayerColor.WHITE),
-                    new GrasshopperPiece(PlayerColor.WHITE),
-                    new QueenPiece(PlayerColor.WHITE),
-                    new SpiderPiece(PlayerColor.WHITE)
-                    ];
-
-                var spawnCoordinate = (0, 0);
-
-                foreach (var piece in allPossiblePieces)
-                {
-                    var validationResult = SpawnRules.ValidatePieceSpawn(piece,
-                        gameState.CoordinateSystem,
-                        spawnCoordinate,
-                        gameState.CurrentPlayerTurnColor,
-                        gameState.TurnNumber
-                        );
-
-                    if (validationResult == SpawnValidationResult.VALID)
-                    {
-                        allAvailableActions.Add(new PlayerSpawnAction(piece, spawnCoordinate));
-                    }
-                }
+                AddValidSpawnPlayerActions(gameState, allAvailableActions, allPossiblePieces, spawnCoordinate);
             }
 
             return allAvailableActions;
+        }
+
+        private static void AddValidSpawnPlayerActions(GameState gameState, List<IPlayerAction> allAvailableActions, List<IPiece> allPossiblePieces, (int, int) spawnCoordinate)
+        {
+            foreach (var piece in allPossiblePieces)
+            {
+                var validationResult = SpawnRules.ValidatePieceSpawn(piece,
+                    gameState.CoordinateSystem,
+                    spawnCoordinate,
+                    gameState.CurrentPlayerTurnColor,
+                    gameState.TurnNumber
+                    );
+
+                if (validationResult == SpawnValidationResult.VALID)
+                {
+                    allAvailableActions.Add(new PlayerSpawnAction(piece, spawnCoordinate));
+                }
+            }
         }
 
         /// <summary>
@@ -178,7 +182,9 @@ namespace Hive.Core.Rules
         private static (PlayerColor playerColor, int turnNumber) IncrementTurnCounter(PlayerColor currentPlayerTurnColor, int currentTurnNumber)
         {
             var nextTurnNumber = currentTurnNumber;
-            var nextPlayerColor = currentPlayerTurnColor + 1 % 1;
+
+            var nextPlayerColor = currentPlayerTurnColor == PlayerColor.WHITE ? PlayerColor.BLACK : PlayerColor.WHITE;
+
             if (nextPlayerColor == PlayerColor.WHITE)
             {
                 nextTurnNumber++;
@@ -190,8 +196,10 @@ namespace Hive.Core.Rules
         private static (PlayerColor playerColor, int turnNumber) DecrementTurnCounter(PlayerColor currentPlayerTurnColor, int currentTurnNumber)
         {
             var nextTurnNumber = currentTurnNumber;
-            var nextPlayerColor = currentPlayerTurnColor + 1 % 1;
-            if (nextPlayerColor == PlayerColor.WHITE)
+
+            var nextPlayerColor = currentPlayerTurnColor == PlayerColor.WHITE ? PlayerColor.BLACK : PlayerColor.WHITE;
+
+            if (nextPlayerColor == PlayerColor.BLACK)
             {
                 nextTurnNumber--;
             }

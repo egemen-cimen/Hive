@@ -38,6 +38,27 @@ namespace Hive.Core.Tests.Rules
         }
 
         [TestMethod]
+        public void Given_GameStateWithFirstPlayerAction_When_AllAvailableActionsRetrieved_Then_ReturnsAllPossibleSpawnActions()
+        {
+            // GIVEN
+            var freshGameState = GameRules.CreateFreshGameState();
+            var appliedAction = GameRules.GetAllAvailablePlayerActions(freshGameState).Cast<PlayerSpawnAction>().First();
+            var updatedGameState = GameRules.ApplyPlayerActionToGameState(freshGameState, appliedAction);
+
+            // WHEN
+            var availableActions = GameRules.GetAllAvailablePlayerActions(updatedGameState);
+
+            // THEN
+            CollectionAssert.AllItemsAreInstancesOfType(availableActions, typeof(PlayerSpawnAction));
+            Assert.HasCount(24, availableActions);
+            foreach(var action in availableActions.Cast<PlayerSpawnAction>())
+            {
+                Assert.AreEqual(PlayerColor.BLACK, action.PieceToSpawn.Color);
+                Assert.IsNotInstanceOfType<QueenPiece>(action.PieceToSpawn);
+            }
+        }
+
+        [TestMethod]
         public void Given_FreshGameState_When_FirstPlayerActionApplied_Then_ReturnsUpdatedGameState()
         {
             // GIVEN
