@@ -114,15 +114,16 @@ namespace Hive.Core.Tests.Rules
             actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).Cast<PlayerSpawnAction>().First();
             gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
             // Spawn the third piece
-            actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).Cast<PlayerSpawnAction>().First();
+            actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).Cast<PlayerSpawnAction>().First(a
+                => a.PieceToSpawn.GetType() != typeof(QueenPiece));
             gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
             // Record count of available actions for this state (should be 15)
             var firstAvailableActions = GameRules.GetAllAvailablePlayerActions(gameState);
-            var availableActionsCount = firstAvailableActions.Count;
             // Undo the last move
             gameState = GameRules.UndoLastMoveFromGameState(gameState);
             // Spawn the third piece again
-            actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).Cast<PlayerSpawnAction>().First();
+            actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).Cast<PlayerSpawnAction>().First(a
+                => a.PieceToSpawn.GetType() != typeof(QueenPiece));
             gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
 
             // WHEN
@@ -189,6 +190,26 @@ namespace Hive.Core.Tests.Rules
 
             // WHEN & THEN
             Assert.Throws<Exception>(() => GameRules.ApplyPlayerActionToGameState(updatedGameState, actionToBeApplied));
+        }
+
+        [TestMethod]
+        public void Given_GameStateWithFourPiecesSpawned_When_AllAvailableActionsRetrieved_Then_ReturnsSpawnAndMovementActions()
+        {
+            // GIVEN
+            var gameState = GameRules.CreateFreshGameState();
+            // Spawn 4 pieces including the queen for each player
+            for (var i = 0; i < 8; i++)
+            {
+                var actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).First(a => a.GetType() == typeof(PlayerSpawnAction));
+                gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
+            }
+
+            // WHEN
+            var availableActions = GameRules.GetAllAvailablePlayerActions(gameState);
+
+            // THEN
+            Assert.IsGreaterThan(0, availableActions.Count(a => a.GetType() == typeof(PlayerSpawnAction)));
+            Assert.IsGreaterThan(0, availableActions.Count(a => a.GetType() == typeof(PlayerMovementAction)));
         }
     }
 }

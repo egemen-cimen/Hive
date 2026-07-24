@@ -4,6 +4,12 @@ namespace Hive.Core.Rules
 {
     public static class GameRules
     {
+        private static readonly AntMovementRules _antMovementRules = new();
+        private static readonly BeetleMovementRules _beetleMovementRules = new();
+        private static readonly GrasshopperMovementRules _grasshopperMovementRules = new();
+        private static readonly QueenMovementRules _queenMovementRules = new();
+        private static readonly SpiderMovementRules _spiderMovementRules = new();
+
         /// <summary>
         /// Returns a game state reset to beginning.
         /// </summary>
@@ -23,7 +29,7 @@ namespace Hive.Core.Rules
         {
             var allAvailableActions = new List<IPlayerAction>();
 
-            List<IPiece> allPossiblePieces = [new AntPiece(gameState.CurrentPlayerTurnColor),
+            List<IPiece> allPossibleSpawnPieces = [new AntPiece(gameState.CurrentPlayerTurnColor),
                 new BeetlePiece(gameState.CurrentPlayerTurnColor),
                 new GrasshopperPiece(gameState.CurrentPlayerTurnColor),
                 new QueenPiece(gameState.CurrentPlayerTurnColor),
@@ -33,15 +39,69 @@ namespace Hive.Core.Rules
             var possibleSpawnCoordinates = gameState.CoordinateSystem.GetAllFreeAdjacentCoordinates();
             foreach (var spawnCoordinate in possibleSpawnCoordinates)
             {
-                AddValidSpawnPlayerActions(gameState, allAvailableActions, allPossiblePieces, spawnCoordinate);
+                AddValidSpawnPlayerActions(gameState, allAvailableActions, allPossibleSpawnPieces, spawnCoordinate);
             }
+
+            var allCoordinates = gameState.CoordinateSystem.GetAllCoordinates();
+            foreach (var coordinate in allCoordinates)
+            {
+                gameState.CoordinateSystem.TryGetHexagon(coordinate, out var populatedHexagon);
+                var piece = populatedHexagon!.PeekPiece();
+                IMovementRules movementRule;
+                IEnumerable<(int column, int row)> possibleDestinations;
+
+                // TODO: fix inefficency
+                if (piece.GetType() == typeof(AntPiece))
+                {
+                    movementRule = _antMovementRules;
+                    possibleDestinations = gameState.CoordinateSystem.GetAllFreeAdjacentCoordinates();
+                }
+                else if (piece.GetType() == typeof(BeetlePiece))
+                {
+                    movementRule = _beetleMovementRules;
+                    var possibleFirstLevelDestinations = gameState.CoordinateSystem.GetAllFreeAdjacentCoordinates();
+                    var possibleStackingDestinations = gameState.CoordinateSystem.GetAllCoordinates();
+                    possibleDestinations = possibleFirstLevelDestinations.Concat(possibleStackingDestinations);
+                }
+                else if (piece.GetType() == typeof(GrasshopperPiece))
+                {
+                    movementRule = _grasshopperMovementRules;
+                    possibleDestinations = gameState.CoordinateSystem.GetAllFreeAdjacentCoordinates();
+                }
+                else if (piece.GetType() == typeof(QueenPiece))
+                {
+                    movementRule = _queenMovementRules;
+                    possibleDestinations = gameState.CoordinateSystem.GetAllFreeAdjacentCoordinates();
+                }
+                else
+                {
+                    movementRule = _spiderMovementRules;
+                    possibleDestinations = gameState.CoordinateSystem.GetAllFreeAdjacentCoordinates();
+                }
+
+                foreach (var destination in possibleDestinations)
+                {
+                    var validationResult = movementRule.ValidatePieceMovement(gameState.CoordinateSystem, coordinate, destination, gameState.CurrentPlayerTurnColor);
+                    if (validationResult == MovementValidationResult.VALID)
+                    {
+                        allAvailableActions.Add(new PlayerMovementAction(coordinate, destination));
+                    }
+                }
+
+            }
+
+            // TODO: return no valid player move if allAvailableActions is empty
 
             return allAvailableActions;
         }
 
-        private static void AddValidSpawnPlayerActions(GameState gameState, List<IPlayerAction> allAvailableActions, List<IPiece> allPossiblePieces, (int, int) spawnCoordinate)
+        private static void AddValidSpawnPlayerActions(GameState gameState,
+            List<IPlayerAction> allAvailableActions,
+            List<IPiece> allPossibleSpawnPieces,
+            (int, int) spawnCoordinate
+            )
         {
-            foreach (var piece in allPossiblePieces)
+            foreach (var piece in allPossibleSpawnPieces)
             {
                 var validationResult = SpawnRules.ValidatePieceSpawn(piece,
                     gameState.CoordinateSystem,
