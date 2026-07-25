@@ -215,7 +215,7 @@ namespace Hive.Core.Rules
         {
             if (VerifyWhetherGameStateIsTerminal(gameState))
             {
-                return false; // TODO: tests
+                return false;
             }
 
             if (playerAction.GetType() == typeof(PlayerSpawnAction))

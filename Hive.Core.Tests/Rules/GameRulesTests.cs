@@ -521,9 +521,11 @@ namespace Hive.Core.Tests.Rules
             var freshGameState = GameRules.CreateFreshGameState();
             var appliedAction = GameRules.GetAllAvailablePlayerActions(freshGameState).OfType<PlayerSpawnAction>().First();
             var updatedGameState = GameRules.ApplyPlayerActionToGameState(freshGameState, appliedAction);
+            appliedAction = GameRules.GetAllAvailablePlayerActions(updatedGameState).OfType<PlayerSpawnAction>().First();
+            updatedGameState = GameRules.ApplyPlayerActionToGameState(updatedGameState, appliedAction);
 
             // WHEN
-            var gameResult = GameRules.GetGameResult(freshGameState);
+            var gameResult = GameRules.GetGameResult(updatedGameState);
 
             // THEN
             Assert.AreEqual(GameResult.ONGOING, gameResult);
@@ -658,7 +660,6 @@ namespace Hive.Core.Tests.Rules
             Assert.IsEmpty(availableActions);
         }
 
-
         [TestMethod]
         public void Given_GameStateWithWhiteAndBlackQueenSurrounded_When_GameResultsIsRetrieved_Then_ReturnsDraw()
         {
@@ -727,6 +728,73 @@ namespace Hive.Core.Tests.Rules
 
             // THEN
             Assert.AreEqual(GameResult.DRAW, gameResult);
+        }
+
+        [TestMethod]
+        public void Given_GameStateWithTerminalResult_When_InvalidPlayerActionIsApllied_Then_ThrowsException()
+        {
+            // GIVEN
+            //      [BLK x] [BLK B] [BLK x]
+            //      [-1,-2] [ 0,-2] [ 1,-2]
+            //
+            //  [BLK x] [BLK Q] [BLK S]
+            //  [-2,-1] [-1,-1] [ 0,-1]
+            //
+            //      [WHT A] [WHT Q] [WHT S]
+            //      [-2, 0] [-1, 0] [ 0, 0]
+            //
+            //          [WHT x] [WHT x]
+            //          [-2, 1] [-1, 1]
+            var gameState = GameRules.CreateFreshGameState();
+            // Turn: 1
+            var actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First(a
+                => a.PieceToSpawn.GetType() == typeof(SpiderPiece) && a.DestinationCoordinate == (0, 0));
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
+            actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First(a
+                => a.PieceToSpawn.GetType() == typeof(SpiderPiece) && a.DestinationCoordinate == (0, -1));
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
+            // Turn: 2
+            actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First(a
+                => a.PieceToSpawn.GetType() == typeof(QueenPiece) && a.DestinationCoordinate == (-1, 1));
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
+            actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First(a
+                => a.PieceToSpawn.GetType() == typeof(QueenPiece) && a.DestinationCoordinate == (-1, -1));
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
+            // Turn: 3 - white queen moves closer
+            var moveActionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerMovementAction>().First(a
+                => a.StartCoordinate == (-1, 1) && a.DestinationCoordinate == (-1, 0));
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, moveActionToBeApplied);
+            actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First(a
+                => a.PieceToSpawn.GetType() == typeof(BeetlePiece) && a.DestinationCoordinate == (0, -2));
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
+            // Turn: 4
+            actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First(a
+                => a.PieceToSpawn.GetType() == typeof(BeetlePiece) && a.DestinationCoordinate == (-1, 1));
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
+            actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First(a
+                => a.PieceToSpawn.GetType() == typeof(BeetlePiece) && a.DestinationCoordinate == (-1, -2));
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
+            // Turn: 5
+            actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First(a
+                => a.PieceToSpawn.GetType() == typeof(GrasshopperPiece) && a.DestinationCoordinate == (-2, 1));
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
+            actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First(a
+                => a.PieceToSpawn.GetType() == typeof(GrasshopperPiece) && a.DestinationCoordinate == (-2, -1));
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
+            // Turn: 6
+            actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First(a
+                => a.PieceToSpawn.GetType() == typeof(AntPiece) && a.DestinationCoordinate == (0, 1));
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
+            actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First(a
+                => a.PieceToSpawn.GetType() == typeof(AntPiece) && a.DestinationCoordinate == (1, -2));
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
+            // Turn: 7 - ant moves to surround both queens
+            moveActionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerMovementAction>().First(a
+                => a.StartCoordinate == (0, 1) && a.DestinationCoordinate == (-2, 0));
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, moveActionToBeApplied);
+
+            // WHEN & THEN
+            Assert.Throws<Exception>(() => GameRules.ApplyPlayerActionToGameState(gameState, new PlayerMovementAction((0, -2), (1, -3))));
         }
     }
 }
