@@ -138,6 +138,75 @@ namespace Hive.Core.Tests.Rules
         }
 
         [TestMethod]
+        public void Given_CoordinateSystemWithSixPiecesButNoQueenForWhite_When_QueenPieceSpawnValidated_Then_ReturnsValid()
+        {
+            // GIVEN
+
+            //              [WHT B]
+            //              [ 1,-1]
+            //
+            //  [WHT A] [WHT S]
+            //  [-1, 0] [ q, r]
+            //
+            //              [BLK S]
+            //              [ 0, 1]
+            //
+            //          [BLK Q] [BLK G]
+            //          [-1, 2] [ 0, 2]
+            var coordinateSystem = CoordinateSystemPopulationHelper.CreatePopulatedCoordinateSystem(
+            [
+                (( 0,  0), typeof(SpiderPiece)),
+                (( 0,  1), typeof(SpiderPiece)),
+                ((-1,  0), typeof(AntPiece)),
+                (( 0,  2), typeof(GrasshopperPiece)),
+                (( 1, -1), typeof(BeetlePiece)),
+                ((-1,  2), typeof(QueenPiece))
+            ]);
+
+            // WHEN
+            var piece = new QueenPiece(PlayerColor.WHITE);
+            var result = SpawnRules.ValidatePieceSpawn(piece, coordinateSystem, (-2, 0), PlayerColor.WHITE, 4);
+
+            // THEN
+            Assert.AreEqual(SpawnValidationResult.VALID, result);
+        }
+
+        [TestMethod]
+        public void Given_CoordinateSystemWithSevenPiecesButNoQueenForBlack_When_QueenPieceSpawnValidated_Then_ReturnsValid()
+        {
+            // GIVEN
+
+            //                      [WHT B]
+            //                      [ 1,-1]
+            //
+            //  [WHT Q] [WHT A] [WHT S]
+            //  [-2, 0] [-1, 0] [ q, r]
+            //
+            //                      [BLK S]
+            //                      [ 0, 1]
+            //
+            //                  [BLK A] [BLK G]
+            //                  [-1, 2] [ 0, 2]
+            var coordinateSystem = CoordinateSystemPopulationHelper.CreatePopulatedCoordinateSystem(
+            [
+                (( 0,  0), typeof(SpiderPiece)),
+                (( 0,  1), typeof(SpiderPiece)),
+                ((-1,  0), typeof(AntPiece)),
+                (( 0,  2), typeof(GrasshopperPiece)),
+                (( 1, -1), typeof(BeetlePiece)),
+                ((-1,  2), typeof(AntPiece)),
+                ((-2,  0), typeof(QueenPiece))
+            ]);
+
+            // WHEN
+            var piece = new QueenPiece(PlayerColor.BLACK);
+            var result = SpawnRules.ValidatePieceSpawn(piece, coordinateSystem, (0, 3), PlayerColor.BLACK, 4);
+
+            // THEN
+            Assert.AreEqual(SpawnValidationResult.VALID, result);
+        }
+
+        [TestMethod]
         public void Given_PopulatedCoordinateSystem_When_UnreachablePieceSpawned_Then_ReturnsValidationFail()
         {
             // GIVEN

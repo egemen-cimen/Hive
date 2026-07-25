@@ -10,7 +10,7 @@ namespace Hive.Core.Rules
             PlayerColor playerTurnColor
             )
         {
-            var commonMovementValidation = CommonMovementRuleHelper.ValidateCommonMovementRules<GrasshopperPiece>(coordinateSystem,
+            var commonMovementValidation = CommonMovementRules.ValidateCommonMovementRules<GrasshopperPiece>(coordinateSystem,
                 startCoordinate,
                 destinationCoordinate,
                 playerTurnColor

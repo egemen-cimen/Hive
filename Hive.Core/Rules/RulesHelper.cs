@@ -2,25 +2,21 @@
 
 namespace Hive.Core.Rules
 {
-    public class RulesHelper
+    public static class RulesHelper
     {
-        public static bool FindQueenForPlayerColor(ICoordinateSystem coordinateSystem, PlayerColor playerTurnColor)
+        public static (bool queenExists, (int column, int row)? coordinate) VerifyWhetherQueenIsSpawned(ICoordinateSystem coordinateSystem, PlayerColor playerTurnColor)
         {
-            var coordinates = coordinateSystem.GetAllCoordinates();
-            var isQueenPlayedForColor = false;
-
-            foreach (var coordinate in coordinates)
+            var allCoordinates = coordinateSystem.GetAllCoordinates();
+            foreach (var populatedCoordinate in allCoordinates)
             {
-                coordinateSystem.TryGetHexagon(coordinate, out var hexagon);
-
+                coordinateSystem.TryGetHexagon(populatedCoordinate, out var hexagon);
                 if (hexagon!.GetAllPieces().Any(p => p.Color == playerTurnColor && p is QueenPiece))
                 {
-                    isQueenPlayedForColor = true;
-                    break;
+                    return (true, populatedCoordinate);
                 }
             }
 
-            return isQueenPlayedForColor;
+            return (false, null);
         }
     }
 }

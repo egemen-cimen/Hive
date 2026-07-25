@@ -637,7 +637,7 @@ namespace Hive.Core.Tests.Models
 
             // THEN
             Assert.HasCount(1, sharedNighbors);
-            Assert.AreEqual(hexagon1, sharedNighbors.First());
+            Assert.AreEqual(hexagon1, sharedNighbors[0]);
         }
     }
 }
