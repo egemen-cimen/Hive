@@ -230,7 +230,12 @@ namespace Hive.Core.Rules
             }
             else if (playerAction.GetType() == typeof(PlayerUnableToPlayAction))
             {
-                throw new NotImplementedException();
+                var (nextPlayerColor, nextTurnNumber) = IncrementTurnCounter(gameState.CurrentPlayerTurnColor, gameState.TurnNumber);
+
+                gameState.PastPlayerActions.Push(playerAction);
+
+                // TODO: consider keeping only one copy of a game state rather than creating new ones.
+                return new GameState(gameState.CoordinateSystem, gameState.PastPlayerActions, nextPlayerColor, nextTurnNumber);
             }
             else
             {
@@ -273,7 +278,10 @@ namespace Hive.Core.Rules
             }
             else if (playerAction.GetType() == typeof(PlayerUnableToPlayAction))
             {
-                throw new NotImplementedException();
+                var (previousPlayerColor, previousTurnNumber) = DecrementTurnCounter(gameState.CurrentPlayerTurnColor, gameState.TurnNumber);
+
+                // TODO: consider keeping only one copy of a game state rather than creating new ones.
+                return new GameState(gameState.CoordinateSystem, gameState.PastPlayerActions, previousPlayerColor, previousTurnNumber);
             }
             else
             {

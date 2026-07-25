@@ -167,6 +167,7 @@ namespace Hive.Core.Tests.Rules
                 gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
             }
 
+            // Move ant to the other side to block the other player's last possile move
             var antMovementToOtherSideAction = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerMovementAction>().First(a
                 => a.DestinationCoordinate.column == 0);
             gameState = GameRules.ApplyPlayerActionToGameState(gameState, antMovementToOtherSideAction);
@@ -177,6 +178,8 @@ namespace Hive.Core.Tests.Rules
             // THEN
             Assert.HasCount(1, availableActions);
             Assert.IsInstanceOfType<PlayerUnableToPlayAction>(availableActions[0]);
+            Assert.AreEqual(12, gameState.TurnNumber);
+            Assert.AreEqual(PlayerColor.BLACK, gameState.CurrentPlayerTurnColor);
         }
 
         [TestMethod]
@@ -398,12 +401,79 @@ namespace Hive.Core.Tests.Rules
         public void Given_GameStateWherePlayerHasNoMoves_When_PlayerMovementActionApplied_Then_ReturnsUpdatedGameState()
         {
             // GIVEN
+            var gameState = GameRules.CreateFreshGameState();
+            // Spawn all non-ant pieces in a line
+            for (var i = 0; i < 16; i++)
+            {
+                var actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First(a
+                    => a.PieceToSpawn.GetType() != typeof(AntPiece) && a.DestinationCoordinate.column == 0);
+                gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
+            }
+
+            // Spawn rest of the pieces (all ants) in a line
+            for (var i = 0; i < 6; i++)
+            {
+                var actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First(a
+                    => a.DestinationCoordinate.column == 0);
+                gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
+            }
+
+            // Move ant to the other side to block the other player's last possile move
+            var antMovementToOtherSideAction = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerMovementAction>().First(a
+                => a.DestinationCoordinate.column == 0);
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, antMovementToOtherSideAction);
+            var unableToPlayAction = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerUnableToPlayAction>().First();
+            var allCoordinatesFromOriginalGameState = gameState.CoordinateSystem.GetAllCoordinates();
+
+            // WHEN
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, unableToPlayAction);
+
+            // THEN
+            Assert.AreEqual(13, gameState.TurnNumber);
+            Assert.AreEqual(PlayerColor.WHITE, gameState.CurrentPlayerTurnColor);
+            var allCoordinatesFromUpdatedGameState = gameState.CoordinateSystem.GetAllCoordinates();
+            Assert.IsTrue(allCoordinatesFromOriginalGameState.SetEquals(allCoordinatesFromUpdatedGameState));
         }
 
         [TestMethod]
         public void Given_GameStateWherePlayerHasNoMoves_When_PlayerMovementActionReverted_Then_ReturnsPreviousGameState()
         {
             // GIVEN
+            var gameState = GameRules.CreateFreshGameState();
+            // Spawn all non-ant pieces in a line
+            for (var i = 0; i < 16; i++)
+            {
+                var actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First(a
+                    => a.PieceToSpawn.GetType() != typeof(AntPiece) && a.DestinationCoordinate.column == 0);
+                gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
+            }
+
+            // Spawn rest of the pieces (all ants) in a line
+            for (var i = 0; i < 6; i++)
+            {
+                var actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First(a
+                    => a.DestinationCoordinate.column == 0);
+                gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
+            }
+
+            // Move ant to the other side to block the other player's last possile move
+            var antMovementToOtherSideAction = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerMovementAction>().First(a
+                => a.DestinationCoordinate.column == 0);
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, antMovementToOtherSideAction);
+            var unableToPlayAction = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerUnableToPlayAction>().First();
+            var allCoordinatesFromPreviousGameState = gameState.CoordinateSystem.GetAllCoordinates();
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, unableToPlayAction);
+            var allCoordinatesFromCurrentGameState = gameState.CoordinateSystem.GetAllCoordinates();
+
+            // WHEN
+            var revertedGameState = GameRules.UndoLastMoveFromGameState(gameState);
+
+            // THEN
+            Assert.AreEqual(12, revertedGameState.TurnNumber);
+            Assert.AreEqual(PlayerColor.BLACK, revertedGameState.CurrentPlayerTurnColor);
+            var allCoordinatesFromRevertedGameState = revertedGameState.CoordinateSystem.GetAllCoordinates();
+            Assert.IsTrue(allCoordinatesFromPreviousGameState.SetEquals(allCoordinatesFromRevertedGameState));
+            Assert.IsTrue(allCoordinatesFromPreviousGameState.SetEquals(allCoordinatesFromCurrentGameState));
         }
     }
 }
