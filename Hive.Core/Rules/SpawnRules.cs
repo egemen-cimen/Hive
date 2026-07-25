@@ -37,7 +37,8 @@ namespace Hive.Core.Rules
                 return SpawnValidationResult.QUEEN_CANNOT_BE_PLACED_ON_FIRST_TURN;
             }
 
-            if (turnNumber == 4 && piece.GetType() != typeof(QueenPiece) && !RulesHelper.VerifyWhetherQueenIsSpawned(coordinateSystem, playerTurnColor))
+            var (queenExists, _) = RulesHelper.VerifyWhetherQueenIsSpawned(coordinateSystem, playerTurnColor);
+            if (turnNumber == 4 && piece.GetType() != typeof(QueenPiece) && !queenExists)
             {
                 return SpawnValidationResult.QUEEN_WAS_NOT_PLACED_UNTIL_FOURTH_TURN;
             }

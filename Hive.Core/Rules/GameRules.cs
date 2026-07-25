@@ -30,6 +30,11 @@ namespace Hive.Core.Rules
         /// <returns></returns>
         public static List<IPlayerAction> GetAllAvailablePlayerActions(GameState gameState)
         {
+            if (VerifyWhetherGameStateIsTerminal(gameState))
+            {
+                return [];
+            }
+
             var allAvailableActions = new List<IPlayerAction>();
 
             List<IPiece> allPossibleSpawnPieces = [new AntPiece(gameState.CurrentPlayerTurnColor),
@@ -52,24 +57,12 @@ namespace Hive.Core.Rules
                 var piece = populatedHexagon!.PeekPiece();
                 IEnumerable<(int column, int row)> possibleDestinations;
 
-                // TODO: fix inefficencies by implementing "GetAllAvailableMovements" method in *MovementRules
-                if (piece.GetType() == typeof(AntPiece))
-                {
-                    possibleDestinations = gameState.CoordinateSystem.GetAllFreeAdjacentCoordinates();
-                }
-                else if (piece.GetType() == typeof(BeetlePiece))
+                // TODO: Fix inefficencies by implementing "GetAllAvailableMovements" method in *MovementRules.
+                if (piece.GetType() == typeof(BeetlePiece))
                 {
                     var possibleFirstLevelDestinations = gameState.CoordinateSystem.GetAllFreeAdjacentCoordinates();
                     var possibleStackingDestinations = gameState.CoordinateSystem.GetAllCoordinates();
                     possibleDestinations = possibleFirstLevelDestinations.Concat(possibleStackingDestinations);
-                }
-                else if (piece.GetType() == typeof(GrasshopperPiece))
-                {
-                    possibleDestinations = gameState.CoordinateSystem.GetAllFreeAdjacentCoordinates();
-                }
-                else if (piece.GetType() == typeof(QueenPiece))
-                {
-                    possibleDestinations = gameState.CoordinateSystem.GetAllFreeAdjacentCoordinates();
                 }
                 else
                 {
@@ -124,7 +117,31 @@ namespace Hive.Core.Rules
         /// <returns></returns>
         public static GameResult GetGameResult(GameState gameState)
         {
-            throw new NotImplementedException();
+            var (whiteQueenExists, whiteQueenCoordinate) = RulesHelper.VerifyWhetherQueenIsSpawned(gameState.CoordinateSystem, PlayerColor.WHITE);
+            var (blackQueenExists, blackQueenCoordinate) = RulesHelper.VerifyWhetherQueenIsSpawned(gameState.CoordinateSystem, PlayerColor.BLACK);
+
+            if (!whiteQueenExists || !blackQueenExists)
+            {
+                return GameResult.ONGOING;
+            }
+
+            var numberOfPiecesAroundWhiteQueen = gameState.CoordinateSystem.GetPopulatedNeighborHexagons(whiteQueenCoordinate!.Value).Count;
+            var numberOfPiecesAroundBlackQueen = gameState.CoordinateSystem.GetPopulatedNeighborHexagons(blackQueenCoordinate!.Value).Count;
+
+            if (numberOfPiecesAroundWhiteQueen == 6 && numberOfPiecesAroundBlackQueen == 6)
+            {
+                return GameResult.DRAW;
+            }
+            else if (numberOfPiecesAroundWhiteQueen == 6)
+            {
+                return GameResult.BLACK_WON;
+            }
+            else if (numberOfPiecesAroundBlackQueen == 6)
+            {
+                return GameResult.WHITE_WON;
+            }
+
+            return GameResult.ONGOING;
         }
 
         /// <summary>
@@ -134,9 +151,8 @@ namespace Hive.Core.Rules
         /// <returns></returns>
         public static bool VerifyWhetherGameStateIsTerminal(GameState gameState)
         {
-            //var gameResult = GetGameResult(gameState);
-            //return gameResult == GameResult.ONGOING;
-            throw new NotImplementedException();
+            var gameResult = GetGameResult(gameState);
+            return gameResult != GameResult.ONGOING;
         }
 
         /// <summary>
@@ -163,7 +179,7 @@ namespace Hive.Core.Rules
 
                 gameState.PastPlayerActions.Push(playerAction);
 
-                // TODO: consider keeping only one copy of a game state rather than creating new ones.
+                // TODO: Consider keeping only one copy of a game state rather than creating new ones. Do this for all occurrences in this class.
                 return new GameState(gameState.CoordinateSystem, gameState.PastPlayerActions, nextPlayerColor, nextTurnNumber);
 
             }
@@ -177,7 +193,6 @@ namespace Hive.Core.Rules
 
                 gameState.PastPlayerActions.Push(playerAction);
 
-                // TODO: consider keeping only one copy of a game state rather than creating new ones.
                 return new GameState(gameState.CoordinateSystem, gameState.PastPlayerActions, nextPlayerColor, nextTurnNumber);
             }
             else // Player unable to play
@@ -186,7 +201,6 @@ namespace Hive.Core.Rules
 
                 gameState.PastPlayerActions.Push(playerAction);
 
-                // TODO: consider keeping only one copy of a game state rather than creating new ones.
                 return new GameState(gameState.CoordinateSystem, gameState.PastPlayerActions, nextPlayerColor, nextTurnNumber);
             }
         }
@@ -199,6 +213,11 @@ namespace Hive.Core.Rules
         /// <returns></returns>
         private static bool VerifyWhetherActionIsLegal(GameState gameState, IPlayerAction playerAction)
         {
+            if (VerifyWhetherGameStateIsTerminal(gameState))
+            {
+                return false; // TODO: tests
+            }
+
             if (playerAction.GetType() == typeof(PlayerSpawnAction))
             {
                 var spawnAction = (PlayerSpawnAction)playerAction;
@@ -246,7 +265,7 @@ namespace Hive.Core.Rules
         /// <returns>A new game state but reuses the coordinate system and past move stack from the original.</returns>
         public static GameState UndoLastMoveFromGameState(GameState gameState)
         {
-            var playerAction = gameState.PastPlayerActions.Pop(); // TODO: write test case for it
+            var playerAction = gameState.PastPlayerActions.Pop();
 
             if (playerAction.GetType() == typeof(PlayerSpawnAction))
             {
@@ -258,7 +277,6 @@ namespace Hive.Core.Rules
 
                 var (previousPlayerColor, previousTurnNumber) = DecrementTurnCounter(gameState.CurrentPlayerTurnColor, gameState.TurnNumber);
 
-                // TODO: consider keeping only one copy of a game state rather than creating new ones.
                 return new GameState(gameState.CoordinateSystem, gameState.PastPlayerActions, previousPlayerColor, previousTurnNumber);
             }
             else if (playerAction.GetType() == typeof(PlayerMovementAction))
@@ -269,14 +287,12 @@ namespace Hive.Core.Rules
 
                 var (previousPlayerColor, previousTurnNumber) = DecrementTurnCounter(gameState.CurrentPlayerTurnColor, gameState.TurnNumber);
 
-                // TODO: consider keeping only one copy of a game state rather than creating new ones.
                 return new GameState(gameState.CoordinateSystem, gameState.PastPlayerActions, previousPlayerColor, previousTurnNumber);
             }
             else // Player unable to play
             {
                 var (previousPlayerColor, previousTurnNumber) = DecrementTurnCounter(gameState.CurrentPlayerTurnColor, gameState.TurnNumber);
 
-                // TODO: consider keeping only one copy of a game state rather than creating new ones.
                 return new GameState(gameState.CoordinateSystem, gameState.PastPlayerActions, previousPlayerColor, previousTurnNumber);
             }
         }

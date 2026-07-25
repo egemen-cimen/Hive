@@ -87,10 +87,11 @@ namespace Hive.Core.Tests.Rules
         {
             // GIVEN
             var gameState = GameRules.CreateFreshGameState();
-            // Spawn all 22 pieces
+            // Spawn all 22 pieces in a line (in order to prevent accidental game over)
             for (var i = 0; i < 22; i++)
             {
-                var actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First();
+                var actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First(a
+                    => a.DestinationCoordinate.column == 0);
                 gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
             }
 
@@ -498,6 +499,234 @@ namespace Hive.Core.Tests.Rules
 
             // WHEN & THEN
             Assert.Throws<Exception>(() => GameRules.UndoLastMoveFromGameState(gameState));
+        }
+
+        [TestMethod]
+        public void Given_FreshGameState_When_GameResultsIsRetrieved_Then_ReturnsOngoing()
+        {
+            // GIVEN
+            var freshGameState = GameRules.CreateFreshGameState();
+
+            // WHEN
+            var gameResult = GameRules.GetGameResult(freshGameState);
+
+            // THEN
+            Assert.AreEqual(GameResult.ONGOING, gameResult);
+        }
+
+        [TestMethod]
+        public void Given_GameStateWithTwoSpawnedPieces_When_GameResultsIsRetrieved_Then_ReturnsOngoing()
+        {
+            // GIVEN
+            var freshGameState = GameRules.CreateFreshGameState();
+            var appliedAction = GameRules.GetAllAvailablePlayerActions(freshGameState).OfType<PlayerSpawnAction>().First();
+            var updatedGameState = GameRules.ApplyPlayerActionToGameState(freshGameState, appliedAction);
+
+            // WHEN
+            var gameResult = GameRules.GetGameResult(freshGameState);
+
+            // THEN
+            Assert.AreEqual(GameResult.ONGOING, gameResult);
+        }
+
+        [TestMethod]
+        public void Given_GameStateWithWhiteQueenSurrounded_When_GameResultsIsRetrieved_Then_ReturnsBlackWon()
+        {
+            // GIVEN
+            var gameState = GameRules.CreateFreshGameState();
+            // Spawn first pieces in a line
+            var actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First(a
+                => a.PieceToSpawn.GetType() == typeof(SpiderPiece) && a.DestinationCoordinate.column == 0);
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
+            actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First(a
+                => a.PieceToSpawn.GetType() == typeof(SpiderPiece) && a.DestinationCoordinate.column == 0);
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
+            // Spawn queens as second pieces in a line and get the coordinates
+            actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First(a
+                => a.PieceToSpawn.GetType() == typeof(QueenPiece) && a.DestinationCoordinate.column == 0);
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
+            var whiteQueenCoordinate = actionToBeApplied.DestinationCoordinate;
+            var spacesNextToQueen = gameState.CoordinateSystem.GetAdjacentCoordinates(whiteQueenCoordinate);
+            actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First(a
+                => a.PieceToSpawn.GetType() == typeof(QueenPiece) && a.DestinationCoordinate.column == 0);
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
+            // Finally spawn next 5 pieces near white queen to surround it (9 pieces in total)
+            for (var i = 0; i < 4; i++)
+            {
+                // Surround white queen
+                actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First(a
+                    => spacesNextToQueen.Contains(a.DestinationCoordinate));
+                gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
+
+                // Don't surround black queen
+                actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First(a
+                    => a.DestinationCoordinate.column == 0);
+                gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
+            }
+            actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First(a
+                => spacesNextToQueen.Contains(a.DestinationCoordinate));
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
+
+            // WHEN
+            var gameResult = GameRules.GetGameResult(gameState);
+
+            // THEN
+            Assert.AreEqual(GameResult.BLACK_WON, gameResult);
+        }
+
+        [TestMethod]
+        public void Given_GameStateWithBlackQueenSurrounded_When_GameResultsIsRetrieved_Then_ReturnsWhiteWon()
+        {
+            // GIVEN
+            var gameState = GameRules.CreateFreshGameState();
+            // Spawn first pieces in a line
+            var actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First(a
+                => a.PieceToSpawn.GetType() == typeof(SpiderPiece) && a.DestinationCoordinate.column == 0);
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
+            actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First(a
+                => a.PieceToSpawn.GetType() == typeof(SpiderPiece) && a.DestinationCoordinate.column == 0);
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
+            // Spawn queens as second pieces in a line and get the coordinates
+            actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First(a
+                => a.PieceToSpawn.GetType() == typeof(QueenPiece) && a.DestinationCoordinate.column == 0);
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
+            actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First(a
+                => a.PieceToSpawn.GetType() == typeof(QueenPiece) && a.DestinationCoordinate.column == 0);
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
+            var blackQueenCoordinate = actionToBeApplied.DestinationCoordinate;
+            var spacesNextToQueen = gameState.CoordinateSystem.GetAdjacentCoordinates(blackQueenCoordinate);
+            // Finally spawn next 5 pieces near black queen to surround it (10 pieces in total)
+            for (var i = 0; i < 5; i++)
+            {
+                // Don't surround white queen
+                actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First(a
+                    => a.DestinationCoordinate.column == 0);
+                gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
+
+                // Surround black queen
+                actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First(a
+                    => spacesNextToQueen.Contains(a.DestinationCoordinate));
+                gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
+            }
+
+            // WHEN
+            var gameResult = GameRules.GetGameResult(gameState);
+
+            // THEN
+            Assert.AreEqual(GameResult.WHITE_WON, gameResult);
+        }
+
+        [TestMethod]
+        public void Given_GameStateIsTerminal_When_AllAvailableActionsRetrieved_Then_ReturnsEmptyList()
+        {
+            // GIVEN
+            var gameState = GameRules.CreateFreshGameState();
+            // Spawn first pieces in a line
+            var actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First(a
+                => a.PieceToSpawn.GetType() == typeof(SpiderPiece) && a.DestinationCoordinate.column == 0);
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
+            actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First(a
+                => a.PieceToSpawn.GetType() == typeof(SpiderPiece) && a.DestinationCoordinate.column == 0);
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
+            // Spawn queens as second pieces in a line and get the coordinates
+            actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First(a
+                => a.PieceToSpawn.GetType() == typeof(QueenPiece) && a.DestinationCoordinate.column == 0);
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
+            actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First(a
+                => a.PieceToSpawn.GetType() == typeof(QueenPiece) && a.DestinationCoordinate.column == 0);
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
+            var blackQueenCoordinate = actionToBeApplied.DestinationCoordinate;
+            var spacesNextToQueen = gameState.CoordinateSystem.GetAdjacentCoordinates(blackQueenCoordinate);
+            // Finally spawn next 5 pieces near black queen to surround it (10 pieces in total)
+            for (var i = 0; i < 5; i++)
+            {
+                // Don't surround white queen
+                actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First(a
+                    => a.DestinationCoordinate.column == 0);
+                gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
+
+                // Surround black queen
+                actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First(a
+                    => spacesNextToQueen.Contains(a.DestinationCoordinate));
+                gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
+            }
+
+            // WHEN
+            var availableActions = GameRules.GetAllAvailablePlayerActions(gameState);
+
+            // THEN
+            Assert.IsEmpty(availableActions);
+        }
+
+
+        [TestMethod]
+        public void Given_GameStateWithWhiteAndBlackQueenSurrounded_When_GameResultsIsRetrieved_Then_ReturnsDraw()
+        {
+            // GIVEN
+            //      [BLK x] [BLK x] [BLK x]
+            //      [-1,-2] [ 0,-2] [ 1,-2]
+            //
+            //  [BLK x] [BLK Q] [BLK S]
+            //  [-2,-1] [-1,-1] [ 0,-1]
+            //
+            //      [WHT A] [WHT Q] [WHT S]
+            //      [-2, 0] [-1, 0] [ 0, 0]
+            //
+            //          [WHT x] [WHT x]
+            //          [-2, 1] [-1, 1]
+            var gameState = GameRules.CreateFreshGameState();
+            // Turn: 1
+            var actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First(a
+                => a.PieceToSpawn.GetType() == typeof(SpiderPiece) && a.DestinationCoordinate == (0, 0));
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
+            actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First(a
+                => a.PieceToSpawn.GetType() == typeof(SpiderPiece) && a.DestinationCoordinate == (0, -1));
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
+            // Turn: 2
+            actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First(a
+                => a.PieceToSpawn.GetType() == typeof(QueenPiece) && a.DestinationCoordinate == (-1, 1));
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
+            actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First(a
+                => a.PieceToSpawn.GetType() == typeof(QueenPiece) && a.DestinationCoordinate == (-1, -1));
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
+            // Turn: 3 - white queen moves closer
+            var moveActionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerMovementAction>().First(a
+                => a.StartCoordinate == (-1, 1) && a.DestinationCoordinate == (-1, 0));
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, moveActionToBeApplied);
+            actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First(a
+                => a.PieceToSpawn.GetType() == typeof(BeetlePiece) && a.DestinationCoordinate == (0, -2));
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
+            // Turn: 4
+            actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First(a
+                => a.PieceToSpawn.GetType() == typeof(BeetlePiece) && a.DestinationCoordinate == (-1, 1));
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
+            actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First(a
+                => a.PieceToSpawn.GetType() == typeof(BeetlePiece) && a.DestinationCoordinate == (-1, -2));
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
+            // Turn: 5
+            actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First(a
+                => a.PieceToSpawn.GetType() == typeof(GrasshopperPiece) && a.DestinationCoordinate == (-2, 1));
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
+            actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First(a
+                => a.PieceToSpawn.GetType() == typeof(GrasshopperPiece) && a.DestinationCoordinate == (-2, -1));
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
+            // Turn: 6
+            actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First(a
+                => a.PieceToSpawn.GetType() == typeof(AntPiece) && a.DestinationCoordinate == (0, 1));
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
+            actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First(a
+                => a.PieceToSpawn.GetType() == typeof(AntPiece) && a.DestinationCoordinate == (1, -2));
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
+            // Turn: 7 - ant moves to surround both queens
+            moveActionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerMovementAction>().First(a
+                => a.StartCoordinate == (0, 1) && a.DestinationCoordinate == (-2, 0));
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, moveActionToBeApplied);
+
+            // WHEN
+            var gameResult = GameRules.GetGameResult(gameState);
+
+            // THEN
+            Assert.AreEqual(GameResult.DRAW, gameResult);
         }
     }
 }

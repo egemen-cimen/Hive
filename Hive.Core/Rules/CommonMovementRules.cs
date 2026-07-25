@@ -55,7 +55,7 @@ namespace Hive.Core.Rules
             // Validation for non-queen pieces
             if (typeof(T) != typeof(QueenPiece))
             {
-                var queenExists = RulesHelper.VerifyWhetherQueenIsSpawned(coordinateSystem, playerTurnColor);
+                var (queenExists, _) = RulesHelper.VerifyWhetherQueenIsSpawned(coordinateSystem, playerTurnColor);
                 if (!queenExists)
                 {
                     return MovementValidationResult.CANNOT_MOVE_WITHOUT_QUEEN;
