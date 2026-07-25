@@ -30,7 +30,7 @@ namespace Hive.Core.Tests.Rules
             // THEN
             CollectionAssert.AllItemsAreInstancesOfType(availableActions, typeof(PlayerSpawnAction));
             Assert.HasCount(4, availableActions);
-            foreach (var action in availableActions.Cast<PlayerSpawnAction>())
+            foreach (var action in availableActions.OfType<PlayerSpawnAction>())
             {
                 Assert.AreEqual(PlayerColor.WHITE, action.PieceToSpawn.Color);
                 Assert.IsNotInstanceOfType<QueenPiece>(action.PieceToSpawn);
@@ -42,7 +42,7 @@ namespace Hive.Core.Tests.Rules
         {
             // GIVEN
             var freshGameState = GameRules.CreateFreshGameState();
-            var appliedAction = GameRules.GetAllAvailablePlayerActions(freshGameState).Cast<PlayerSpawnAction>().First();
+            var appliedAction = GameRules.GetAllAvailablePlayerActions(freshGameState).OfType<PlayerSpawnAction>().First();
             var updatedGameState = GameRules.ApplyPlayerActionToGameState(freshGameState, appliedAction);
 
             // WHEN
@@ -51,7 +51,7 @@ namespace Hive.Core.Tests.Rules
             // THEN
             CollectionAssert.AllItemsAreInstancesOfType(availableActions, typeof(PlayerSpawnAction));
             Assert.HasCount(24, availableActions);
-            foreach (var action in availableActions.Cast<PlayerSpawnAction>())
+            foreach (var action in availableActions.OfType<PlayerSpawnAction>())
             {
                 Assert.AreEqual(PlayerColor.BLACK, action.PieceToSpawn.Color);
                 Assert.IsNotInstanceOfType<QueenPiece>(action.PieceToSpawn);
@@ -64,10 +64,10 @@ namespace Hive.Core.Tests.Rules
             // GIVEN
             var gameState = GameRules.CreateFreshGameState();
             // Spawn the first piece
-            var appliedAction = GameRules.GetAllAvailablePlayerActions(gameState).Cast<PlayerSpawnAction>().First();
+            var appliedAction = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First();
             gameState = GameRules.ApplyPlayerActionToGameState(gameState, appliedAction);
             // Spawn the second piece
-            appliedAction = GameRules.GetAllAvailablePlayerActions(gameState).Cast<PlayerSpawnAction>().First();
+            appliedAction = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First();
             gameState = GameRules.ApplyPlayerActionToGameState(gameState, appliedAction);
 
             // WHEN
@@ -76,7 +76,7 @@ namespace Hive.Core.Tests.Rules
             // THEN
             CollectionAssert.AllItemsAreInstancesOfType(availableActions, typeof(PlayerSpawnAction));
             Assert.HasCount(15, availableActions);
-            foreach (var action in availableActions.Cast<PlayerSpawnAction>())
+            foreach (var action in availableActions.OfType<PlayerSpawnAction>())
             {
                 Assert.AreEqual(PlayerColor.WHITE, action.PieceToSpawn.Color);
             }
@@ -90,7 +90,7 @@ namespace Hive.Core.Tests.Rules
             // Spawn all 22 pieces
             for (var i = 0; i < 22; i++)
             {
-                var actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).First(a => a.GetType() == typeof(PlayerSpawnAction));
+                var actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First();
                 gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
             }
 
@@ -99,8 +99,8 @@ namespace Hive.Core.Tests.Rules
 
             // THEN
             CollectionAssert.AllItemsAreInstancesOfType(availableActions, typeof(PlayerMovementAction));
-            Assert.AreEqual(0, availableActions.Count(a => a.GetType() == typeof(PlayerSpawnAction)));
-            Assert.IsGreaterThan(0, availableActions.Count(a => a.GetType() == typeof(PlayerMovementAction)));
+            Assert.AreEqual(0, availableActions.OfType<PlayerSpawnAction>().Count());
+            Assert.IsGreaterThan(0, availableActions.OfType<PlayerMovementAction>().Count());
         }
 
         [TestMethod]
@@ -109,13 +109,13 @@ namespace Hive.Core.Tests.Rules
             // GIVEN
             var gameState = GameRules.CreateFreshGameState();
             // Spawn the first piece
-            var actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).Cast<PlayerSpawnAction>().First();
+            var actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First();
             gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
             // Spawn the second piece
-            actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).Cast<PlayerSpawnAction>().First();
+            actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First();
             gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
             // Spawn the third piece
-            actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).Cast<PlayerSpawnAction>().First(a
+            actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First(a
                 => a.PieceToSpawn.GetType() != typeof(QueenPiece));
             gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
             // Record count of available actions for this state (should be 15)
@@ -123,7 +123,7 @@ namespace Hive.Core.Tests.Rules
             // Undo the last move
             gameState = GameRules.UndoLastMoveFromGameState(gameState);
             // Spawn the third piece again
-            actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).Cast<PlayerSpawnAction>().First(a
+            actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First(a
                 => a.PieceToSpawn.GetType() != typeof(QueenPiece));
             gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
 
@@ -135,15 +135,20 @@ namespace Hive.Core.Tests.Rules
             CollectionAssert.AllItemsAreInstancesOfType(secondAvailableActions, typeof(PlayerSpawnAction));
             Assert.HasCount(firstAvailableActions.Count, secondAvailableActions);
             Assert.HasCount(15, secondAvailableActions);
-            foreach (var action in firstAvailableActions.Cast<PlayerSpawnAction>())
+            foreach (var action in firstAvailableActions.OfType<PlayerSpawnAction>())
             {
                 Assert.AreEqual(PlayerColor.BLACK, action.PieceToSpawn.Color);
             }
 
-            foreach (var action in secondAvailableActions.Cast<PlayerSpawnAction>())
+            foreach (var action in secondAvailableActions.OfType<PlayerSpawnAction>())
             {
                 Assert.AreEqual(PlayerColor.BLACK, action.PieceToSpawn.Color);
             }
+        }
+
+        [TestMethod]
+        public void Given_GameStateWherePlayerHasNoMoves_When_AllAvailableActionsRetrieved_Then_ReturnsOnlyPlayerUnableToPlayAction()
+        {
         }
 
         [TestMethod]
@@ -151,7 +156,7 @@ namespace Hive.Core.Tests.Rules
         {
             // GIVEN
             var freshGameState = GameRules.CreateFreshGameState();
-            var actionToBeApplied = GameRules.GetAllAvailablePlayerActions(freshGameState).Cast<PlayerSpawnAction>().First();
+            var actionToBeApplied = GameRules.GetAllAvailablePlayerActions(freshGameState).OfType<PlayerSpawnAction>().First();
 
             // WHEN
             var updatedGameState = GameRules.ApplyPlayerActionToGameState(freshGameState, actionToBeApplied);
@@ -169,7 +174,7 @@ namespace Hive.Core.Tests.Rules
         {
             // GIVEN
             var freshGameState = GameRules.CreateFreshGameState();
-            var appliedAction = GameRules.GetAllAvailablePlayerActions(freshGameState).Cast<PlayerSpawnAction>().First();
+            var appliedAction = GameRules.GetAllAvailablePlayerActions(freshGameState).OfType<PlayerSpawnAction>().First();
             var updatedGameState = GameRules.ApplyPlayerActionToGameState(freshGameState, appliedAction);
 
             // WHEN
@@ -186,7 +191,7 @@ namespace Hive.Core.Tests.Rules
         {
             // GIVEN
             var freshGameState = GameRules.CreateFreshGameState();
-            var actionToBeApplied = GameRules.GetAllAvailablePlayerActions(freshGameState).Cast<PlayerSpawnAction>().First();
+            var actionToBeApplied = GameRules.GetAllAvailablePlayerActions(freshGameState).OfType<PlayerSpawnAction>().First();
             var updatedGameState = GameRules.ApplyPlayerActionToGameState(freshGameState, actionToBeApplied);
 
             // WHEN & THEN
@@ -201,7 +206,7 @@ namespace Hive.Core.Tests.Rules
             // Spawn 4 pieces including the queen for each player
             for (var i = 0; i < 8; i++)
             {
-                var actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).First(a => a.GetType() == typeof(PlayerSpawnAction));
+                var actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First();
                 gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
             }
 
@@ -209,8 +214,8 @@ namespace Hive.Core.Tests.Rules
             var availableActions = GameRules.GetAllAvailablePlayerActions(gameState);
 
             // THEN
-            Assert.IsGreaterThan(0, availableActions.Count(a => a.GetType() == typeof(PlayerSpawnAction)));
-            Assert.IsGreaterThan(0, availableActions.Count(a => a.GetType() == typeof(PlayerMovementAction)));
+            Assert.IsGreaterThan(0, availableActions.OfType<PlayerSpawnAction>().Count());
+            Assert.IsGreaterThan(0, availableActions.OfType<PlayerMovementAction>().Count());
         }
 
         [TestMethod]
@@ -221,11 +226,11 @@ namespace Hive.Core.Tests.Rules
             // Spawn 4 pieces including the queen for each player
             for (var i = 0; i < 8; i++)
             {
-                var actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).First(a => a.GetType() == typeof(PlayerSpawnAction));
+                var actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First();
                 gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
             }
             var allCoordinatesFromOriginalGameState = gameState.CoordinateSystem.GetAllCoordinates();
-            var availableMovementActions = GameRules.GetAllAvailablePlayerActions(gameState).Where(a => a.GetType() == typeof(PlayerMovementAction));
+            var availableMovementActions = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerMovementAction>().ToList();
 
             // WHEN
             var updatedGameState = GameRules.ApplyPlayerActionToGameState(gameState, availableMovementActions.First());
@@ -246,11 +251,11 @@ namespace Hive.Core.Tests.Rules
             // Spawn 4 pieces including the queen for each player
             for (var i = 0; i < 8; i++)
             {
-                var actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).First(a => a.GetType() == typeof(PlayerSpawnAction));
+                var actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First();
                 gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
             }
             var allCoordinatesFromPreviousGameState = gameState.CoordinateSystem.GetAllCoordinates();
-            var availableMovementActions = GameRules.GetAllAvailablePlayerActions(gameState).Where(a => a.GetType() == typeof(PlayerMovementAction));
+            var availableMovementActions = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerMovementAction>();
             var updatedGameState = GameRules.ApplyPlayerActionToGameState(gameState, availableMovementActions.First());
 
             // WHEN
@@ -264,6 +269,113 @@ namespace Hive.Core.Tests.Rules
             Assert.AreEqual(PlayerColor.WHITE, revertedGameState.CurrentPlayerTurnColor);
         }
 
-        // TODO: another two tests with beetle on second level (move and revert)
+        [TestMethod]
+        public void Given_GameStateWithBeetleOnSecondLevel_When_PlayerMovementActionApplied_Then_ReturnsUpdatedGameState()
+        {
+            // GIVEN
+            var gameState = GameRules.CreateFreshGameState();
+            // Spawn 4 pieces including the queen for each player
+            for (var i = 0; i < 8; i++)
+            {
+                var actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First();
+                gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
+            }
+            // Spawn a beetle for each player.
+            var spawnBeetleAction = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First(a
+                => a.PieceToSpawn.GetType() == typeof(BeetlePiece));
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, spawnBeetleAction);
+            spawnBeetleAction = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First(a
+                => a.PieceToSpawn.GetType() == typeof(BeetlePiece));
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, spawnBeetleAction);
+
+            var allCoordinatesFromOriginalGameState = gameState.CoordinateSystem.GetAllCoordinates();
+            var availableMovementActions = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerMovementAction>();
+
+            PlayerMovementAction? beetleMovementToSecondFloorAction = null;
+            foreach (var action in availableMovementActions)
+            {
+                gameState.CoordinateSystem.TryGetHexagon(action.StartCoordinate, out var hexagon);
+                if (hexagon!.PeekPiece().GetType() == typeof(BeetlePiece) && gameState.CoordinateSystem.GetAllCoordinates().Contains(action.DestinationCoordinate))
+                {
+                    beetleMovementToSecondFloorAction = action;
+                    break;
+                }
+            }
+            Assert.IsNotNull(beetleMovementToSecondFloorAction);
+
+            // WHEN
+            var updatedGameState = GameRules.ApplyPlayerActionToGameState(gameState, beetleMovementToSecondFloorAction);
+
+            // THEN
+            var allCoordinatesFromUpdatedGameState = updatedGameState.CoordinateSystem.GetAllCoordinates();
+            Assert.HasCount(9, allCoordinatesFromUpdatedGameState);
+            Assert.IsFalse(allCoordinatesFromOriginalGameState.SetEquals(allCoordinatesFromUpdatedGameState));
+            Assert.AreEqual(6, updatedGameState.TurnNumber);
+            Assert.AreEqual(PlayerColor.BLACK, updatedGameState.CurrentPlayerTurnColor);
+            gameState.CoordinateSystem.TryGetHexagon(beetleMovementToSecondFloorAction.DestinationCoordinate, out var destinationHexagon);
+            Assert.IsNotNull(destinationHexagon);
+            Assert.AreEqual(2, destinationHexagon.GetPieceCount());
+        }
+
+        [TestMethod]
+        public void Given_GameStateWithBeetleOnSecondLevel_When_PlayerMovementActionReverted_Then_ReturnsPreviousGameState()
+        {
+            // GIVEN
+            var gameState = GameRules.CreateFreshGameState();
+            // Spawn 4 pieces including the queen for each player
+            for (var i = 0; i < 8; i++)
+            {
+                var actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First();
+                gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
+            }
+            // Spawn a beetle for each player.
+            var spawnBeetleAction = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First(a
+                => a.PieceToSpawn.GetType() == typeof(BeetlePiece));
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, spawnBeetleAction);
+            spawnBeetleAction = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First(a
+                => a.PieceToSpawn.GetType() == typeof(BeetlePiece));
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, spawnBeetleAction);
+
+            var allCoordinatesFromPreviousGameState = gameState.CoordinateSystem.GetAllCoordinates();
+            var availableMovementActions = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerMovementAction>();
+
+            PlayerMovementAction? beetleMovementToSecondFloorAction = null;
+            foreach (var action in availableMovementActions)
+            {
+                gameState.CoordinateSystem.TryGetHexagon(action.StartCoordinate, out var hexagon);
+                if (hexagon!.PeekPiece().GetType() == typeof(BeetlePiece) && gameState.CoordinateSystem.GetAllCoordinates().Contains(action.DestinationCoordinate))
+                {
+                    beetleMovementToSecondFloorAction = action;
+                    break;
+                }
+            }
+            Assert.IsNotNull(beetleMovementToSecondFloorAction);
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, beetleMovementToSecondFloorAction);
+
+            // WHEN
+            var revertedGameState = GameRules.UndoLastMoveFromGameState(gameState);
+
+            // THEN
+            var allCoordinatesFromRevertedGameState = revertedGameState.CoordinateSystem.GetAllCoordinates();
+            Assert.HasCount(10, allCoordinatesFromRevertedGameState);
+            Assert.IsTrue(allCoordinatesFromPreviousGameState.SetEquals(allCoordinatesFromRevertedGameState));
+            Assert.AreEqual(6, revertedGameState.TurnNumber);
+            Assert.AreEqual(PlayerColor.WHITE, revertedGameState.CurrentPlayerTurnColor);
+            gameState.CoordinateSystem.TryGetHexagon(beetleMovementToSecondFloorAction.DestinationCoordinate, out var destinationHexagon);
+            Assert.IsNotNull(destinationHexagon);
+            Assert.AreEqual(1, destinationHexagon.GetPieceCount());
+        }
+
+        [TestMethod]
+        public void Given_GameStateWherePlayerHasNoMoves_When_PlayerMovementActionApplied_Then_ReturnsUpdatedGameState()
+        {
+            // GIVEN
+        }
+
+        [TestMethod]
+        public void Given_GameStateWherePlayerHasNoMoves_When_PlayerMovementActionReverted_Then_ReturnsPreviousGameState()
+        {
+            // GIVEN
+        }
     }
 }
