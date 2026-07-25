@@ -52,11 +52,6 @@ namespace Hive.Core.Rules
                 var piece = populatedHexagon!.PeekPiece();
                 IEnumerable<(int column, int row)> possibleDestinations;
 
-                if (!_movementRules.TryGetValue(piece.GetType(), out var movementRules))
-                {
-                    throw new Exception("Unsupported piece type encountered.");
-                }
-
                 // TODO: fix inefficencies by implementing "GetAllAvailableMovements" method in *MovementRules
                 if (piece.GetType() == typeof(AntPiece))
                 {
@@ -81,15 +76,15 @@ namespace Hive.Core.Rules
                     possibleDestinations = gameState.CoordinateSystem.GetAllFreeAdjacentCoordinates();
                 }
 
+                _movementRules.TryGetValue(piece.GetType(), out var movementRules);
                 foreach (var destination in possibleDestinations)
                 {
-                    var validationResult = movementRules.ValidatePieceMovement(gameState.CoordinateSystem, coordinate, destination, gameState.CurrentPlayerTurnColor);
+                    var validationResult = movementRules!.ValidatePieceMovement(gameState.CoordinateSystem, coordinate, destination, gameState.CurrentPlayerTurnColor);
                     if (validationResult == MovementValidationResult.VALID)
                     {
                         allAvailableActions.Add(new PlayerMovementAction(coordinate, destination));
                     }
                 }
-
             }
 
             if (allAvailableActions.Count == 0)
@@ -123,17 +118,6 @@ namespace Hive.Core.Rules
         }
 
         /// <summary>
-        /// Checks the given player action against the game state to determine if the action is valid.
-        /// </summary>
-        /// <param name="gameState"></param>
-        /// <param name="playerAction"></param>
-        /// <returns></returns>
-        public static bool VerifyWhetherActionIsLegal(GameState gameState, IPlayerAction playerAction)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
         /// Returns the result of the game state.
         /// </summary>
         /// <param name="gameState"></param>
@@ -163,6 +147,58 @@ namespace Hive.Core.Rules
         /// <returns>A new game state but reuses the coordinate system and past move stack from the original.</returns>
         public static GameState ApplyPlayerActionToGameState(GameState gameState, IPlayerAction playerAction)
         {
+            if (!VerifyWhetherActionIsLegal(gameState, playerAction))
+            {
+                throw new Exception("Player action cannot be applied to the game state.");
+            }
+
+            if (playerAction.GetType() == typeof(PlayerSpawnAction))
+            {
+                var spawnAction = (PlayerSpawnAction)playerAction;
+                var hexagonToBeAdded = new Hexagon();
+                hexagonToBeAdded.PushPiece(spawnAction.PieceToSpawn);
+                gameState.CoordinateSystem.AddHexagon(hexagonToBeAdded, spawnAction.DestinationCoordinate);
+
+                var (nextPlayerColor, nextTurnNumber) = IncrementTurnCounter(gameState.CurrentPlayerTurnColor, gameState.TurnNumber);
+
+                gameState.PastPlayerActions.Push(playerAction);
+
+                // TODO: consider keeping only one copy of a game state rather than creating new ones.
+                return new GameState(gameState.CoordinateSystem, gameState.PastPlayerActions, nextPlayerColor, nextTurnNumber);
+
+            }
+            else if (playerAction.GetType() == typeof(PlayerMovementAction))
+            {
+                var movementAction = (PlayerMovementAction)playerAction;
+
+                MovePiece(gameState.CoordinateSystem, movementAction.StartCoordinate, movementAction.DestinationCoordinate);
+
+                var (nextPlayerColor, nextTurnNumber) = IncrementTurnCounter(gameState.CurrentPlayerTurnColor, gameState.TurnNumber);
+
+                gameState.PastPlayerActions.Push(playerAction);
+
+                // TODO: consider keeping only one copy of a game state rather than creating new ones.
+                return new GameState(gameState.CoordinateSystem, gameState.PastPlayerActions, nextPlayerColor, nextTurnNumber);
+            }
+            else // Player unable to play
+            {
+                var (nextPlayerColor, nextTurnNumber) = IncrementTurnCounter(gameState.CurrentPlayerTurnColor, gameState.TurnNumber);
+
+                gameState.PastPlayerActions.Push(playerAction);
+
+                // TODO: consider keeping only one copy of a game state rather than creating new ones.
+                return new GameState(gameState.CoordinateSystem, gameState.PastPlayerActions, nextPlayerColor, nextTurnNumber);
+            }
+        }
+
+        /// <summary>
+        /// Checks the given player action against the game state to determine if the action is valid.
+        /// </summary>
+        /// <param name="gameState"></param>
+        /// <param name="playerAction"></param>
+        /// <returns></returns>
+        private static bool VerifyWhetherActionIsLegal(GameState gameState, IPlayerAction playerAction)
+        {
             if (playerAction.GetType() == typeof(PlayerSpawnAction))
             {
                 var spawnAction = (PlayerSpawnAction)playerAction;
@@ -173,73 +209,33 @@ namespace Hive.Core.Rules
                     gameState.TurnNumber
                     );
 
-                if (validationResult == SpawnValidationResult.VALID)
-                {
-                    var hexagonToBeAdded = new Hexagon();
-                    hexagonToBeAdded.PushPiece(spawnAction.PieceToSpawn);
-                    gameState.CoordinateSystem.AddHexagon(hexagonToBeAdded, spawnAction.DestinationCoordinate);
-
-                    var (nextPlayerColor, nextTurnNumber) = IncrementTurnCounter(gameState.CurrentPlayerTurnColor, gameState.TurnNumber);
-
-                    gameState.PastPlayerActions.Push(playerAction);
-
-                    // TODO: consider keeping only one copy of a game state rather than creating new ones.
-                    return new GameState(gameState.CoordinateSystem, gameState.PastPlayerActions, nextPlayerColor, nextTurnNumber);
-                }
-                else
-                {
-                    throw new Exception("Player action cannot be applied to the game state.");
-                }
-
+                return validationResult == SpawnValidationResult.VALID;
             }
             else if (playerAction.GetType() == typeof(PlayerMovementAction))
             {
                 var movementAction = (PlayerMovementAction)playerAction;
-                if (!gameState.CoordinateSystem.TryGetHexagon(movementAction.StartCoordinate, out var startHexagon))
-                {
-                    throw new Exception("Piece selected for movement is not found.");
-                }
+                gameState.CoordinateSystem.TryGetHexagon(movementAction.StartCoordinate, out var startHexagon);
                 var pieceToMove = startHexagon!.PeekPiece();
 
-                if (!_movementRules.TryGetValue(pieceToMove.GetType(), out var movementRules))
-                {
-                    throw new Exception("Unsupported piece type encountered.");
-                }
+                _movementRules.TryGetValue(pieceToMove.GetType(), out var movementRules);
 
-                var validationResult = movementRules.ValidatePieceMovement(gameState.CoordinateSystem,
+                var validationResult = movementRules!.ValidatePieceMovement(gameState.CoordinateSystem,
                     movementAction.StartCoordinate,
                     movementAction.DestinationCoordinate,
                     gameState.CurrentPlayerTurnColor
                     );
 
-                if (validationResult == MovementValidationResult.VALID)
-                {
-                    MovePiece(gameState.CoordinateSystem, movementAction.StartCoordinate, movementAction.DestinationCoordinate);
-
-                    var (nextPlayerColor, nextTurnNumber) = IncrementTurnCounter(gameState.CurrentPlayerTurnColor, gameState.TurnNumber);
-
-                    gameState.PastPlayerActions.Push(playerAction);
-
-                    // TODO: consider keeping only one copy of a game state rather than creating new ones.
-                    return new GameState(gameState.CoordinateSystem, gameState.PastPlayerActions, nextPlayerColor, nextTurnNumber);
-                }
-                else
-                {
-                    throw new Exception("Player action cannot be applied to the game state.");
-                }
+                return validationResult == MovementValidationResult.VALID;
             }
-            else if (playerAction.GetType() == typeof(PlayerUnableToPlayAction))
+            else // Player unable to play
             {
-                var (nextPlayerColor, nextTurnNumber) = IncrementTurnCounter(gameState.CurrentPlayerTurnColor, gameState.TurnNumber);
+                var allAvailablePlayerActions = GetAllAvailablePlayerActions(gameState);
+                if (allAvailablePlayerActions.Count > 1 && allAvailablePlayerActions[0].GetType() != typeof(PlayerUnableToPlayAction))
+                {
+                    return false;
+                }
 
-                gameState.PastPlayerActions.Push(playerAction);
-
-                // TODO: consider keeping only one copy of a game state rather than creating new ones.
-                return new GameState(gameState.CoordinateSystem, gameState.PastPlayerActions, nextPlayerColor, nextTurnNumber);
-            }
-            else
-            {
-                throw new Exception($"Unknown player action {playerAction.GetType()} encountered.");
+                return true;
             }
         }
 
@@ -276,16 +272,12 @@ namespace Hive.Core.Rules
                 // TODO: consider keeping only one copy of a game state rather than creating new ones.
                 return new GameState(gameState.CoordinateSystem, gameState.PastPlayerActions, previousPlayerColor, previousTurnNumber);
             }
-            else if (playerAction.GetType() == typeof(PlayerUnableToPlayAction))
+            else // Player unable to play
             {
                 var (previousPlayerColor, previousTurnNumber) = DecrementTurnCounter(gameState.CurrentPlayerTurnColor, gameState.TurnNumber);
 
                 // TODO: consider keeping only one copy of a game state rather than creating new ones.
                 return new GameState(gameState.CoordinateSystem, gameState.PastPlayerActions, previousPlayerColor, previousTurnNumber);
-            }
-            else
-            {
-                throw new Exception($"Unknown player action {playerAction.GetType()} encountered.");
             }
         }
 
@@ -294,10 +286,7 @@ namespace Hive.Core.Rules
             (int column, int row) destinationCoordinate
             )
         {
-            if (!coordinateSystem.TryGetHexagon(startCoordinate, out var startHexagon))
-            {
-                throw new Exception("Piece selected for movement is not found.");
-            }
+            coordinateSystem.TryGetHexagon(startCoordinate, out var startHexagon);
 
             var pieceToMove = startHexagon!.PeekPiece();
             if (!coordinateSystem.TryGetHexagon(destinationCoordinate, out var destinationHexagon))

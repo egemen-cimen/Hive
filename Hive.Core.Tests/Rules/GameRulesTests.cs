@@ -475,5 +475,29 @@ namespace Hive.Core.Tests.Rules
             Assert.IsTrue(allCoordinatesFromPreviousGameState.SetEquals(allCoordinatesFromRevertedGameState));
             Assert.IsTrue(allCoordinatesFromPreviousGameState.SetEquals(allCoordinatesFromCurrentGameState));
         }
+
+        [TestMethod]
+        public void Given_GameStateInProgress_When_InvalidUnableToPlayActionIsAttempted_Then_ThrowsException()
+        {
+            // GIVEN
+            var gameState = GameRules.CreateFreshGameState();
+            var actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First();
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
+            actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First();
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
+
+            // WHEN & THEN
+            Assert.Throws<Exception>(() => GameRules.ApplyPlayerActionToGameState(gameState, new PlayerUnableToPlayAction()));
+        }
+
+        [TestMethod]
+        public void Given_FreshGameState_When_PlayerMovementActionReverted_Then_ThrowsException()
+        {
+            // GIVEN
+            var gameState = GameRules.CreateFreshGameState();
+
+            // WHEN & THEN
+            Assert.Throws<Exception>(() => GameRules.UndoLastMoveFromGameState(gameState));
+        }
     }
 }
