@@ -100,6 +100,7 @@ namespace Hive.Core.Tests.Rules
             // THEN
             CollectionAssert.AllItemsAreInstancesOfType(availableActions, typeof(PlayerMovementAction));
             Assert.AreEqual(0, availableActions.Count(a => a.GetType() == typeof(PlayerSpawnAction)));
+            Assert.IsGreaterThan(0, availableActions.Count(a => a.GetType() == typeof(PlayerMovementAction)));
         }
 
         [TestMethod]
@@ -146,7 +147,7 @@ namespace Hive.Core.Tests.Rules
         }
 
         [TestMethod]
-        public void Given_FreshGameState_When_FirstPlayerActionApplied_Then_ReturnsUpdatedGameState()
+        public void Given_FreshGameState_When_FirstPlayerSpawnActionApplied_Then_ReturnsUpdatedGameState()
         {
             // GIVEN
             var freshGameState = GameRules.CreateFreshGameState();
@@ -164,7 +165,7 @@ namespace Hive.Core.Tests.Rules
         }
 
         [TestMethod]
-        public void Given_GameStateWithFirstPlayerAction_When_PlayerActionReverted_Then_ReturnsFreshGameState()
+        public void Given_GameStateWithFirstPlayerAction_When_PlayerSpawnActionReverted_Then_ReturnsFreshGameState()
         {
             // GIVEN
             var freshGameState = GameRules.CreateFreshGameState();
@@ -211,5 +212,58 @@ namespace Hive.Core.Tests.Rules
             Assert.IsGreaterThan(0, availableActions.Count(a => a.GetType() == typeof(PlayerSpawnAction)));
             Assert.IsGreaterThan(0, availableActions.Count(a => a.GetType() == typeof(PlayerMovementAction)));
         }
+
+        [TestMethod]
+        public void Given_GameStateWithFourPiecesSpawned_When_PlayerMovementActionApplied_Then_ReturnsUpdatedGameState()
+        {
+            // GIVEN
+            var gameState = GameRules.CreateFreshGameState();
+            // Spawn 4 pieces including the queen for each player
+            for (var i = 0; i < 8; i++)
+            {
+                var actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).First(a => a.GetType() == typeof(PlayerSpawnAction));
+                gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
+            }
+            var allCoordinatesFromOriginalGameState = gameState.CoordinateSystem.GetAllCoordinates();
+            var availableMovementActions = GameRules.GetAllAvailablePlayerActions(gameState).Where(a => a.GetType() == typeof(PlayerMovementAction));
+
+            // WHEN
+            var updatedGameState = GameRules.ApplyPlayerActionToGameState(gameState, availableMovementActions.First());
+
+            // THEN
+            var allCoordinatesFromUpdatedGameState = updatedGameState.CoordinateSystem.GetAllCoordinates();
+            Assert.HasCount(8, allCoordinatesFromUpdatedGameState);
+            Assert.IsFalse(allCoordinatesFromOriginalGameState.SetEquals(allCoordinatesFromUpdatedGameState));
+            Assert.AreEqual(5, updatedGameState.TurnNumber);
+            Assert.AreEqual(PlayerColor.BLACK, updatedGameState.CurrentPlayerTurnColor);
+        }
+
+        [TestMethod]
+        public void Given_GameStateWherePlayerMoved_When_PlayerMovementActionReverted_Then_ReturnsPreviousGameState()
+        {
+            // GIVEN
+            var gameState = GameRules.CreateFreshGameState();
+            // Spawn 4 pieces including the queen for each player
+            for (var i = 0; i < 8; i++)
+            {
+                var actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).First(a => a.GetType() == typeof(PlayerSpawnAction));
+                gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
+            }
+            var allCoordinatesFromPreviousGameState = gameState.CoordinateSystem.GetAllCoordinates();
+            var availableMovementActions = GameRules.GetAllAvailablePlayerActions(gameState).Where(a => a.GetType() == typeof(PlayerMovementAction));
+            var updatedGameState = GameRules.ApplyPlayerActionToGameState(gameState, availableMovementActions.First());
+
+            // WHEN
+            var revertedGameState = GameRules.UndoLastMoveFromGameState(updatedGameState);
+
+            // THEN
+            var allCoordinatesFromRevertedGameState = updatedGameState.CoordinateSystem.GetAllCoordinates();
+            Assert.HasCount(8, allCoordinatesFromRevertedGameState);
+            Assert.IsTrue(allCoordinatesFromPreviousGameState.SetEquals(allCoordinatesFromRevertedGameState));
+            Assert.AreEqual(5, revertedGameState.TurnNumber);
+            Assert.AreEqual(PlayerColor.WHITE, revertedGameState.CurrentPlayerTurnColor);
+        }
+
+        // TODO: another two tests with beetle on second level (move and revert)
     }
 }

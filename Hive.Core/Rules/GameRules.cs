@@ -4,11 +4,14 @@ namespace Hive.Core.Rules
 {
     public static class GameRules
     {
-        private static readonly AntMovementRules _antMovementRules = new();
-        private static readonly BeetleMovementRules _beetleMovementRules = new();
-        private static readonly GrasshopperMovementRules _grasshopperMovementRules = new();
-        private static readonly QueenMovementRules _queenMovementRules = new();
-        private static readonly SpiderMovementRules _spiderMovementRules = new();
+        private static readonly Dictionary<Type, IMovementRules> _movementRules = new()
+        {
+            { typeof(AntPiece), new AntMovementRules() },
+            { typeof(BeetlePiece), new BeetleMovementRules() },
+            { typeof(GrasshopperPiece), new GrasshopperMovementRules() },
+            { typeof(QueenPiece), new QueenMovementRules() },
+            { typeof(SpiderPiece), new SpiderMovementRules() }
+        };
 
         /// <summary>
         /// Returns a game state reset to beginning.
@@ -47,41 +50,40 @@ namespace Hive.Core.Rules
             {
                 gameState.CoordinateSystem.TryGetHexagon(coordinate, out var populatedHexagon);
                 var piece = populatedHexagon!.PeekPiece();
-                IMovementRules movementRule;
                 IEnumerable<(int column, int row)> possibleDestinations;
 
-                // TODO: fix inefficency
+                if (!_movementRules.TryGetValue(piece.GetType(), out var movementRules))
+                {
+                    throw new Exception("Unsupported piece type encountered.");
+                }
+
+                // TODO: fix inefficencies by implementing "GetAllAvailableMovements" method in *MovementRules
                 if (piece.GetType() == typeof(AntPiece))
                 {
-                    movementRule = _antMovementRules;
                     possibleDestinations = gameState.CoordinateSystem.GetAllFreeAdjacentCoordinates();
                 }
                 else if (piece.GetType() == typeof(BeetlePiece))
                 {
-                    movementRule = _beetleMovementRules;
                     var possibleFirstLevelDestinations = gameState.CoordinateSystem.GetAllFreeAdjacentCoordinates();
                     var possibleStackingDestinations = gameState.CoordinateSystem.GetAllCoordinates();
                     possibleDestinations = possibleFirstLevelDestinations.Concat(possibleStackingDestinations);
                 }
                 else if (piece.GetType() == typeof(GrasshopperPiece))
                 {
-                    movementRule = _grasshopperMovementRules;
                     possibleDestinations = gameState.CoordinateSystem.GetAllFreeAdjacentCoordinates();
                 }
                 else if (piece.GetType() == typeof(QueenPiece))
                 {
-                    movementRule = _queenMovementRules;
                     possibleDestinations = gameState.CoordinateSystem.GetAllFreeAdjacentCoordinates();
                 }
                 else
                 {
-                    movementRule = _spiderMovementRules;
                     possibleDestinations = gameState.CoordinateSystem.GetAllFreeAdjacentCoordinates();
                 }
 
                 foreach (var destination in possibleDestinations)
                 {
-                    var validationResult = movementRule.ValidatePieceMovement(gameState.CoordinateSystem, coordinate, destination, gameState.CurrentPlayerTurnColor);
+                    var validationResult = movementRules.ValidatePieceMovement(gameState.CoordinateSystem, coordinate, destination, gameState.CurrentPlayerTurnColor);
                     if (validationResult == MovementValidationResult.VALID)
                     {
                         allAvailableActions.Add(new PlayerMovementAction(coordinate, destination));
@@ -189,7 +191,39 @@ namespace Hive.Core.Rules
             }
             else if (playerAction.GetType() == typeof(PlayerMovementAction))
             {
-                throw new NotImplementedException();
+                var movementAction = (PlayerMovementAction)playerAction;
+                if (!gameState.CoordinateSystem.TryGetHexagon(movementAction.StartCoordinate, out var startHexagon))
+                {
+                    throw new Exception("Piece selected for movement is not found.");
+                }
+                var pieceToMove = startHexagon!.PeekPiece();
+
+                if (!_movementRules.TryGetValue(pieceToMove.GetType(), out var movementRules))
+                {
+                    throw new Exception("Unsupported piece type encountered.");
+                }
+
+                var validationResult = movementRules.ValidatePieceMovement(gameState.CoordinateSystem,
+                    movementAction.StartCoordinate,
+                    movementAction.DestinationCoordinate,
+                    gameState.CurrentPlayerTurnColor
+                    );
+
+                if (validationResult == MovementValidationResult.VALID)
+                {
+                    MovePiece(gameState.CoordinateSystem, movementAction.StartCoordinate, movementAction.DestinationCoordinate);
+
+                    var (nextPlayerColor, nextTurnNumber) = IncrementTurnCounter(gameState.CurrentPlayerTurnColor, gameState.TurnNumber);
+
+                    gameState.PastPlayerActions.Push(playerAction);
+
+                    // TODO: consider keeping only one copy of a game state rather than creating new ones.
+                    return new GameState(gameState.CoordinateSystem, gameState.PastPlayerActions, nextPlayerColor, nextTurnNumber);
+                }
+                else
+                {
+                    throw new Exception("Player action cannot be applied to the game state.");
+                }
             }
             else if (playerAction.GetType() == typeof(PlayerUnableToPlayAction))
             {
@@ -222,11 +256,17 @@ namespace Hive.Core.Rules
 
                 // TODO: consider keeping only one copy of a game state rather than creating new ones.
                 return new GameState(gameState.CoordinateSystem, gameState.PastPlayerActions, previousPlayerColor, previousTurnNumber);
-
             }
             else if (playerAction.GetType() == typeof(PlayerMovementAction))
             {
-                throw new NotImplementedException();
+                var movementAction = (PlayerMovementAction)playerAction;
+
+                MovePiece(gameState.CoordinateSystem, movementAction.DestinationCoordinate, movementAction.StartCoordinate);
+
+                var (previousPlayerColor, previousTurnNumber) = DecrementTurnCounter(gameState.CurrentPlayerTurnColor, gameState.TurnNumber);
+
+                // TODO: consider keeping only one copy of a game state rather than creating new ones.
+                return new GameState(gameState.CoordinateSystem, gameState.PastPlayerActions, previousPlayerColor, previousTurnNumber);
             }
             else if (playerAction.GetType() == typeof(PlayerUnableToPlayAction))
             {
@@ -235,6 +275,31 @@ namespace Hive.Core.Rules
             else
             {
                 throw new Exception($"Unknown player action {playerAction.GetType()} encountered.");
+            }
+        }
+
+        private static void MovePiece(ICoordinateSystem coordinateSystem,
+            (int column, int row) startCoordinate,
+            (int column, int row) destinationCoordinate
+            )
+        {
+            if (!coordinateSystem.TryGetHexagon(startCoordinate, out var startHexagon))
+            {
+                throw new Exception("Piece selected for movement is not found.");
+            }
+
+            var pieceToMove = startHexagon!.PeekPiece();
+            if (!coordinateSystem.TryGetHexagon(destinationCoordinate, out var destinationHexagon))
+            {
+                destinationHexagon = new Hexagon();
+                coordinateSystem.AddHexagon(destinationHexagon, destinationCoordinate);
+            }
+
+            destinationHexagon!.PushPiece(pieceToMove);
+            startHexagon.PopPiece();
+            if (startHexagon.GetPieceCount() == 0)
+            {
+                coordinateSystem.RemoveHexagon(startCoordinate);
             }
         }
 
