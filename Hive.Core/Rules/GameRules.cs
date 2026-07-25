@@ -92,7 +92,10 @@ namespace Hive.Core.Rules
 
             }
 
-            // TODO: return no valid player move if allAvailableActions is empty
+            if (allAvailableActions.Count == 0)
+            {
+                allAvailableActions.Add(new PlayerUnableToPlayAction());
+            }
 
             return allAvailableActions;
         }

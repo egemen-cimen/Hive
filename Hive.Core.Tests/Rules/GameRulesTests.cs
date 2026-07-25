@@ -149,6 +149,34 @@ namespace Hive.Core.Tests.Rules
         [TestMethod]
         public void Given_GameStateWherePlayerHasNoMoves_When_AllAvailableActionsRetrieved_Then_ReturnsOnlyPlayerUnableToPlayAction()
         {
+            // GIVEN
+            var gameState = GameRules.CreateFreshGameState();
+            // Spawn all non-ant pieces in a line
+            for (var i = 0; i < 16; i++)
+            {
+                var actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First(a
+                    => a.PieceToSpawn.GetType() != typeof(AntPiece) && a.DestinationCoordinate.column == 0);
+                gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
+            }
+
+            // Spawn rest of the pieces (all ants) in a line
+            for (var i = 0; i < 6; i++)
+            {
+                var actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First(a
+                    => a.DestinationCoordinate.column == 0);
+                gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
+            }
+
+            var antMovementToOtherSideAction = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerMovementAction>().First(a
+                => a.DestinationCoordinate.column == 0);
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, antMovementToOtherSideAction);
+
+            // WHEN
+            var availableActions = GameRules.GetAllAvailablePlayerActions(gameState);
+
+            // THEN
+            Assert.HasCount(1, availableActions);
+            Assert.IsInstanceOfType<PlayerUnableToPlayAction>(availableActions[0]);
         }
 
         [TestMethod]
