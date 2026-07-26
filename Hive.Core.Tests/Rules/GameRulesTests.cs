@@ -10,22 +10,22 @@ namespace Hive.Core.Tests.Rules
         public void Given_GameRules_When_FreshGameStateCreated_Then_ReturnsNewFreshGameState()
         {
             // WHEN
-            var freshGameState = GameRules.CreateFreshGameState();
+            var gameState = GameRules.CreateFreshGameState();
 
             // THEN
-            Assert.AreEqual(PlayerColor.WHITE, freshGameState.CurrentPlayerTurnColor);
-            Assert.AreEqual(1, freshGameState.TurnNumber);
-            Assert.IsEmpty(freshGameState.CoordinateSystem.GetAllCoordinates());
+            Assert.AreEqual(PlayerColor.WHITE, gameState.CurrentPlayerTurnColor);
+            Assert.AreEqual(1, gameState.TurnNumber);
+            Assert.IsEmpty(gameState.CoordinateSystem.GetAllCoordinates());
         }
 
         [TestMethod]
         public void Given_FreshGameState_When_AllAvailableActionsRetrieved_Then_ReturnsAllPossibleSpawnActions()
         {
             // GIVEN
-            var freshGameState = GameRules.CreateFreshGameState();
+            var gameState = GameRules.CreateFreshGameState();
 
             // WHEN
-            var availableActions = GameRules.GetAllAvailablePlayerActions(freshGameState);
+            var availableActions = GameRules.GetAllAvailablePlayerActions(gameState);
 
             // THEN
             CollectionAssert.AllItemsAreInstancesOfType(availableActions, typeof(PlayerSpawnAction));
@@ -41,9 +41,9 @@ namespace Hive.Core.Tests.Rules
         public void Given_GameStateWithFirstPlayerAction_When_AllAvailableActionsRetrieved_Then_ReturnsAllPossibleSpawnActions()
         {
             // GIVEN
-            var freshGameState = GameRules.CreateFreshGameState();
-            var appliedAction = GameRules.GetAllAvailablePlayerActions(freshGameState).OfType<PlayerSpawnAction>().First();
-            var updatedGameState = GameRules.ApplyPlayerActionToGameState(freshGameState, appliedAction);
+            var gameState = GameRules.CreateFreshGameState();
+            var appliedAction = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First();
+            var updatedGameState = GameRules.ApplyPlayerActionToGameState(gameState, appliedAction);
 
             // WHEN
             var availableActions = GameRules.GetAllAvailablePlayerActions(updatedGameState);
@@ -187,16 +187,16 @@ namespace Hive.Core.Tests.Rules
         public void Given_FreshGameState_When_FirstPlayerSpawnActionApplied_Then_ReturnsUpdatedGameState()
         {
             // GIVEN
-            var freshGameState = GameRules.CreateFreshGameState();
-            var actionToBeApplied = GameRules.GetAllAvailablePlayerActions(freshGameState).OfType<PlayerSpawnAction>().First();
+            var gameState = GameRules.CreateFreshGameState();
+            var actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First();
 
             // WHEN
-            var updatedGameState = GameRules.ApplyPlayerActionToGameState(freshGameState, actionToBeApplied);
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
 
             // THEN
-            var allCoordinatesFromUpdatedGameState = updatedGameState.CoordinateSystem.GetAllCoordinates();
+            var allCoordinatesFromUpdatedGameState = gameState.CoordinateSystem.GetAllCoordinates();
             Assert.HasCount(1, allCoordinatesFromUpdatedGameState);
-            updatedGameState.CoordinateSystem.TryGetHexagon(allCoordinatesFromUpdatedGameState.First(), out var onlyHexagon);
+            gameState.CoordinateSystem.TryGetHexagon(allCoordinatesFromUpdatedGameState.First(), out var onlyHexagon);
             Assert.IsNotNull(onlyHexagon);
             Assert.AreEqual(actionToBeApplied.PieceToSpawn.GetType(), onlyHexagon.PeekPiece().GetType());
         }
@@ -205,12 +205,12 @@ namespace Hive.Core.Tests.Rules
         public void Given_GameStateWithFirstPlayerAction_When_PlayerSpawnActionReverted_Then_ReturnsFreshGameState()
         {
             // GIVEN
-            var freshGameState = GameRules.CreateFreshGameState();
-            var appliedAction = GameRules.GetAllAvailablePlayerActions(freshGameState).OfType<PlayerSpawnAction>().First();
-            var updatedGameState = GameRules.ApplyPlayerActionToGameState(freshGameState, appliedAction);
+            var gameState = GameRules.CreateFreshGameState();
+            var appliedAction = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First();
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, appliedAction);
 
             // WHEN
-            var revertedGameState = GameRules.UndoLastMoveFromGameState(updatedGameState);
+            var revertedGameState = GameRules.UndoLastMoveFromGameState(gameState);
 
             // THEN
             Assert.AreEqual(PlayerColor.WHITE, revertedGameState.CurrentPlayerTurnColor);
@@ -222,12 +222,12 @@ namespace Hive.Core.Tests.Rules
         public void Given_GameStateInProgress_When_InvalidSpawnActionIsAttempted_Then_ThrowsException()
         {
             // GIVEN
-            var freshGameState = GameRules.CreateFreshGameState();
-            var actionToBeApplied = GameRules.GetAllAvailablePlayerActions(freshGameState).OfType<PlayerSpawnAction>().First();
-            var updatedGameState = GameRules.ApplyPlayerActionToGameState(freshGameState, actionToBeApplied);
+            var gameState = GameRules.CreateFreshGameState();
+            var actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First();
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
 
             // WHEN & THEN
-            Assert.Throws<Exception>(() => GameRules.ApplyPlayerActionToGameState(updatedGameState, actionToBeApplied));
+            Assert.Throws<InvalidOperationException>(() => GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied));
         }
 
         [TestMethod]
@@ -265,14 +265,14 @@ namespace Hive.Core.Tests.Rules
             var availableMovementActions = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerMovementAction>().ToList();
 
             // WHEN
-            var updatedGameState = GameRules.ApplyPlayerActionToGameState(gameState, availableMovementActions.First());
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, availableMovementActions[0]);
 
             // THEN
-            var allCoordinatesFromUpdatedGameState = updatedGameState.CoordinateSystem.GetAllCoordinates();
+            var allCoordinatesFromUpdatedGameState = gameState.CoordinateSystem.GetAllCoordinates();
             Assert.HasCount(8, allCoordinatesFromUpdatedGameState);
             Assert.IsFalse(allCoordinatesFromOriginalGameState.SetEquals(allCoordinatesFromUpdatedGameState));
-            Assert.AreEqual(5, updatedGameState.TurnNumber);
-            Assert.AreEqual(PlayerColor.BLACK, updatedGameState.CurrentPlayerTurnColor);
+            Assert.AreEqual(5, gameState.TurnNumber);
+            Assert.AreEqual(PlayerColor.BLACK, gameState.CurrentPlayerTurnColor);
         }
 
         [TestMethod]
@@ -288,13 +288,13 @@ namespace Hive.Core.Tests.Rules
             }
             var allCoordinatesFromPreviousGameState = gameState.CoordinateSystem.GetAllCoordinates();
             var availableMovementActions = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerMovementAction>();
-            var updatedGameState = GameRules.ApplyPlayerActionToGameState(gameState, availableMovementActions.First());
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, availableMovementActions.First());
 
             // WHEN
-            var revertedGameState = GameRules.UndoLastMoveFromGameState(updatedGameState);
+            var revertedGameState = GameRules.UndoLastMoveFromGameState(gameState);
 
             // THEN
-            var allCoordinatesFromRevertedGameState = updatedGameState.CoordinateSystem.GetAllCoordinates();
+            var allCoordinatesFromRevertedGameState = gameState.CoordinateSystem.GetAllCoordinates();
             Assert.HasCount(8, allCoordinatesFromRevertedGameState);
             Assert.IsTrue(allCoordinatesFromPreviousGameState.SetEquals(allCoordinatesFromRevertedGameState));
             Assert.AreEqual(5, revertedGameState.TurnNumber);
@@ -336,14 +336,14 @@ namespace Hive.Core.Tests.Rules
             Assert.IsNotNull(beetleMovementToSecondFloorAction);
 
             // WHEN
-            var updatedGameState = GameRules.ApplyPlayerActionToGameState(gameState, beetleMovementToSecondFloorAction);
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, beetleMovementToSecondFloorAction);
 
             // THEN
-            var allCoordinatesFromUpdatedGameState = updatedGameState.CoordinateSystem.GetAllCoordinates();
+            var allCoordinatesFromUpdatedGameState = gameState.CoordinateSystem.GetAllCoordinates();
             Assert.HasCount(9, allCoordinatesFromUpdatedGameState);
             Assert.IsFalse(allCoordinatesFromOriginalGameState.SetEquals(allCoordinatesFromUpdatedGameState));
-            Assert.AreEqual(6, updatedGameState.TurnNumber);
-            Assert.AreEqual(PlayerColor.BLACK, updatedGameState.CurrentPlayerTurnColor);
+            Assert.AreEqual(6, gameState.TurnNumber);
+            Assert.AreEqual(PlayerColor.BLACK, gameState.CurrentPlayerTurnColor);
             gameState.CoordinateSystem.TryGetHexagon(beetleMovementToSecondFloorAction.DestinationCoordinate, out var destinationHexagon);
             Assert.IsNotNull(destinationHexagon);
             Assert.AreEqual(2, destinationHexagon.GetPieceCount());
@@ -393,7 +393,7 @@ namespace Hive.Core.Tests.Rules
             Assert.IsTrue(allCoordinatesFromPreviousGameState.SetEquals(allCoordinatesFromRevertedGameState));
             Assert.AreEqual(6, revertedGameState.TurnNumber);
             Assert.AreEqual(PlayerColor.WHITE, revertedGameState.CurrentPlayerTurnColor);
-            gameState.CoordinateSystem.TryGetHexagon(beetleMovementToSecondFloorAction.DestinationCoordinate, out var destinationHexagon);
+            revertedGameState.CoordinateSystem.TryGetHexagon(beetleMovementToSecondFloorAction.DestinationCoordinate, out var destinationHexagon);
             Assert.IsNotNull(destinationHexagon);
             Assert.AreEqual(1, destinationHexagon.GetPieceCount());
         }
@@ -488,7 +488,7 @@ namespace Hive.Core.Tests.Rules
             gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
 
             // WHEN & THEN
-            Assert.Throws<Exception>(() => GameRules.ApplyPlayerActionToGameState(gameState, new PlayerUnableToPlayAction()));
+            Assert.Throws<InvalidOperationException>(() => GameRules.ApplyPlayerActionToGameState(gameState, new PlayerUnableToPlayAction()));
         }
 
         [TestMethod]
@@ -498,17 +498,17 @@ namespace Hive.Core.Tests.Rules
             var gameState = GameRules.CreateFreshGameState();
 
             // WHEN & THEN
-            Assert.Throws<Exception>(() => GameRules.UndoLastMoveFromGameState(gameState));
+            Assert.Throws<InvalidOperationException>(() => GameRules.UndoLastMoveFromGameState(gameState));
         }
 
         [TestMethod]
         public void Given_FreshGameState_When_GameResultsIsRetrieved_Then_ReturnsOngoing()
         {
             // GIVEN
-            var freshGameState = GameRules.CreateFreshGameState();
+            var gameState = GameRules.CreateFreshGameState();
 
             // WHEN
-            var gameResult = GameRules.GetGameResult(freshGameState);
+            var gameResult = GameRules.GetGameResult(gameState);
 
             // THEN
             Assert.AreEqual(GameResult.ONGOING, gameResult);
@@ -518,14 +518,14 @@ namespace Hive.Core.Tests.Rules
         public void Given_GameStateWithTwoSpawnedPieces_When_GameResultsIsRetrieved_Then_ReturnsOngoing()
         {
             // GIVEN
-            var freshGameState = GameRules.CreateFreshGameState();
-            var appliedAction = GameRules.GetAllAvailablePlayerActions(freshGameState).OfType<PlayerSpawnAction>().First();
-            var updatedGameState = GameRules.ApplyPlayerActionToGameState(freshGameState, appliedAction);
-            appliedAction = GameRules.GetAllAvailablePlayerActions(updatedGameState).OfType<PlayerSpawnAction>().First();
-            updatedGameState = GameRules.ApplyPlayerActionToGameState(updatedGameState, appliedAction);
+            var gameState = GameRules.CreateFreshGameState();
+            var appliedAction = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First();
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, appliedAction);
+            appliedAction = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First();
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, appliedAction);
 
             // WHEN
-            var gameResult = GameRules.GetGameResult(updatedGameState);
+            var gameResult = GameRules.GetGameResult(gameState);
 
             // THEN
             Assert.AreEqual(GameResult.ONGOING, gameResult);
@@ -794,7 +794,7 @@ namespace Hive.Core.Tests.Rules
             gameState = GameRules.ApplyPlayerActionToGameState(gameState, moveActionToBeApplied);
 
             // WHEN & THEN
-            Assert.Throws<Exception>(() => GameRules.ApplyPlayerActionToGameState(gameState, new PlayerMovementAction((0, -2), (1, -3))));
+            Assert.Throws<InvalidOperationException>(() => GameRules.ApplyPlayerActionToGameState(gameState, new PlayerMovementAction((0, -2), (1, -3))));
         }
     }
 }
