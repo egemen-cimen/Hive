@@ -165,7 +165,7 @@ namespace Hive.Core.Rules
         {
             if (!VerifyWhetherActionIsLegal(gameState, playerAction))
             {
-                throw new Exception("Player action cannot be applied to the game state.");
+                throw new InvalidOperationException("Player action cannot be applied to the game state.");
             }
 
             if (playerAction.GetType() == typeof(PlayerSpawnAction))
@@ -174,34 +174,26 @@ namespace Hive.Core.Rules
                 var hexagonToBeAdded = new Hexagon();
                 hexagonToBeAdded.PushPiece(spawnAction.PieceToSpawn);
                 gameState.CoordinateSystem.AddHexagon(hexagonToBeAdded, spawnAction.DestinationCoordinate);
-
-                var (nextPlayerColor, nextTurnNumber) = IncrementTurnCounter(gameState.CurrentPlayerTurnColor, gameState.TurnNumber);
-
+                gameState.IncrementTurnCounter();
                 gameState.PastPlayerActions.Push(playerAction);
 
-                // TODO: Consider keeping only one copy of a game state rather than creating new ones. Do this for all occurrences in this class.
-                return new GameState(gameState.CoordinateSystem, gameState.PastPlayerActions, nextPlayerColor, nextTurnNumber);
-
+                return gameState;
             }
             else if (playerAction.GetType() == typeof(PlayerMovementAction))
             {
                 var movementAction = (PlayerMovementAction)playerAction;
-
                 MovePiece(gameState.CoordinateSystem, movementAction.StartCoordinate, movementAction.DestinationCoordinate);
-
-                var (nextPlayerColor, nextTurnNumber) = IncrementTurnCounter(gameState.CurrentPlayerTurnColor, gameState.TurnNumber);
-
+                gameState.IncrementTurnCounter();
                 gameState.PastPlayerActions.Push(playerAction);
 
-                return new GameState(gameState.CoordinateSystem, gameState.PastPlayerActions, nextPlayerColor, nextTurnNumber);
+                return gameState;
             }
             else // Player unable to play
             {
-                var (nextPlayerColor, nextTurnNumber) = IncrementTurnCounter(gameState.CurrentPlayerTurnColor, gameState.TurnNumber);
-
+                gameState.IncrementTurnCounter();
                 gameState.PastPlayerActions.Push(playerAction);
 
-                return new GameState(gameState.CoordinateSystem, gameState.PastPlayerActions, nextPlayerColor, nextTurnNumber);
+                return gameState;
             }
         }
 
@@ -274,26 +266,23 @@ namespace Hive.Core.Rules
                 gameState.CoordinateSystem.TryGetHexagon(spawnAction.DestinationCoordinate, out var hexagonToBeRemoved);
                 hexagonToBeRemoved!.PopPiece();
                 gameState.CoordinateSystem.RemoveHexagon(spawnAction.DestinationCoordinate);
+                gameState.DecrementTurnCounter();
 
-                var (previousPlayerColor, previousTurnNumber) = DecrementTurnCounter(gameState.CurrentPlayerTurnColor, gameState.TurnNumber);
-
-                return new GameState(gameState.CoordinateSystem, gameState.PastPlayerActions, previousPlayerColor, previousTurnNumber);
+                return gameState;
             }
             else if (playerAction.GetType() == typeof(PlayerMovementAction))
             {
                 var movementAction = (PlayerMovementAction)playerAction;
-
                 MovePiece(gameState.CoordinateSystem, movementAction.DestinationCoordinate, movementAction.StartCoordinate);
+                gameState.DecrementTurnCounter();
 
-                var (previousPlayerColor, previousTurnNumber) = DecrementTurnCounter(gameState.CurrentPlayerTurnColor, gameState.TurnNumber);
-
-                return new GameState(gameState.CoordinateSystem, gameState.PastPlayerActions, previousPlayerColor, previousTurnNumber);
+                return gameState;
             }
             else // Player unable to play
             {
-                var (previousPlayerColor, previousTurnNumber) = DecrementTurnCounter(gameState.CurrentPlayerTurnColor, gameState.TurnNumber);
+                gameState.DecrementTurnCounter();
 
-                return new GameState(gameState.CoordinateSystem, gameState.PastPlayerActions, previousPlayerColor, previousTurnNumber);
+                return gameState;
             }
         }
 
@@ -317,34 +306,6 @@ namespace Hive.Core.Rules
             {
                 coordinateSystem.RemoveHexagon(startCoordinate);
             }
-        }
-
-        private static (PlayerColor playerColor, int turnNumber) IncrementTurnCounter(PlayerColor currentPlayerTurnColor, int currentTurnNumber)
-        {
-            var nextTurnNumber = currentTurnNumber;
-
-            var nextPlayerColor = currentPlayerTurnColor == PlayerColor.WHITE ? PlayerColor.BLACK : PlayerColor.WHITE;
-
-            if (nextPlayerColor == PlayerColor.WHITE)
-            {
-                nextTurnNumber++;
-            }
-
-            return (nextPlayerColor, nextTurnNumber);
-        }
-
-        private static (PlayerColor playerColor, int turnNumber) DecrementTurnCounter(PlayerColor currentPlayerTurnColor, int currentTurnNumber)
-        {
-            var nextTurnNumber = currentTurnNumber;
-
-            var nextPlayerColor = currentPlayerTurnColor == PlayerColor.WHITE ? PlayerColor.BLACK : PlayerColor.WHITE;
-
-            if (nextPlayerColor == PlayerColor.BLACK)
-            {
-                nextTurnNumber--;
-            }
-
-            return (nextPlayerColor, nextTurnNumber);
         }
     }
 }
