@@ -1,4 +1,6 @@
-﻿namespace Hive.Core.Models
+﻿using System.Text;
+
+namespace Hive.Core.Models
 {
     public class AxialCoordinateSystem : ICoordinateSystem
     {
@@ -246,6 +248,41 @@
             AddHexagon(hexagon, hexagonCoordinate);
 
             return result;
+        }
+
+        public override string ToString()
+        {
+            var stringBuilder = new StringBuilder();
+            // TODO get top-most and left-most pieces for bounds and draw the coordinate system
+            var allCoordinates = GetAllCoordinates();
+            var topMostRow = allCoordinates.Min(c => c.row);
+            var smallestColumn = allCoordinates.Min(c => c.column);
+            var leftMostCoordinate = allCoordinates.Where(c => c.column == smallestColumn).MinBy(c => c.row);
+            var bottomMostRow = allCoordinates.Max(c => c.row);
+            var greatestColumn = allCoordinates.Max(c => c.column);
+            var rightMostCoordinate = allCoordinates.Where(c => c.column == greatestColumn).MaxBy(c => c.row);
+
+            for (var row = topMostRow; row <= bottomMostRow; row++)
+            {
+                for (var column = leftMostCoordinate.column; column <= rightMostCoordinate.column; column++)
+                {
+                    if (TryGetHexagon((column, row), out _))
+                    {
+                        stringBuilder.Append('[');
+                        stringBuilder.Append(column);
+                        stringBuilder.Append(',');
+                        stringBuilder.Append(row);
+                        stringBuilder.Append(']');
+                        stringBuilder.AppendLine();
+                    }
+                    else
+                    {
+                        stringBuilder.Append("       ");
+                    }
+                }
+            }
+
+            return stringBuilder.ToString();
         }
     }
 }

@@ -639,5 +639,35 @@ namespace Hive.Core.Tests.Models
             Assert.HasCount(1, sharedNighbors);
             Assert.AreEqual(hexagon1, sharedNighbors[0]);
         }
+
+        [TestMethod]
+        public void Given_CoordinateSystem_When_ToStringCalled_Then_ReturnsAsciiArtOfCoordinateSystem()
+        {
+            // GIVEN
+            var coordinateSystem = new AxialCoordinateSystem();
+            var hexagon1 = new Hexagon();
+            (int column, int row) coordinate1 = (0, -2);
+            var hexagon2 = new Hexagon();
+            (int column, int row) coordinate2 = (0, -1);
+            var hexagon3 = new Hexagon();
+            (int column, int row) coordinate3 = (0, 0);
+
+            coordinateSystem.AddHexagon(hexagon1, coordinate1);
+            coordinateSystem.AddHexagon(hexagon2, coordinate2);
+            coordinateSystem.AddHexagon(hexagon3, coordinate3);
+
+            // WHEN
+            var asciiArt = coordinateSystem.ToString();
+
+            // THEN
+            var expectedAsciiArt = @"
+[ 0,-2]
+
+    [ 0,-1]
+
+        [ q, r]
+";
+            Assert.AreEqual(expectedAsciiArt, asciiArt);
+        }
     }
 }
