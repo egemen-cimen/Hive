@@ -252,34 +252,51 @@ namespace Hive.Core.Models
 
         public override string ToString()
         {
+            const string INDENT = "      ";
             var stringBuilder = new StringBuilder();
-            // TODO get top-most and left-most pieces for bounds and draw the coordinate system
             var allCoordinates = GetAllCoordinates();
             var topMostRow = allCoordinates.Min(c => c.row);
-            var smallestColumn = allCoordinates.Min(c => c.column);
-            var leftMostCoordinate = allCoordinates.Where(c => c.column == smallestColumn).MinBy(c => c.row);
             var bottomMostRow = allCoordinates.Max(c => c.row);
-            var greatestColumn = allCoordinates.Max(c => c.column);
-            var rightMostCoordinate = allCoordinates.Where(c => c.column == greatestColumn).MaxBy(c => c.row);
+            var smallestColumn = allCoordinates.Min(c => c.column);
+            var largestColumn = allCoordinates.Max(c => c.column);
+
+            var rowCount = 0;
 
             for (var row = topMostRow; row <= bottomMostRow; row++)
             {
-                for (var column = leftMostCoordinate.column; column <= rightMostCoordinate.column; column++)
+                stringBuilder.AppendLine();
+
+                for (var i = 0; i < rowCount; i++)
                 {
-                    if (TryGetHexagon((column, row), out _))
+                    stringBuilder.Append(INDENT);
+                }
+
+                for (var column = smallestColumn; column <= largestColumn; column++)
+                {
+                    if (allCoordinates.Contains((column, row)))
                     {
                         stringBuilder.Append('[');
-                        stringBuilder.Append(column);
+                        stringBuilder.Append($"{column,4}");
                         stringBuilder.Append(',');
-                        stringBuilder.Append(row);
-                        stringBuilder.Append(']');
-                        stringBuilder.AppendLine();
+                        stringBuilder.Append($"{row,4}");
+                        if (column == largestColumn)
+                        {
+                            stringBuilder.Append(']');
+                        }
+                        else
+                        {
+                            stringBuilder.Append("] ");
+                        }
                     }
                     else
                     {
-                        stringBuilder.Append("       ");
+                        stringBuilder.Append(INDENT);
+                        stringBuilder.Append(INDENT);
                     }
                 }
+
+                stringBuilder.AppendLine();
+                rowCount++;
             }
 
             return stringBuilder.ToString();
