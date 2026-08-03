@@ -253,33 +253,40 @@ namespace Hive.Core.Models
         public override string ToString()
         {
             const string INDENT = "      ";
+
             var stringBuilder = new StringBuilder();
             var allCoordinates = GetAllCoordinates();
+
             var topMostRow = allCoordinates.Min(c => c.row);
             var bottomMostRow = allCoordinates.Max(c => c.row);
-            var smallestColumn = allCoordinates.Min(c => c.column);
-            var largestColumn = allCoordinates.Max(c => c.column);
 
-            var rowCount = 0;
+            // Calculate the indentations for the ascii art
+            IEnumerable<(int column, int row, int indent)> allCoordinatesAndIndents = allCoordinates.Select(c
+                => (c.column, c.row, 2 * c.column + c.row));
+            // Normalize indents to start from 0
+            var minIndent = allCoordinatesAndIndents.Min(ci => ci.indent);
+            allCoordinatesAndIndents = allCoordinatesAndIndents.Select(c => (c.column, c.row, c.indent - minIndent));
 
             for (var row = topMostRow; row <= bottomMostRow; row++)
             {
                 stringBuilder.AppendLine();
+                var coordinatesInThisRow = allCoordinatesAndIndents.Where(ci => ci.row == row);
+                var largestIndentForThisRow = coordinatesInThisRow.Max(ci => ci.indent);
 
-                for (var i = 0; i < rowCount; i++)
+                foreach (var coordinateIndent in coordinatesInThisRow)
                 {
-                    stringBuilder.Append(INDENT);
-                }
+                    for (var i = 0; i < coordinateIndent.indent; i++)
+                    {
+                        stringBuilder.Append(INDENT);
+                    }
 
-                for (var column = smallestColumn; column <= largestColumn; column++)
-                {
-                    if (allCoordinates.Contains((column, row)))
+                    if (allCoordinates.Contains((coordinateIndent.column, row)))
                     {
                         stringBuilder.Append('[');
-                        stringBuilder.Append($"{column,4}");
+                        stringBuilder.Append($"{coordinateIndent.column,4}");
                         stringBuilder.Append(',');
                         stringBuilder.Append($"{row,4}");
-                        if (column == largestColumn)
+                        if (coordinateIndent.indent == largestIndentForThisRow)
                         {
                             stringBuilder.Append(']');
                         }
@@ -296,7 +303,6 @@ namespace Hive.Core.Models
                 }
 
                 stringBuilder.AppendLine();
-                rowCount++;
             }
 
             return stringBuilder.ToString();

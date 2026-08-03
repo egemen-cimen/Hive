@@ -646,21 +646,16 @@ namespace Hive.Core.Tests.Models
             // GIVEN
             var coordinateSystem = new AxialCoordinateSystem();
             var hexagon1 = new Hexagon();
-            (int column, int row) coordinate1 = (0, -2);
             var hexagon2 = new Hexagon();
-            (int column, int row) coordinate2 = (0, -1);
             var hexagon3 = new Hexagon();
-            (int column, int row) coordinate3 = (0, 0);
             var hexagon4 = new Hexagon();
-            (int column, int row) coordinate4 = (-1, 1);
             var hexagon5 = new Hexagon();
-            (int column, int row) coordinate5 = (-2, 2);
 
-            coordinateSystem.AddHexagon(hexagon1, coordinate1);
-            coordinateSystem.AddHexagon(hexagon2, coordinate2);
-            coordinateSystem.AddHexagon(hexagon3, coordinate3);
-            coordinateSystem.AddHexagon(hexagon4, coordinate4);
-            coordinateSystem.AddHexagon(hexagon5, coordinate5);
+            coordinateSystem.AddHexagon(hexagon1, (0, -2));
+            coordinateSystem.AddHexagon(hexagon2, (0, -1));
+            coordinateSystem.AddHexagon(hexagon3, (0,  0));
+            coordinateSystem.AddHexagon(hexagon4, (-1, 1));
+            coordinateSystem.AddHexagon(hexagon5, (-2, 2));
 
             // WHEN
             var asciiArt = coordinateSystem.ToString();
