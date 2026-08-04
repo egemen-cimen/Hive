@@ -633,11 +633,11 @@ namespace Hive.Core.Tests.Models
             coordinateSystem.AddHexagon(hexagon6, coordinate6);
 
             // WHEN
-            var sharedNeighbors = coordinateSystem.GetSharedPopulatedNeighborHexagons(coordinate3, coordinate2);
+            var sharedNighbors = coordinateSystem.GetSharedPopulatedNeighborHexagons(coordinate3, coordinate2);
 
             // THEN
-            Assert.HasCount(1, sharedNeighbors);
-            Assert.AreEqual(hexagon1, sharedNeighbors[0]);
+            Assert.HasCount(1, sharedNighbors);
+            Assert.AreEqual(hexagon1, sharedNighbors[0]);
         }
 
         [TestMethod]
@@ -651,32 +651,21 @@ namespace Hive.Core.Tests.Models
             (int column, int row) coordinate2 = (0, -1);
             var hexagon3 = new Hexagon();
             (int column, int row) coordinate3 = (0, 0);
-            var hexagon4 = new Hexagon();
-            (int column, int row) coordinate4 = (-1, 1);
-            var hexagon5 = new Hexagon();
-            (int column, int row) coordinate5 = (-2, 2);
 
             coordinateSystem.AddHexagon(hexagon1, coordinate1);
             coordinateSystem.AddHexagon(hexagon2, coordinate2);
             coordinateSystem.AddHexagon(hexagon3, coordinate3);
-            coordinateSystem.AddHexagon(hexagon4, coordinate4);
-            coordinateSystem.AddHexagon(hexagon5, coordinate5);
 
             // WHEN
             var asciiArt = coordinateSystem.ToString();
 
             // THEN
-            // TODO: also implement printing pieces on top of the hexagons
             var expectedAsciiArt = @"
-[   0,  -2]
+[ 0,-2]
 
-      [   0,  -1]
+    [ 0,-1]
 
-            [   0,   0]
-
-      [  -1,   1]
-
-[  -2,   2]
+        [ q, r]
 ";
             Assert.AreEqual(expectedAsciiArt, asciiArt);
         }
