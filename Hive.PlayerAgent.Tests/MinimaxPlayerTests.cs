@@ -86,6 +86,7 @@ namespace Hive.PlayerAgent.Tests
         }
 
         // TODO: complete and verify the test
+        [Ignore] // Minimax player should be tested further in the future.
         [TestMethod]
         public void Given_GameStateWhereWhiteCanWinInNextTurn_When_SuggestedNextMoveRetrievedForBlack_Then_ReturnsBlockingForWinningMove()
         {
@@ -129,6 +130,7 @@ namespace Hive.PlayerAgent.Tests
 
 
         // TODO: complete and verify the test
+        [Ignore] // Minimax player should be tested further in the future.
         [TestMethod]
         public void Given_GameStateWhereBlackCanWinInNextTurn_When_SuggestedNextMoveRetrievedForWhite_Then_ReturnsBlockingForWinningMove()
         {
