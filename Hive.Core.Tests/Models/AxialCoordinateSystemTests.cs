@@ -122,10 +122,10 @@ namespace Hive.Core.Tests.Models
             coordinateSystem.AddHexagon(notNeighborHexagon, (2, 0));
 
             // WHEN
-            var neigborHexagons = coordinateSystem.GetPopulatedNeighborHexagons(coordinate);
+            var neighborHexagons = coordinateSystem.GetPopulatedNeighborHexagons(coordinate);
 
-            Assert.HasCount(2, neigborHexagons);
-            CollectionAssert.AreEquivalent(new List<Hexagon>() { neighborHexagon1, neighborHexagon2 }, neigborHexagons);
+            Assert.HasCount(2, neighborHexagons);
+            CollectionAssert.AreEquivalent(new List<Hexagon>() { neighborHexagon1, neighborHexagon2 }, neighborHexagons);
         }
 
         [TestMethod]
@@ -146,16 +146,16 @@ namespace Hive.Core.Tests.Models
             coordinateSystem.AddHexagon(notNeighborHexagon, (0, 1));
 
             // WHEN
-            var neigborHexagons = coordinateSystem.GetPopulatedNeighborCoordinates(coordinate);
+            var neighborHexagons = coordinateSystem.GetPopulatedNeighborCoordinates(coordinate);
 
-            Assert.HasCount(2, neigborHexagons);
-            Assert.IsTrue(new HashSet<(int column, int row)>() { (0, 0), (1, -1) }.SetEquals(neigborHexagons));
+            Assert.HasCount(2, neighborHexagons);
+            Assert.IsTrue(new HashSet<(int column, int row)>() { (0, 0), (1, -1) }.SetEquals(neighborHexagons));
         }
 
         [TestMethod]
         [DataRow(1, -1, 1, -2)]
         [DataRow(0, 0, -1, 0)]
-        public void Given_AddedHexagons_When_SharedFreeAdjacentCoordinatesRetrieved_Then_RetrievalReturnsOnlyFreeAjacentCoordinates(int neighborColumn, int neighborRow, int freeAdjacentColumn, int freeAdjacentRow)
+        public void Given_AddedHexagons_When_SharedFreeAdjacentCoordinatesRetrieved_Then_RetrievalReturnsOnlyFreeAdjacentCoordinates(int neighborColumn, int neighborRow, int freeAdjacentColumn, int freeAdjacentRow)
         {
             // GIVEN
 
@@ -184,14 +184,14 @@ namespace Hive.Core.Tests.Models
             coordinateSystem.AddHexagon(notNeighborHexagon, (0, 1));
 
             // WHEN
-            var neigborHexagons = coordinateSystem.GetSharedFreeAdjacentCoordinates(coordinate, (neighborColumn, neighborRow));
+            var neighborHexagons = coordinateSystem.GetSharedFreeAdjacentCoordinates(coordinate, (neighborColumn, neighborRow));
 
-            Assert.HasCount(1, neigborHexagons);
-            Assert.IsTrue(new HashSet<(int column, int row)>() { (freeAdjacentColumn, freeAdjacentRow) }.SetEquals(neigborHexagons));
+            Assert.HasCount(1, neighborHexagons);
+            Assert.IsTrue(new HashSet<(int column, int row)>() { (freeAdjacentColumn, freeAdjacentRow) }.SetEquals(neighborHexagons));
         }
 
         [TestMethod]
-        public void Given_CoordinateSystem_When_AdjacentCoordinatesRetrieved_Then_RetrivalReturnsAllSix()
+        public void Given_CoordinateSystem_When_AdjacentCoordinatesRetrieved_Then_RetrievalReturnsAllSix()
         {
             // GIVEN
             var coordinateSystem = new AxialCoordinateSystem();
@@ -215,25 +215,25 @@ namespace Hive.Core.Tests.Models
         }
 
         [TestMethod]
-        public void Given_NoHexagon_When_RetrievedAllFreeAdjacents_Then_ReturnsSingleCoordinate()
+        public void Given_NoHexagon_When_RetrievedAllFreeAdjacentCoordinates_Then_ReturnsSingleCoordinate()
         {
             // GIVEN
             var coordinateSystem = new AxialCoordinateSystem();
 
             // WHEN
-            var freeAdjacents = coordinateSystem.GetAllFreeAdjacentCoordinates();
+            var freeAdjacentCoordinates = coordinateSystem.GetAllFreeAdjacentCoordinates();
 
             // THEN
-            Assert.HasCount(1, freeAdjacents);
+            Assert.HasCount(1, freeAdjacentCoordinates);
             var expectedCoordinates = new HashSet<(int column, int row)>() {
                 (0, 0)
             };
 
-            Assert.IsTrue(expectedCoordinates.SetEquals(freeAdjacents));
+            Assert.IsTrue(expectedCoordinates.SetEquals(freeAdjacentCoordinates));
         }
 
         [TestMethod]
-        public void Given_AddedHexagon_When_RetrievedAllFreeAdjacents_Then_ReturnsSixCoordinates()
+        public void Given_AddedHexagon_When_RetrievedAllFreeAdjacentCoordinates_Then_ReturnsSixCoordinates()
         {
             // GIVEN
 
@@ -253,10 +253,10 @@ namespace Hive.Core.Tests.Models
             coordinateSystem.AddHexagon(hexagon, coordinate);
 
             // WHEN
-            var freeAdjacents = coordinateSystem.GetAllFreeAdjacentCoordinates();
+            var freeAdjacentCoordinates = coordinateSystem.GetAllFreeAdjacentCoordinates();
 
             // THEN
-            Assert.HasCount(6, freeAdjacents);
+            Assert.HasCount(6, freeAdjacentCoordinates);
             var expectedCoordinates = new HashSet<(int column, int row)>() {
                 ( 0,-1),
                 ( 1,-1),
@@ -266,11 +266,11 @@ namespace Hive.Core.Tests.Models
                 ( 0, 1)
             };
 
-            Assert.IsTrue(expectedCoordinates.SetEquals(freeAdjacents));
+            Assert.IsTrue(expectedCoordinates.SetEquals(freeAdjacentCoordinates));
         }
 
         [TestMethod]
-        public void Given_AddedHexagons_When_RetrievedAllFreeAdjacents_Then_ReturnsAllFreeCoordinates()
+        public void Given_AddedHexagons_When_RetrievedAllFreeAdjacentCoordinates_Then_ReturnsAllFreeCoordinates()
         {
             // GIVEN
 
@@ -295,10 +295,10 @@ namespace Hive.Core.Tests.Models
             coordinateSystem.AddHexagon(hexagon2, coordinate2);
 
             // WHEN
-            var freeAdjacents = coordinateSystem.GetAllFreeAdjacentCoordinates();
+            var freeAdjacentCoordinates = coordinateSystem.GetAllFreeAdjacentCoordinates();
 
             // THEN
-            Assert.HasCount(8, freeAdjacents);
+            Assert.HasCount(8, freeAdjacentCoordinates);
             var expectedCoordinates = new HashSet<(int column, int row)>() {
                 ( 0,-2),
                 ( 1,-2),
@@ -310,11 +310,11 @@ namespace Hive.Core.Tests.Models
                 ( 0, 1),
             };
 
-            Assert.IsTrue(expectedCoordinates.SetEquals(freeAdjacents));
+            Assert.IsTrue(expectedCoordinates.SetEquals(freeAdjacentCoordinates));
         }
 
         [TestMethod]
-        public void Given_AddedHexagonsInACycle_When_RetrievedAllFreeAdjacents_Then_ReturnsAllFreeCoordinates()
+        public void Given_AddedHexagonsInACycle_When_RetrievedAllFreeAdjacentCoordinates_Then_ReturnsAllFreeCoordinates()
         {
             // GIVEN
 
@@ -353,10 +353,10 @@ namespace Hive.Core.Tests.Models
             coordinateSystem.AddHexagon(hexagon6, coordinate6);
 
             // WHEN
-            var freeAdjacents = coordinateSystem.GetAllFreeAdjacentCoordinates();
+            var freeAdjacentCoordinates = coordinateSystem.GetAllFreeAdjacentCoordinates();
 
             // THEN
-            Assert.HasCount(13, freeAdjacents);
+            Assert.HasCount(13, freeAdjacentCoordinates);
             var expectedCoordinates = new HashSet<(int column, int row)>() {
                 ( 0,-2),
                 ( 1,-2),
@@ -373,11 +373,11 @@ namespace Hive.Core.Tests.Models
                 ( 0, 2)
             };
 
-            Assert.IsTrue(expectedCoordinates.SetEquals(freeAdjacents));
+            Assert.IsTrue(expectedCoordinates.SetEquals(freeAdjacentCoordinates));
         }
 
         [TestMethod]
-        public void Given_AddedUnreachableHexagons_When_RetrievedAllFreeAdjacents_Then_ThrowsException()
+        public void Given_AddedUnreachableHexagons_When_RetrievedAllFreeAdjacentCoordinates_Then_ThrowsException()
         {
             // GIVEN
 
@@ -404,7 +404,7 @@ namespace Hive.Core.Tests.Models
         }
 
         [TestMethod]
-        public void Given_AddedTwoHexagons_When_RetrievedAllFreeAdjacentsWithoutOne_Then_ReturnsAllFreeCoordinates()
+        public void Given_AddedTwoHexagons_When_RetrievedAllFreeAdjacentCoordinatesWithoutOne_Then_ReturnsAllFreeCoordinates()
         {
             // GIVEN
 
@@ -429,10 +429,10 @@ namespace Hive.Core.Tests.Models
             coordinateSystem.AddHexagon(hexagon2, coordinate2);
 
             // WHEN
-            var freeAdjacents = coordinateSystem.GetAllFreeAdjacentCoordinatesWithoutHexagon(coordinate2);
+            var freeAdjacentCoordinates = coordinateSystem.GetAllFreeAdjacentCoordinatesWithoutHexagon(coordinate2);
 
             // THEN
-            Assert.HasCount(6, freeAdjacents);
+            Assert.HasCount(6, freeAdjacentCoordinates);
             var expectedCoordinates = new HashSet<(int column, int row)>() {
                 ( 0,-1),
                 ( 1,-1),
@@ -442,7 +442,7 @@ namespace Hive.Core.Tests.Models
                 ( 0, 1)
             };
 
-            Assert.IsTrue(expectedCoordinates.SetEquals(freeAdjacents));
+            Assert.IsTrue(expectedCoordinates.SetEquals(freeAdjacentCoordinates));
         }
 
         [TestMethod]
@@ -572,7 +572,7 @@ namespace Hive.Core.Tests.Models
         }
 
         [TestMethod]
-        public void Given_CoordinateSystemRetrived_When_ChangesMadeToResult_Then_ChangesShouldNotAffectOriginal()
+        public void Given_CoordinateSystemRetrieved_When_ChangesMadeToResult_Then_ChangesShouldNotAffectOriginal()
         {
             // GIVEN
             var coordinateSystem = new AxialCoordinateSystem();
@@ -633,11 +633,11 @@ namespace Hive.Core.Tests.Models
             coordinateSystem.AddHexagon(hexagon6, coordinate6);
 
             // WHEN
-            var sharedNighbors = coordinateSystem.GetSharedPopulatedNeighborHexagons(coordinate3, coordinate2);
+            var sharedNeighbors = coordinateSystem.GetSharedPopulatedNeighborHexagons(coordinate3, coordinate2);
 
             // THEN
-            Assert.HasCount(1, sharedNighbors);
-            Assert.AreEqual(hexagon1, sharedNighbors[0]);
+            Assert.HasCount(1, sharedNeighbors);
+            Assert.AreEqual(hexagon1, sharedNeighbors[0]);
         }
     }
 }

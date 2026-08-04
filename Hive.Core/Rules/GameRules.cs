@@ -57,7 +57,7 @@ namespace Hive.Core.Rules
                 var piece = populatedHexagon!.PeekPiece();
                 IEnumerable<(int column, int row)> possibleDestinations;
 
-                // TODO: Fix inefficencies by implementing "GetAllAvailableMovements" method in *MovementRules.
+                // TODO: Fix inefficiencies by implementing "GetAllAvailableMovements" method in *MovementRules.
                 if (piece.GetType() == typeof(BeetlePiece))
                 {
                     var possibleFirstLevelDestinations = gameState.CoordinateSystem.GetAllFreeAdjacentCoordinates();
