@@ -168,7 +168,7 @@ namespace Hive.Core.Tests.Rules
                 gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
             }
 
-            // Move ant to the other side to block the other player's last possile move
+            // Move ant to the other side to block the other player's last possible move
             var antMovementToOtherSideAction = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerMovementAction>().First(a
                 => a.DestinationCoordinate.column == 0);
             gameState = GameRules.ApplyPlayerActionToGameState(gameState, antMovementToOtherSideAction);
@@ -419,7 +419,7 @@ namespace Hive.Core.Tests.Rules
                 gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
             }
 
-            // Move ant to the other side to block the other player's last possile move
+            // Move ant to the other side to block the other player's last possible move
             var antMovementToOtherSideAction = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerMovementAction>().First(a
                 => a.DestinationCoordinate.column == 0);
             gameState = GameRules.ApplyPlayerActionToGameState(gameState, antMovementToOtherSideAction);
@@ -457,7 +457,7 @@ namespace Hive.Core.Tests.Rules
                 gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
             }
 
-            // Move ant to the other side to block the other player's last possile move
+            // Move ant to the other side to block the other player's last possible move
             var antMovementToOtherSideAction = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerMovementAction>().First(a
                 => a.DestinationCoordinate.column == 0);
             gameState = GameRules.ApplyPlayerActionToGameState(gameState, antMovementToOtherSideAction);
@@ -731,7 +731,7 @@ namespace Hive.Core.Tests.Rules
         }
 
         [TestMethod]
-        public void Given_GameStateWithTerminalResult_When_InvalidPlayerActionIsApllied_Then_ThrowsException()
+        public void Given_GameStateWithTerminalResult_When_InvalidPlayerActionIsApplied_Then_ThrowsException()
         {
             // GIVEN
             //      [BLK x] [BLK B] [BLK x]

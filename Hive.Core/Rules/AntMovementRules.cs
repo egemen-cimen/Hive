@@ -29,14 +29,14 @@ namespace Hive.Core.Rules
 
             return MovementValidationResult.VALID;
 
-            static HashSet<(int column, int row)> GetSharedFreeAdjacentsWithNeighbors(ICoordinateSystem coordinateSystem, (int column, int row) currentCoordinate, HashSet<(int column, int row)> directContactNeighborHexagons)
+            static HashSet<(int column, int row)> GetSharedFreeAdjacentCoordinatesWithNeighbors(ICoordinateSystem coordinateSystem, (int column, int row) currentCoordinate, HashSet<(int column, int row)> directContactNeighborHexagons)
             {
                 var sharedFreeCoordinates = new HashSet<(int column, int row)>();
                 foreach (var directContactNeighbor in directContactNeighborHexagons)
                 {
-                    var freeAdjacents = coordinateSystem.GetSharedFreeAdjacentCoordinates(currentCoordinate, directContactNeighbor);
+                    var freeAdjacentCoordinates = coordinateSystem.GetSharedFreeAdjacentCoordinates(currentCoordinate, directContactNeighbor);
 
-                    foreach (var freeAdjacent in freeAdjacents)
+                    foreach (var freeAdjacent in freeAdjacentCoordinates)
                     {
                         sharedFreeCoordinates.Add(freeAdjacent);
                     }
@@ -58,7 +58,7 @@ namespace Hive.Core.Rules
 
                     var directContactNeighborHexagons = coordinateSystem.GetPopulatedNeighborCoordinatesWithoutHexagon(currentCoordinate, startCoordinate);
 
-                    var sharedFreeCoordinates = GetSharedFreeAdjacentsWithNeighbors(coordinateSystem, currentCoordinate, directContactNeighborHexagons);
+                    var sharedFreeCoordinates = GetSharedFreeAdjacentCoordinatesWithNeighbors(coordinateSystem, currentCoordinate, directContactNeighborHexagons);
                     sharedFreeCoordinates.ExceptWith(visitedCoordinates);
 
                     foreach (var sharedFreeCoordinate in sharedFreeCoordinates)
