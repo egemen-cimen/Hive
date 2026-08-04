@@ -10,6 +10,7 @@ var gameState = GameRules.CreateFreshGameState();
 while (!GameRules.VerifyWhetherGameStateIsTerminal(gameState))
 {
     var suggestedAction = minimaxPlayer.SuggestNextPlayerAction(gameState);
+    PrintPlayerAction(suggestedAction, gameState);
     GameRules.ApplyPlayerActionToGameState(gameState, suggestedAction);
 
     if (GameRules.VerifyWhetherGameStateIsTerminal(gameState))
@@ -18,6 +19,7 @@ while (!GameRules.VerifyWhetherGameStateIsTerminal(gameState))
     }
 
     suggestedAction = randomPlayer.SuggestNextPlayerAction(gameState);
+    PrintPlayerAction(suggestedAction, gameState);
     GameRules.ApplyPlayerActionToGameState(gameState, suggestedAction);
 
     PrintGameState(gameState);
@@ -25,6 +27,32 @@ while (!GameRules.VerifyWhetherGameStateIsTerminal(gameState))
 }
 
 Console.WriteLine(GameRules.GetGameResult(gameState));
+
+static void PrintPlayerAction(IPlayerAction playerAction, GameState gameState)
+{
+    if (playerAction.GetType() == typeof(PlayerSpawnAction))
+    {
+        var spawnAction = (PlayerSpawnAction)playerAction;
+        Console.WriteLine($"{spawnAction.PieceToSpawn.Color} " +
+            $"{spawnAction.PieceToSpawn.GetPieceName()} is spawned at " +
+            $"{spawnAction.DestinationCoordinate}.");
+    }
+    else if (playerAction.GetType() == typeof(PlayerMovementAction))
+    {
+        var movementAction = (PlayerMovementAction)playerAction;
+        var pieceToMove = gameState.CoordinateSystem.GetHexagonAtCoordinate(movementAction.StartCoordinate).PeekPiece();
+        Console.WriteLine($"{pieceToMove.Color} " +
+            $"{pieceToMove.GetPieceName()} is moved from " +
+            $"{movementAction.StartCoordinate} to " +
+            $"{movementAction.DestinationCoordinate}.");
+    }
+    else // Player unable to play
+    {
+        Console.WriteLine($"{gameState.CurrentPlayerTurnColor} player is unable to play.");
+    }
+
+    Console.WriteLine();
+}
 
 static void PrintGameState(GameState gameState)
 {
@@ -38,8 +66,9 @@ static void PrintGameState(GameState gameState)
             foreach (var piece in retrievedHexagon.GetAllPieces())
             {
                 Console.WriteLine($"{piece.Color} {piece.GetPieceName()}");
-
             }
         }
     }
+
+    Console.WriteLine();
 }

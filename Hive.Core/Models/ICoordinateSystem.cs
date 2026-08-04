@@ -18,6 +18,12 @@
         public bool TryGetHexagon((int column, int row) coordinate, out Hexagon? hexagon);
 
         /// <summary>
+        /// Gets the hexagon located on the given coordinate.
+        /// </summary>
+        /// <returns>The hexagon at the coordinates</returns>
+        public Hexagon GetHexagonAtCoordinate((int column, int row) coordinate);
+
+        /// <summary>
         /// Gets only the neighbor hexagons of the given coordinate.
         /// </summary>
         /// <param name="coordinate"></param>

@@ -5,7 +5,7 @@ namespace Hive.PlayerAgent
 {
     public class RandomPlayer : IPlayerAgent
     {
-        private static readonly Random randomNumberGenerator = new Random();
+        private static readonly Random randomNumberGenerator = new();
 
         public IPlayerAction SuggestNextPlayerAction(GameState gameState)
         {
