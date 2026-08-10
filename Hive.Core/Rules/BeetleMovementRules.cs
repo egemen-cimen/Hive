@@ -87,5 +87,10 @@ namespace Hive.Core.Rules
 
             return MovementValidationResult.VALID;
         }
+
+        public HashSet<(int column, int row)> GetAllAvailablePieceMovements(ICoordinateSystem coordinateSystem, (int column, int row) startCoordinate)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

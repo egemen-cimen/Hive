@@ -21,13 +21,45 @@ namespace Hive.Core.Rules
                 return commonMovementValidation;
             }
 
-            var validDestinationCoordinates = FindValidDestinationCoordinates(coordinateSystem, startCoordinate);
+            var validDestinationCoordinates = GetAllAvailablePieceMovements(coordinateSystem, startCoordinate);
             if (!validDestinationCoordinates.Contains(destinationCoordinate))
             {
                 return MovementValidationResult.PIECE_CANNOT_REACH_DESTINATION;
             }
 
             return MovementValidationResult.VALID;
+
+        }
+
+        public HashSet<(int column, int row)> GetAllAvailablePieceMovements(ICoordinateSystem coordinateSystem, (int column, int row) startCoordinate)
+        {
+            var visitedCoordinates = new HashSet<(int column, int row)>();
+            var nextCoordinates = new Stack<(int column, int row)>();
+            nextCoordinates.Push(startCoordinate);
+
+            while (nextCoordinates.Count > 0)
+            {
+                var currentCoordinate = nextCoordinates.Pop();
+                visitedCoordinates.Add(currentCoordinate);
+
+                var directContactNeighborHexagons = coordinateSystem.GetPopulatedNeighborCoordinatesWithoutHexagon(currentCoordinate, startCoordinate);
+
+                var sharedFreeCoordinates = GetSharedFreeAdjacentCoordinatesWithNeighbors(coordinateSystem, currentCoordinate, directContactNeighborHexagons);
+                sharedFreeCoordinates.ExceptWith(visitedCoordinates);
+
+                foreach (var sharedFreeCoordinate in sharedFreeCoordinates)
+                {
+                    var sharedPopulatedNeighborHexagons = coordinateSystem.GetSharedPopulatedNeighborHexagons(sharedFreeCoordinate, currentCoordinate);
+
+                    // Two shared populated neighbors mean that the piece cannot slide into the space.
+                    if (sharedPopulatedNeighborHexagons.Count != 2)
+                    {
+                        nextCoordinates.Push(sharedFreeCoordinate);
+                    }
+                }
+            }
+
+            return visitedCoordinates;
 
             static HashSet<(int column, int row)> GetSharedFreeAdjacentCoordinatesWithNeighbors(ICoordinateSystem coordinateSystem, (int column, int row) currentCoordinate, HashSet<(int column, int row)> directContactNeighborHexagons)
             {
@@ -43,37 +75,6 @@ namespace Hive.Core.Rules
                 }
 
                 return sharedFreeCoordinates;
-            }
-
-            static HashSet<(int column, int row)> FindValidDestinationCoordinates(ICoordinateSystem coordinateSystem, (int column, int row) startCoordinate)
-            {
-                var visitedCoordinates = new HashSet<(int column, int row)>();
-                var nextCoordinates = new Stack<(int column, int row)>();
-                nextCoordinates.Push(startCoordinate);
-
-                while (nextCoordinates.Count > 0)
-                {
-                    var currentCoordinate = nextCoordinates.Pop();
-                    visitedCoordinates.Add(currentCoordinate);
-
-                    var directContactNeighborHexagons = coordinateSystem.GetPopulatedNeighborCoordinatesWithoutHexagon(currentCoordinate, startCoordinate);
-
-                    var sharedFreeCoordinates = GetSharedFreeAdjacentCoordinatesWithNeighbors(coordinateSystem, currentCoordinate, directContactNeighborHexagons);
-                    sharedFreeCoordinates.ExceptWith(visitedCoordinates);
-
-                    foreach (var sharedFreeCoordinate in sharedFreeCoordinates)
-                    {
-                        var sharedPopulatedNeighborHexagons = coordinateSystem.GetSharedPopulatedNeighborHexagons(sharedFreeCoordinate, currentCoordinate);
-
-                        // Two shared populated neighbors mean that the piece cannot slide into the space.
-                        if (sharedPopulatedNeighborHexagons.Count != 2)
-                        {
-                            nextCoordinates.Push(sharedFreeCoordinate);
-                        }
-                    }
-                }
-
-                return visitedCoordinates;
             }
         }
     }
