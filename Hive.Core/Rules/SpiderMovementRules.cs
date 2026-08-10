@@ -71,7 +71,7 @@ namespace Hive.Core.Rules
 
                     foreach (var sharedFreeCoordinate in sharedFreeCoordinates)
                     {
-                        var sharedPopulatedNeighborHexagons = coordinateSystem.GetSharedPopulatedNeighborHexagons(sharedFreeCoordinate, currentCoordinate);
+                        var sharedPopulatedNeighborHexagons = coordinateSystem.GetSharedPopulatedNeighborHexagonsWithoutHexagon(sharedFreeCoordinate, currentCoordinate, startCoordinate);
 
                         // Two shared populated neighbors mean that the piece cannot slide into the space.
                         if (sharedPopulatedNeighborHexagons.Count != 2)
