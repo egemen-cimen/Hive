@@ -423,5 +423,38 @@ namespace Hive.Core.Tests.Rules
             // THEN
             Assert.AreEqual(MovementValidationResult.WRONG_COLOR_MOVED, result);
         }
+
+        [TestMethod]
+        [DataRow(0, -2)]
+        [DataRow(2, 0)]
+        public void Given_PopulatedCoordinateSystemWithATightTurn_When_SpiderThreeSpaceMovementIsValidated_Then_ReturnsValid(int endColumn, int endRow)
+        {
+            // GIVEN
+            var coordinateSystem = CoordinateSystemPopulationHelper.CreatePopulatedCoordinateSystem(
+            [
+                (( 0, -3), typeof(AntPiece)),
+                ((-1, -2), typeof(QueenPiece)),
+                (( 0, -1), typeof(GrasshopperPiece)),
+                ((-2,  0), typeof(AntPiece)),
+                ((-2, -1), typeof(SpiderPiece)),
+                ((-1,  1), typeof(AntPiece)),
+                (( 0,  0), typeof(SpiderPiece)),
+                (( 1,  1), typeof(BeetlePiece)),
+                ((-1,  0), typeof(GrasshopperPiece)),
+                (( 1,  2), typeof(BeetlePiece)),
+                ((-1,  2), typeof(QueenPiece)),
+                (( 0,  2), typeof(AntPiece)),
+                (( 1,  3), typeof(GrasshopperPiece)),
+                (( 0,  3), typeof(SpiderPiece))
+            ]);
+            var spiderMovementRules = new SpiderMovementRules();
+
+            // WHEN
+            var result = spiderMovementRules.ValidatePieceMovement(coordinateSystem, (0, 0), (endColumn, endRow), PlayerColor.WHITE);
+
+            // THEN
+            Assert.AreEqual(MovementValidationResult.VALID, result);
+        }
+
     }
 }

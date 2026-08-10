@@ -76,6 +76,22 @@
             return sharedNeighbors;
         }
 
+        public List<Hexagon> GetSharedPopulatedNeighborHexagonsWithoutHexagon((int column, int row) coordinate1,
+            (int column, int row) coordinate2,
+            (int column, int row) withoutCoordinate
+            )
+        {
+            var hexagon = GetHexagonAtCoordinate(withoutCoordinate);
+
+            RemoveHexagon(withoutCoordinate);
+
+            var result = GetSharedPopulatedNeighborHexagons(coordinate1, coordinate2);
+
+            AddHexagon(hexagon, withoutCoordinate);
+
+            return result;
+        }
+
         public HashSet<(int column, int row)> GetAdjacentCoordinates((int column, int row) coordinate)
         {
             var adjacentCoordinates = new HashSet<(int column, int row)>();

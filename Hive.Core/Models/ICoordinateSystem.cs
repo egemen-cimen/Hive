@@ -53,6 +53,8 @@
         /// <returns>Collection of common populated neighbor hexagons</returns>
         public List<Hexagon> GetSharedPopulatedNeighborHexagons((int column, int row) coordinate1, (int column, int row) coordinate2);
 
+        public List<Hexagon> GetSharedPopulatedNeighborHexagonsWithoutHexagon((int column, int row) coordinate1, (int column, int row) coordinate2, (int column, int row) withoutCoordinate);
+
         /// <summary>
         /// Gets all possible adjacent coordinates of the given coordinate. Does not check if it's populated or not.
         /// </summary>
