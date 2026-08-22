@@ -11,7 +11,7 @@ namespace Hive.PlayerAgent
         private const int PIECE_NEXT_TO_QUEEN_PENALY = -10;
         private const int QUEEN_CANNOT_MOVE_PENALTY = -10;
         private static readonly QueenMovementRules _queenMovementRules = new();
-        private const int MAX_TREE_DEPTH = 1;
+        private const int MAX_TREE_DEPTH = 2;
 
         public IPlayerAction SuggestNextPlayerAction(GameState gameState)
         {

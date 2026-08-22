@@ -23,7 +23,7 @@ namespace Hive.PlayerAgent.Tests
             //
             //                  [WHT S]
             //                  [ 0, 0]
-            //                    
+            //
             //                      [WHT Q]
             //                      [ 0, 1]
             //
@@ -81,15 +81,15 @@ namespace Hive.PlayerAgent.Tests
             //      [BLK A]
             //      [ 0,-6]
             //
-            //          [BLK A]       
-            //          [ 0,-5]       
+            //          [BLK A]
+            //          [ 0,-5]
             //
             //              [BLK A]
             //              [ 0,-4]
             //
             //                  [BLK B]
             //                  [ 0,-3]
-            //                    
+            //
             //                      [BLK Q]
             //                      [ 0,-2]
             //
@@ -141,13 +141,39 @@ namespace Hive.PlayerAgent.Tests
             Assert.AreEqual(GameResult.BLACK_WON, GameRules.GetGameResult(gameState));
         }
 
-        // TODO: complete and verify the test
-        [Ignore] // Minimax player should be tested further in the future.
         [TestMethod]
         public void Given_GameStateWhereWhiteCanWinInNextTurn_When_SuggestedNextMoveRetrievedForBlack_Then_ReturnsBlockingForWinningMove()
         {
             // GIVEN
             var minimaxPlayer = new MinimaxPlayer();
+
+            //      [BLK A]
+            //      [ 0,-3]
+            //
+            //  [BLK A] [BLK Q] [BLK A]
+            //  [-1,-2] [ 0,-2] [ 1,-2]
+            //
+            //      [BLK A] [BLK S]
+            //      [-1,-1] [ 0,-1]
+            //
+            //                  [WHT S] [WHT B]
+            //                  [ 0, 0] [ 1, 0]
+            //
+            //                      [WHT Q]
+            //                      [ 0, 1]
+            //
+            //                          [WHT B]
+            //                          [ 0, 2]
+            //
+            //                              [WHT A]
+            //                              [ 0, 3]
+            //
+            //                                  [WHT A]
+            //                                  [ 0, 4]
+            //
+            //                                      [WHT A]
+            //                                      [ 0, 5]
+            // White can win in the next turn. Black should pin the white ant to avoid a game over.
             var gameState = GameRules.CreateFreshGameState();
             // Spawn first pieces in a line
             ApplyPlayerSpawnActionPredicateToGameState(gameState, a => a.PieceToSpawn.GetType() == typeof(SpiderPiece) && a.DestinationCoordinate.column == 0);
@@ -160,17 +186,19 @@ namespace Hive.PlayerAgent.Tests
             ApplyPlayerSpawnActionPredicateToGameState(gameState, a => a.PieceToSpawn.GetType() != typeof(AntPiece) && a.DestinationCoordinate.column == 0);
             // Finally spawn next 4 pieces near black queen to surround it
             ApplyPlayerSpawnActionPredicateToGameState(gameState, a => spacesNextToQueen.Contains(a.DestinationCoordinate));
+            (int column, int row) lastWhiteAntCoordinate = (int.MinValue, int.MinValue);
             for (var i = 0; i < 3; i++)
             {
                 // Don't surround white queen & also spawn the ants
-                ApplyPlayerSpawnActionPredicateToGameState(gameState, a => a.PieceToSpawn.GetType() == typeof(AntPiece) && a.DestinationCoordinate.column == 0);
+                var spawnAction = ApplyPlayerSpawnActionPredicateToGameState(gameState, a => a.PieceToSpawn.GetType() == typeof(AntPiece) && a.DestinationCoordinate.column == 0);
+                lastWhiteAntCoordinate = spawnAction.DestinationCoordinate;
 
                 // Continue surrounding the black queen
                 ApplyPlayerSpawnActionPredicateToGameState(gameState, a => spacesNextToQueen.Contains(a.DestinationCoordinate));
             }
 
             // Blunder finishing the game so black has a change to block
-            ApplyPlayerSpawnActionPredicateToGameState(gameState, a => a.PieceToSpawn.GetType() != typeof(AntPiece) && a.DestinationCoordinate.column == 0);
+            ApplyPlayerSpawnActionPredicateToGameState(gameState, a => a.PieceToSpawn.GetType() != typeof(AntPiece) && a.DestinationCoordinate.column != 0);
 
             // WHEN
             var suggestedAction = minimaxPlayer.SuggestNextPlayerAction(gameState);
@@ -178,10 +206,8 @@ namespace Hive.PlayerAgent.Tests
             // THEN
             // TODO: check if the game state is not modified after the method call
             Assert.IsInstanceOfType<PlayerMovementAction>(suggestedAction);
-            Assert.Contains(((PlayerMovementAction)suggestedAction).DestinationCoordinate, spacesNextToQueen);
-            GameRules.ApplyPlayerActionToGameState(gameState, suggestedAction);
-            //Assert.IsTrue(GameRules.VerifyWhetherGameStateIsTerminal(gameState));
-            //Assert.AreEqual(GameResult.WHITE_WON, GameRules.GetGameResult(gameState));
+            var spacesNextToWhiteAnt = gameState.CoordinateSystem.GetAdjacentCoordinates(lastWhiteAntCoordinate);
+            Assert.Contains(((PlayerMovementAction)suggestedAction).DestinationCoordinate, spacesNextToWhiteAnt);
         }
 
         [TestMethod]
@@ -193,15 +219,15 @@ namespace Hive.PlayerAgent.Tests
             //      [BLK A]
             //      [ 0,-6]
             //
-            //          [BLK A]       
-            //          [ 0,-5]       
+            //          [BLK A]
+            //          [ 0,-5]
             //
             //              [BLK A]
             //              [ 0,-4]
             //
             //                  [BLK B]
             //                  [ 0,-3]
-            //                    
+            //
             //                      [BLK Q]
             //                      [ 0,-2]
             //
@@ -216,7 +242,7 @@ namespace Hive.PlayerAgent.Tests
             //
             //                              [WHT B]
             //                              [-1, 2]
-            // White should pin the black ant to avoid a game over.
+            // Black can win in the next turn. White should pin the black ant to avoid a game over.
             var gameState = GameRules.CreateFreshGameState();
             // Spawn first pieces in a line
             ApplyPlayerSpawnActionPredicateToGameState(gameState, a => a.PieceToSpawn.GetType() == typeof(SpiderPiece) && a.DestinationCoordinate.column == 0);
