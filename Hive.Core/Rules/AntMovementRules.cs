@@ -33,6 +33,16 @@ namespace Hive.Core.Rules
 
         public HashSet<(int column, int row)> GetAllAvailablePieceMovements(ICoordinateSystem coordinateSystem, (int column, int row) startCoordinate, PlayerColor playerTurnColor)
         {
+            var commonMovementValidation = CommonMovementRules.ValidateCommonMovementRules<AntPiece>(coordinateSystem,
+                startCoordinate,
+                playerTurnColor
+                );
+
+            if (commonMovementValidation != MovementValidationResult.VALID)
+            {
+                return [];
+            }
+
             var visitedCoordinates = new HashSet<(int column, int row)>();
             var nextCoordinates = new Stack<(int column, int row)>();
             nextCoordinates.Push(startCoordinate);
@@ -59,6 +69,7 @@ namespace Hive.Core.Rules
                 }
             }
 
+            visitedCoordinates.Remove(startCoordinate);
             return visitedCoordinates;
 
             static HashSet<(int column, int row)> GetSharedFreeAdjacentCoordinatesWithNeighbors(ICoordinateSystem coordinateSystem, (int column, int row) currentCoordinate, HashSet<(int column, int row)> directContactNeighborHexagons)

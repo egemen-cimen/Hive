@@ -682,7 +682,7 @@ namespace Hive.Core.Tests.Rules
         }
 
         [TestMethod]
-        public void Given_PopulatedCoordinateSystem_When_AllValidSpiderMovementForWrongColorIsRetrieved_Then_Returns()
+        public void Given_PopulatedCoordinateSystem_When_AllValidSpiderMovementForWrongColorIsRetrieved_Then_ReturnsEmpty()
         {
             // GIVEN
 
