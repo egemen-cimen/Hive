@@ -44,7 +44,17 @@ namespace Hive.Core.Rules
 
         public HashSet<(int column, int row)> GetAllAvailablePieceMovements(ICoordinateSystem coordinateSystem, (int column, int row) startCoordinate, PlayerColor playerTurnColor)
         {
-            throw new NotImplementedException();
+            var allAdjacentCoordinates = coordinateSystem.GetAdjacentCoordinates(startCoordinate);
+            var result = new HashSet<(int column, int row)>();
+            foreach(var adjacentCoordinate in allAdjacentCoordinates)
+            {
+                if (ValidatePieceMovement(coordinateSystem, startCoordinate, adjacentCoordinate, playerTurnColor) == MovementValidationResult.VALID)
+                {
+                    result.Add(adjacentCoordinate);
+                }
+            }
+
+            return result;
         }
     }
 }
