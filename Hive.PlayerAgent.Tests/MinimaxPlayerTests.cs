@@ -350,5 +350,41 @@ namespace Hive.PlayerAgent.Tests
 
             return result;
         }
+
+        [TestMethod]
+        public void Given_GameStateWherePlayerHasNoMoves_When_SuggestedNextMoveRetrieved_Then_ReturnsUnableToPlayAction()
+        {
+            // GIVEN
+            var minimaxPlayer = new MinimaxPlayer();
+
+            // Game state copied from GameRulesTests
+            var gameState = GameRules.CreateFreshGameState();
+            // Spawn all non-ant pieces in a line
+            for (var i = 0; i < 16; i++)
+            {
+                var actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First(a
+                    => a.PieceToSpawn.GetType() != typeof(AntPiece) && a.DestinationCoordinate.column == 0);
+                gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
+            }
+
+            // Spawn rest of the pieces (all ants) in a line
+            for (var i = 0; i < 6; i++)
+            {
+                var actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First(a
+                    => a.DestinationCoordinate.column == 0);
+                gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
+            }
+
+            // Move ant to the other side to block the other player's last possible move
+            var antMovementToOtherSideAction = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerMovementAction>().First(a
+                => a.DestinationCoordinate.column == 0);
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, antMovementToOtherSideAction);
+
+            // WHEN
+            var suggestedAction = minimaxPlayer.SuggestNextPlayerAction(gameState);
+
+            // THEN
+            Assert.IsInstanceOfType<PlayerUnableToPlayAction>(suggestedAction);
+        }
     }
 }
