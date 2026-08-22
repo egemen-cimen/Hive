@@ -11,6 +11,34 @@ namespace Hive.PlayerAgent.Tests
         {
             // GIVEN
             var minimaxPlayer = new MinimaxPlayer();
+
+            //      [BLK A]
+            //      [ 0,-3]
+            //
+            //  [BLK A] [BLK Q] [BLK A]
+            //  [-1,-2] [ 0,-2] [ 1,-2]
+            //
+            //      [BLK A] [BLK S]
+            //      [-1,-1] [ 0,-1]
+            //
+            //                  [WHT S]
+            //                  [ 0, 0]
+            //                    
+            //                      [WHT Q]
+            //                      [ 0, 1]
+            //
+            //                          [WHT B]
+            //                          [ 0, 2]
+            //
+            //                              [WHT A]
+            //                              [ 0, 3]
+            //
+            //                                  [WHT A]
+            //                                  [ 0, 4]
+            //
+            //                                      [WHT A]
+            //                                      [ 0, 5]
+            // White can win in one move.
             var gameState = GameRules.CreateFreshGameState();
             // Spawn first pieces in a line
             ApplyPlayerSpawnActionPredicateToGameState(gameState, a => a.PieceToSpawn.GetType() == typeof(SpiderPiece) && a.DestinationCoordinate.column == 0);
@@ -49,6 +77,34 @@ namespace Hive.PlayerAgent.Tests
         {
             // GIVEN
             var minimaxPlayer = new MinimaxPlayer();
+
+            //      [BLK A]
+            //      [ 0,-6]
+            //
+            //          [BLK A]       
+            //          [ 0,-5]       
+            //
+            //              [BLK A]
+            //              [ 0,-4]
+            //
+            //                  [BLK B]
+            //                  [ 0,-3]
+            //                    
+            //                      [BLK Q]
+            //                      [ 0,-2]
+            //
+            //                          [BLK S]
+            //                          [ 0,-1]
+            //
+            //                              [WHT S] [WHT A]
+            //                              [ 0, 0] [ 1, 0]
+            //
+            //                          [WHT A] [WHT Q] [WHT A]
+            //                          [-1, 1] [ 0, 1] [ 1, 1]
+            //
+            //                      [WHT B] [WHT B]
+            //                      [-2, 2] [-1, 2]
+            // Black can win in one move.
             var gameState = GameRules.CreateFreshGameState();
             // Spawn first pieces in a line
             ApplyPlayerSpawnActionPredicateToGameState(gameState, a => a.PieceToSpawn.GetType() == typeof(SpiderPiece) && a.DestinationCoordinate.column == 0);
@@ -128,14 +184,39 @@ namespace Hive.PlayerAgent.Tests
             //Assert.AreEqual(GameResult.WHITE_WON, GameRules.GetGameResult(gameState));
         }
 
-
-        // TODO: complete and verify the test
-        [Ignore] // Minimax player should be tested further in the future.
         [TestMethod]
         public void Given_GameStateWhereBlackCanWinInNextTurn_When_SuggestedNextMoveRetrievedForWhite_Then_ReturnsBlockingForWinningMove()
         {
             // GIVEN
             var minimaxPlayer = new MinimaxPlayer();
+
+            //      [BLK A]
+            //      [ 0,-6]
+            //
+            //          [BLK A]       
+            //          [ 0,-5]       
+            //
+            //              [BLK A]
+            //              [ 0,-4]
+            //
+            //                  [BLK B]
+            //                  [ 0,-3]
+            //                    
+            //                      [BLK Q]
+            //                      [ 0,-2]
+            //
+            //                          [BLK S]
+            //                          [ 0,-1]
+            //
+            //                              [WHT S] [WHT A]
+            //                              [ 0, 0] [ 1, 0]
+            //
+            //                          [WHT A] [WHT Q] [WHT A]
+            //                          [-1, 1] [ 0, 1] [ 1, 1]
+            //
+            //                              [WHT B]
+            //                              [-1, 2]
+            // White should pin the black ant to avoid a game over.
             var gameState = GameRules.CreateFreshGameState();
             // Spawn first pieces in a line
             ApplyPlayerSpawnActionPredicateToGameState(gameState, a => a.PieceToSpawn.GetType() == typeof(SpiderPiece) && a.DestinationCoordinate.column == 0);
@@ -148,20 +229,16 @@ namespace Hive.PlayerAgent.Tests
             ApplyPlayerSpawnActionPredicateToGameState(gameState, a => spacesNextToQueen.Contains(a.DestinationCoordinate));
             // Don't surround black queen & also save ants for the finishing move
             ApplyPlayerSpawnActionPredicateToGameState(gameState, a => a.PieceToSpawn.GetType() != typeof(AntPiece) && a.DestinationCoordinate.column == 0);
+            (int column, int row) lastBlackAntCoordinate = (int.MinValue, int.MinValue);
             for (var i = 0; i < 3; i++)
             {
                 // Continue surrounding the white queen
                 ApplyPlayerSpawnActionPredicateToGameState(gameState, a => spacesNextToQueen.Contains(a.DestinationCoordinate));
 
                 // Don't surround black queen & also spawn the ants
-                ApplyPlayerSpawnActionPredicateToGameState(gameState, a => a.PieceToSpawn.GetType() == typeof(AntPiece) && a.DestinationCoordinate.column == 0);
+                var spawnAction = ApplyPlayerSpawnActionPredicateToGameState(gameState, a => a.PieceToSpawn.GetType() == typeof(AntPiece) && a.DestinationCoordinate.column == 0);
+                lastBlackAntCoordinate = spawnAction.DestinationCoordinate;
             }
-
-            // Don't spawn a piece to the last free space next to the queen
-            ApplyPlayerSpawnActionPredicateToGameState(gameState, a => !spacesNextToQueen.Contains(a.DestinationCoordinate));
-
-            // Blunder finishing the game so black has a change to block
-            ApplyPlayerSpawnActionPredicateToGameState(gameState, a => a.PieceToSpawn.GetType() != typeof(AntPiece) && a.DestinationCoordinate.column == 0);
 
             // WHEN
             var suggestedAction = minimaxPlayer.SuggestNextPlayerAction(gameState);
@@ -169,10 +246,8 @@ namespace Hive.PlayerAgent.Tests
             // THEN
             // TODO: check if the game state is not modified after the method call
             Assert.IsInstanceOfType<PlayerMovementAction>(suggestedAction);
-            Assert.Contains(((PlayerMovementAction)suggestedAction).DestinationCoordinate, spacesNextToQueen);
-            GameRules.ApplyPlayerActionToGameState(gameState, suggestedAction);
-            Assert.IsTrue(GameRules.VerifyWhetherGameStateIsTerminal(gameState));
-            Assert.AreEqual(GameResult.BLACK_WON, GameRules.GetGameResult(gameState));
+            var spacesNextToBlackAnt = gameState.CoordinateSystem.GetAdjacentCoordinates(lastBlackAntCoordinate);
+            Assert.Contains(((PlayerMovementAction)suggestedAction).DestinationCoordinate, spacesNextToBlackAnt);
         }
 
         private static PlayerSpawnAction ApplyPlayerSpawnActionPredicateToGameState(GameState gameState, Func<PlayerSpawnAction, bool> spawnPredicate)

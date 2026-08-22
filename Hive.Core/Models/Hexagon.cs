@@ -1,5 +1,8 @@
-﻿namespace Hive.Core.Models
+﻿using System.Diagnostics;
+
+namespace Hive.Core.Models
 {
+    [DebuggerDisplay("Hexagon with {GetPieceCount()} piece(s): {PeekPiece().Color} {PeekPiece().GetPieceName()}")]
     public class Hexagon
     {
         private Stack<IPiece> Pieces { get; } = new Stack<IPiece>();
