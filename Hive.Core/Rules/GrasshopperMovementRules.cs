@@ -33,6 +33,16 @@ namespace Hive.Core.Rules
 
         public HashSet<(int column, int row)> GetAllAvailablePieceMovements(ICoordinateSystem coordinateSystem, (int column, int row) startCoordinate, PlayerColor playerTurnColor)
         {
+            var commonMovementValidation = CommonMovementRules.ValidateCommonMovementRules<GrasshopperPiece>(coordinateSystem,
+                startCoordinate,
+                playerTurnColor
+                );
+
+            if (commonMovementValidation != MovementValidationResult.VALID)
+            {
+                return [];
+            }
+
             var populatedNeighborCoordinates = coordinateSystem.GetPopulatedNeighborCoordinates(startCoordinate);
             var validDestinationCoordinates = new HashSet<(int column, int row)>();
 
