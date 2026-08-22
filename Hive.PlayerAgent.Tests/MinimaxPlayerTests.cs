@@ -60,11 +60,17 @@ namespace Hive.PlayerAgent.Tests
                 ApplyPlayerSpawnActionPredicateToGameState(gameState, a => spacesNextToQueen.Contains(a.DestinationCoordinate));
             }
 
+            // Take a snapshot before calling the method
+            var beforeMethodCall = GetStringSnapshotOfGameState(gameState);
+
             // WHEN
             var suggestedAction = minimaxPlayer.SuggestNextPlayerAction(gameState);
 
             // THEN
-            // TODO: check if the game state is not modified after the method call
+            // Take a snapshot after calling the method and compare
+            var afterMethodCall = GetStringSnapshotOfGameState(gameState);
+            CollectionAssert.AreEquivalent(beforeMethodCall, afterMethodCall);
+
             Assert.IsInstanceOfType<PlayerMovementAction>(suggestedAction);
             Assert.Contains(((PlayerMovementAction)suggestedAction).DestinationCoordinate, spacesNextToQueen);
             GameRules.ApplyPlayerActionToGameState(gameState, suggestedAction);
@@ -129,11 +135,17 @@ namespace Hive.PlayerAgent.Tests
             // Don't spawn a piece to the last free space next to the queen
             ApplyPlayerSpawnActionPredicateToGameState(gameState, a => !spacesNextToQueen.Contains(a.DestinationCoordinate));
 
+            // Take a snapshot before calling the method
+            var beforeMethodCall = GetStringSnapshotOfGameState(gameState);
+
             // WHEN
             var suggestedAction = minimaxPlayer.SuggestNextPlayerAction(gameState);
 
             // THEN
-            // TODO: check if the game state is not modified after the method call
+            // Take a snapshot after calling the method and compare
+            var afterMethodCall = GetStringSnapshotOfGameState(gameState);
+            CollectionAssert.AreEquivalent(beforeMethodCall, afterMethodCall);
+
             Assert.IsInstanceOfType<PlayerMovementAction>(suggestedAction);
             Assert.Contains(((PlayerMovementAction)suggestedAction).DestinationCoordinate, spacesNextToQueen);
             GameRules.ApplyPlayerActionToGameState(gameState, suggestedAction);
@@ -200,11 +212,17 @@ namespace Hive.PlayerAgent.Tests
             // Blunder finishing the game so black has a change to block
             ApplyPlayerSpawnActionPredicateToGameState(gameState, a => a.PieceToSpawn.GetType() != typeof(AntPiece) && a.DestinationCoordinate.column != 0);
 
+            // Take a snapshot before calling the method
+            var beforeMethodCall = GetStringSnapshotOfGameState(gameState);
+
             // WHEN
             var suggestedAction = minimaxPlayer.SuggestNextPlayerAction(gameState);
 
             // THEN
-            // TODO: check if the game state is not modified after the method call
+            // Take a snapshot after calling the method and compare
+            var afterMethodCall = GetStringSnapshotOfGameState(gameState);
+            CollectionAssert.AreEquivalent(beforeMethodCall, afterMethodCall);
+
             Assert.IsInstanceOfType<PlayerMovementAction>(suggestedAction);
             var spacesNextToWhiteAnt = gameState.CoordinateSystem.GetAdjacentCoordinates(lastWhiteAntCoordinate);
             Assert.Contains(((PlayerMovementAction)suggestedAction).DestinationCoordinate, spacesNextToWhiteAnt);
@@ -266,11 +284,17 @@ namespace Hive.PlayerAgent.Tests
                 lastBlackAntCoordinate = spawnAction.DestinationCoordinate;
             }
 
+            // Take a snapshot before calling the method
+            var beforeMethodCall = GetStringSnapshotOfGameState(gameState);
+
             // WHEN
             var suggestedAction = minimaxPlayer.SuggestNextPlayerAction(gameState);
 
             // THEN
-            // TODO: check if the game state is not modified after the method call
+            // Take a snapshot after calling the method and compare
+            var afterMethodCall = GetStringSnapshotOfGameState(gameState);
+            CollectionAssert.AreEquivalent(beforeMethodCall, afterMethodCall);
+
             Assert.IsInstanceOfType<PlayerMovementAction>(suggestedAction);
             var spacesNextToBlackAnt = gameState.CoordinateSystem.GetAdjacentCoordinates(lastBlackAntCoordinate);
             Assert.Contains(((PlayerMovementAction)suggestedAction).DestinationCoordinate, spacesNextToBlackAnt);
@@ -282,6 +306,49 @@ namespace Hive.PlayerAgent.Tests
             GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
 
             return actionToBeApplied;
+        }
+
+        private static List<string> GetStringSnapshotOfGameState(GameState gameState)
+        {
+            var result = new List<string>
+            {
+                $"TurnNumber:{gameState.TurnNumber}",
+                $"CurrentPlayerTurnColor:{gameState.CurrentPlayerTurnColor}"
+            };
+
+            var allCoordinates = gameState.CoordinateSystem.GetAllCoordinates();
+            foreach (var coordinate in allCoordinates)
+            {
+                var hexagon = gameState.CoordinateSystem.GetHexagonAtCoordinate(coordinate);
+                var stringRepresentationOfHexagon = $"HexagonAt{coordinate}:" +
+                    string.Join(";", hexagon.GetAllPieces().Select(p => (p.Color, p.GetPieceName())));
+                result.Add(stringRepresentationOfHexagon);
+            }
+
+            foreach (var pastPlayerAction in gameState.PastPlayerActions)
+            {
+                string stringRepresentationOfPlayerAction;
+                if (pastPlayerAction.GetType() == typeof(PlayerSpawnAction))
+                {
+                    var spawnAction = (PlayerSpawnAction)pastPlayerAction;
+                    stringRepresentationOfPlayerAction = $"Spawn{(spawnAction.PieceToSpawn.Color, spawnAction.PieceToSpawn.GetPieceName())}" +
+                        $"At:{spawnAction.DestinationCoordinate}";
+                }
+                else if (pastPlayerAction.GetType() == typeof(PlayerMovementAction))
+                {
+                    var movementAction = (PlayerMovementAction)pastPlayerAction;
+                    stringRepresentationOfPlayerAction = $"MoveFrom:{movementAction.StartCoordinate}" +
+                        $"To:{movementAction.DestinationCoordinate}";
+                }
+                else // Player unable to play
+                {
+                    stringRepresentationOfPlayerAction = "UnableToPlay";
+                }
+
+                result.Add(stringRepresentationOfPlayerAction);
+            }
+
+            return result;
         }
     }
 }
