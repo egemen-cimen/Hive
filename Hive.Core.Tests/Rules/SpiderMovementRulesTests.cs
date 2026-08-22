@@ -71,7 +71,7 @@ namespace Hive.Core.Tests.Rules
             var startCoordinate = (0, -1);
 
             // WHEN
-            var allAvailableMovements = spiderMovementRules.GetAllAvailablePieceMovements(coordinateSystem, startCoordinate);
+            var allAvailableMovements = spiderMovementRules.GetAllAvailablePieceMovements(coordinateSystem, startCoordinate, PlayerColor.WHITE);
 
             // THEN
             Assert.HasCount(2, allAvailableMovements);
@@ -221,7 +221,7 @@ namespace Hive.Core.Tests.Rules
             var spiderMovementRules = new SpiderMovementRules();
 
             // WHEN
-            var allAvailableMovements = spiderMovementRules.GetAllAvailablePieceMovements(coordinateSystem, (1, -1));
+            var allAvailableMovements = spiderMovementRules.GetAllAvailablePieceMovements(coordinateSystem, (1, -1), PlayerColor.WHITE);
 
             // THEN
             Assert.HasCount(0, allAvailableMovements);
@@ -285,7 +285,7 @@ namespace Hive.Core.Tests.Rules
             var spiderMovementRules = new SpiderMovementRules();
 
             // WHEN
-            var allAvailableMovements = spiderMovementRules.GetAllAvailablePieceMovements(coordinateSystem, (1, 0));
+            var allAvailableMovements = spiderMovementRules.GetAllAvailablePieceMovements(coordinateSystem, (1, 0), PlayerColor.WHITE);
 
             // THEN
             Assert.HasCount(0, allAvailableMovements);
@@ -359,7 +359,7 @@ namespace Hive.Core.Tests.Rules
             var spiderMovementRules = new SpiderMovementRules();
 
             // WHEN
-            var allAvailableMovements = spiderMovementRules.GetAllAvailablePieceMovements(coordinateSystem, (0, 0));
+            var allAvailableMovements = spiderMovementRules.GetAllAvailablePieceMovements(coordinateSystem, (0, 0), PlayerColor.WHITE);
 
             // THEN
             Assert.HasCount(0, allAvailableMovements);
@@ -510,7 +510,7 @@ namespace Hive.Core.Tests.Rules
             var startCoordinate = (-1, -1);
 
             // WHEN
-            var allAvailableMovements = spiderMovementRules.GetAllAvailablePieceMovements(coordinateSystem, startCoordinate);
+            var allAvailableMovements = spiderMovementRules.GetAllAvailablePieceMovements(coordinateSystem, startCoordinate, PlayerColor.WHITE);
 
             // THEN
             Assert.HasCount(2, allAvailableMovements);
@@ -579,7 +579,7 @@ namespace Hive.Core.Tests.Rules
             var startCoordinate = (2, -2);
 
             // WHEN
-            var allAvailableMovements = spiderMovementRules.GetAllAvailablePieceMovements(coordinateSystem, startCoordinate);
+            var allAvailableMovements = spiderMovementRules.GetAllAvailablePieceMovements(coordinateSystem, startCoordinate, PlayerColor.WHITE);
 
             // THEN
             Assert.HasCount(2, allAvailableMovements);
@@ -647,7 +647,7 @@ namespace Hive.Core.Tests.Rules
             var spiderMovementRules = new SpiderMovementRules();
 
             // WHEN
-            var allAvailableMovements = spiderMovementRules.GetAllAvailablePieceMovements(coordinateSystem, (1, -1));
+            var allAvailableMovements = spiderMovementRules.GetAllAvailablePieceMovements(coordinateSystem, (1, -1), PlayerColor.WHITE);
 
             // THEN
             Assert.HasCount(0, allAvailableMovements);

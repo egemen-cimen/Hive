@@ -21,7 +21,7 @@ namespace Hive.Core.Rules
                 return commonMovementValidation;
             }
 
-            var validDestinationCoordinates = GetAllAvailablePieceMovements(coordinateSystem, startCoordinate);
+            var validDestinationCoordinates = GetAllAvailablePieceMovements(coordinateSystem, startCoordinate, playerTurnColor);
             if (!validDestinationCoordinates.Contains(destinationCoordinate))
             {
                 return MovementValidationResult.PIECE_CANNOT_REACH_DESTINATION;
@@ -30,8 +30,21 @@ namespace Hive.Core.Rules
             return MovementValidationResult.VALID;
         }
 
-        public HashSet<(int column, int row)> GetAllAvailablePieceMovements(ICoordinateSystem coordinateSystem, (int column, int row) startCoordinate)
+        public HashSet<(int column, int row)> GetAllAvailablePieceMovements(ICoordinateSystem coordinateSystem,
+            (int column, int row) startCoordinate,
+            PlayerColor playerTurnColor
+            )
         {
+            var commonMovementValidation = CommonMovementRules.ValidateCommonMovementRules<SpiderPiece>(coordinateSystem,
+                startCoordinate,
+                playerTurnColor
+                );
+
+            if (commonMovementValidation != MovementValidationResult.VALID)
+            {
+                return [];
+            }
+
             var visitedCoordinates = new HashSet<(int column, int row)>();
             var validDestinationCoordinates = new HashSet<(int column, int row)>();
             var nextStepAndCoordinates = new Stack<(int step, (int column, int row))>();
