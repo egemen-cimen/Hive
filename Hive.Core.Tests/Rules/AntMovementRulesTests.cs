@@ -456,7 +456,7 @@ namespace Hive.Core.Tests.Rules
         }
 
         [TestMethod]
-        public void Given_PopulatedCoordinateSystem_When_AllValidAntMovementForMiddlePieceIsRetrieved_Then_ReturnsEmpty() 
+        public void Given_PopulatedCoordinateSystem_When_AllValidAntMovementForMiddlePieceIsRetrieved_Then_ReturnsEmpty()
         {
             // GIVEN
 
