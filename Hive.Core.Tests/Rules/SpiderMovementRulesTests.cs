@@ -682,6 +682,34 @@ namespace Hive.Core.Tests.Rules
         }
 
         [TestMethod]
+        public void Given_PopulatedCoordinateSystem_When_AllValidSpiderMovementForWrongColorIsRetrieved_Then_Returns()
+        {
+            // GIVEN
+
+            //      [ 0,-1] [ 1,-1]
+            //
+            //  [-1, 0]         [ 1, 0]
+            //
+            //      [-1, 1] [ 0, 1]
+            var coordinateSystem = CoordinateSystemPopulationHelper.CreatePopulatedCoordinateSystem(
+            [
+                (( 0,-1), typeof(QueenPiece)),
+                (( 1,-1), typeof(QueenPiece)),
+                (( 1, 0), typeof(SpiderPiece)),
+                (( 0, 1), typeof(SpiderPiece)),
+                ((-1, 1), typeof(AntPiece)),
+                ((-1, 0), typeof(AntPiece))
+            ]);
+            var spiderMovementRules = new SpiderMovementRules();
+
+            // WHEN
+            var allAvailableMovements = spiderMovementRules.GetAllAvailablePieceMovements(coordinateSystem, (0, 1), PlayerColor.WHITE);
+
+            // THEN
+            Assert.HasCount(0, allAvailableMovements);
+        }
+
+        [TestMethod]
         [DataRow(0, -2)]
         [DataRow(2, 0)]
         public void Given_PopulatedCoordinateSystemWithATightTurn_When_SpiderThreeSpaceMovementIsValidated_Then_ReturnsValid(int endColumn, int endRow)
