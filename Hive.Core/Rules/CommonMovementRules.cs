@@ -15,6 +15,34 @@ namespace Hive.Core.Rules
                 return MovementValidationResult.START_AND_DESTINATION_CANNOT_BE_THE_SAME;
             }
 
+            var simplerValidation = ValidateCommonMovementRules<T>(coordinateSystem, startCoordinate, playerTurnColor);
+            if (simplerValidation != MovementValidationResult.VALID)
+            {
+                return simplerValidation;
+            }
+
+            // Validation for non-beetle pieces
+            if (typeof(T) != typeof(BeetlePiece))
+            {
+                if (coordinateSystem.TryGetHexagon(destinationCoordinate, out _))
+                {
+                    return MovementValidationResult.DESTINATION_IS_NOT_EMPTY;
+                }
+
+                var allFreeAdjacentCoordinatesWithout = coordinateSystem.GetAllFreeAdjacentCoordinatesWithoutHexagon(startCoordinate);
+                if (!allFreeAdjacentCoordinatesWithout.Contains(destinationCoordinate))
+                {
+                    return MovementValidationResult.BREAKS_ONE_HIVE;
+                }
+            }
+
+            return MovementValidationResult.VALID;
+        }
+        public static MovementValidationResult ValidateCommonMovementRules<T>(ICoordinateSystem coordinateSystem,
+            (int column, int row) startCoordinate,
+            PlayerColor playerTurnColor
+            )
+        {
             var isStartHexagonExists = coordinateSystem.TryGetHexagon(startCoordinate, out var hexagonAtStart);
             if (!isStartHexagonExists)
             {
@@ -33,23 +61,9 @@ namespace Hive.Core.Rules
             }
 
             // Validation for non-beetle pieces
-            if (typeof(T) != typeof(BeetlePiece))
+            if (typeof(T) != typeof(BeetlePiece) && !coordinateSystem.VerifyWhetherAllHexagonsConnectedWithoutHexagon(startCoordinate))
             {
-                if (coordinateSystem.TryGetHexagon(destinationCoordinate, out _))
-                {
-                    return MovementValidationResult.DESTINATION_IS_NOT_EMPTY;
-                }
-
-                if (!coordinateSystem.VerifyWhetherAllHexagonsConnectedWithoutHexagon(startCoordinate))
-                {
-                    return MovementValidationResult.BREAKS_ONE_HIVE;
-                }
-
-                var allFreeAdjacentCoordinatesWithout = coordinateSystem.GetAllFreeAdjacentCoordinatesWithoutHexagon(startCoordinate);
-                if (!allFreeAdjacentCoordinatesWithout.Contains(destinationCoordinate))
-                {
-                    return MovementValidationResult.BREAKS_ONE_HIVE;
-                }
+                return MovementValidationResult.BREAKS_ONE_HIVE;
             }
 
             // Validation for non-queen pieces

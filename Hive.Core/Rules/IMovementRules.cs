@@ -6,5 +6,8 @@ namespace Hive.Core.Rules
     {
         MovementValidationResult ValidatePieceMovement(ICoordinateSystem coordinateSystem,
             (int column, int row) startCoordinate, (int column, int row) destinationCoordinate, PlayerColor playerTurnColor);
+
+        HashSet<(int column, int row)> GetAllAvailablePieceMovements(ICoordinateSystem coordinateSystem,
+            (int column, int row) startCoordinate, PlayerColor playerTurnColor);
     }
 }

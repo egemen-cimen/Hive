@@ -21,7 +21,7 @@ namespace Hive.Core.Rules
                 return commonMovementValidation;
             }
 
-            var validDestinationCoordinated = FindValidDestinationCoordinates(coordinateSystem, startCoordinate);
+            var validDestinationCoordinated = GetAllAvailablePieceMovements(coordinateSystem, startCoordinate, playerTurnColor);
 
             if (!validDestinationCoordinated.Contains(destinationCoordinate))
             {
@@ -29,38 +29,48 @@ namespace Hive.Core.Rules
             }
 
             return MovementValidationResult.VALID;
+        }
 
-            static HashSet<(int column, int row)> FindValidDestinationCoordinates(ICoordinateSystem coordinateSystem, (int column, int row) startCoordinate)
+        public HashSet<(int column, int row)> GetAllAvailablePieceMovements(ICoordinateSystem coordinateSystem, (int column, int row) startCoordinate, PlayerColor playerTurnColor)
+        {
+            var commonMovementValidation = CommonMovementRules.ValidateCommonMovementRules<GrasshopperPiece>(coordinateSystem,
+                startCoordinate,
+                playerTurnColor
+                );
+
+            if (commonMovementValidation != MovementValidationResult.VALID)
             {
-                var populatedNeighborCoordinates = coordinateSystem.GetPopulatedNeighborCoordinates(startCoordinate);
-                var validDestinationCoordinates = new HashSet<(int column, int row)>();
+                return [];
+            }
 
-                foreach (var populatedNeighborCoordinate in populatedNeighborCoordinates)
+            var populatedNeighborCoordinates = coordinateSystem.GetPopulatedNeighborCoordinates(startCoordinate);
+            var validDestinationCoordinates = new HashSet<(int column, int row)>();
+
+            foreach (var populatedNeighborCoordinate in populatedNeighborCoordinates)
+            {
+                var direction = SubtractCoordinates(populatedNeighborCoordinate, startCoordinate);
+
+                var nextCoordinate = SumCoordinates(startCoordinate, direction);
+
+                while (coordinateSystem.TryGetHexagon(nextCoordinate, out _))
                 {
-                    var direction = SubtractCoordinates(populatedNeighborCoordinate, startCoordinate);
-
-                    var nextCoordinate = SumCoordinates(startCoordinate, direction);
-
-                    while (coordinateSystem.TryGetHexagon(nextCoordinate, out _))
-                    {
-                        nextCoordinate = SumCoordinates(nextCoordinate, direction);
-                    }
-
-                    validDestinationCoordinates.Add(nextCoordinate);
+                    nextCoordinate = SumCoordinates(nextCoordinate, direction);
                 }
 
-                return validDestinationCoordinates;
+                validDestinationCoordinates.Add(nextCoordinate);
             }
 
-            static (int column, int row) SumCoordinates((int column, int row) coordinate1, (int column, int row) coordinate2)
-            {
-                return (coordinate1.column + coordinate2.column, coordinate1.row + coordinate2.row);
-            }
+            return validDestinationCoordinates;
+        }
 
-            static (int column, int row) SubtractCoordinates((int column, int row) coordinate1, (int column, int row) coordinate2)
-            {
-                return (coordinate1.column - coordinate2.column, coordinate1.row - coordinate2.row);
-            }
+        static (int column, int row) SumCoordinates((int column, int row) coordinate1, (int column, int row) coordinate2)
+        {
+            return (coordinate1.column + coordinate2.column, coordinate1.row + coordinate2.row);
+        }
+
+        static (int column, int row) SubtractCoordinates((int column, int row) coordinate1, (int column, int row) coordinate2)
+        {
+            return (coordinate1.column - coordinate2.column, coordinate1.row - coordinate2.row);
         }
     }
 }

@@ -47,37 +47,13 @@ namespace Hive.Core.Rules
             var possibleSpawnCoordinates = gameState.CoordinateSystem.GetAllFreeAdjacentCoordinates();
             foreach (var spawnCoordinate in possibleSpawnCoordinates)
             {
-                AddValidSpawnPlayerActions(gameState, allAvailableActions, allPossibleSpawnPieces, spawnCoordinate);
+                AddValidPlayerSpawnActions(gameState, allAvailableActions, allPossibleSpawnPieces, spawnCoordinate);
             }
 
             var allCoordinates = gameState.CoordinateSystem.GetAllCoordinates();
             foreach (var coordinate in allCoordinates)
             {
-                gameState.CoordinateSystem.TryGetHexagon(coordinate, out var populatedHexagon);
-                var piece = populatedHexagon!.PeekPiece();
-                IEnumerable<(int column, int row)> possibleDestinations;
-
-                // TODO: Fix inefficiencies by implementing "GetAllAvailableMovements" method in *MovementRules.
-                if (piece.GetType() == typeof(BeetlePiece))
-                {
-                    var possibleFirstLevelDestinations = gameState.CoordinateSystem.GetAllFreeAdjacentCoordinates();
-                    var possibleStackingDestinations = gameState.CoordinateSystem.GetAllCoordinates();
-                    possibleDestinations = possibleFirstLevelDestinations.Concat(possibleStackingDestinations);
-                }
-                else
-                {
-                    possibleDestinations = gameState.CoordinateSystem.GetAllFreeAdjacentCoordinates();
-                }
-
-                _movementRules.TryGetValue(piece.GetType(), out var movementRules);
-                foreach (var destination in possibleDestinations)
-                {
-                    var validationResult = movementRules!.ValidatePieceMovement(gameState.CoordinateSystem, coordinate, destination, gameState.CurrentPlayerTurnColor);
-                    if (validationResult == MovementValidationResult.VALID)
-                    {
-                        allAvailableActions.Add(new PlayerMovementAction(coordinate, destination));
-                    }
-                }
+                AddValidPlayerMovementActions(gameState, allAvailableActions, coordinate);
             }
 
             if (allAvailableActions.Count == 0)
@@ -88,7 +64,7 @@ namespace Hive.Core.Rules
             return allAvailableActions;
         }
 
-        private static void AddValidSpawnPlayerActions(GameState gameState,
+        private static void AddValidPlayerSpawnActions(GameState gameState,
             List<IPlayerAction> allAvailableActions,
             List<IPiece> allPossibleSpawnPieces,
             (int, int) spawnCoordinate
@@ -107,6 +83,22 @@ namespace Hive.Core.Rules
                 {
                     allAvailableActions.Add(new PlayerSpawnAction(piece, spawnCoordinate));
                 }
+            }
+        }
+
+        private static void AddValidPlayerMovementActions(GameState gameState,
+            List<IPlayerAction> allAvailableActions,
+            (int, int) movementCoordinate
+            )
+        {
+            gameState.CoordinateSystem.TryGetHexagon(movementCoordinate, out var populatedHexagon);
+            var piece = populatedHexagon!.PeekPiece();
+            _movementRules.TryGetValue(piece.GetType(), out var movementRules);
+            var availableDestinations = movementRules!.GetAllAvailablePieceMovements(gameState.CoordinateSystem, movementCoordinate, gameState.CurrentPlayerTurnColor);
+
+            foreach (var destination in availableDestinations)
+            {
+                allAvailableActions.Add(new PlayerMovementAction(movementCoordinate, destination));
             }
         }
 

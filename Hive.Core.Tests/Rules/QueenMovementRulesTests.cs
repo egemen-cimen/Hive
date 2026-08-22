@@ -41,6 +41,43 @@ namespace Hive.Core.Tests.Rules
         }
 
         [TestMethod]
+        public void Given_PopulatedCoordinateSystem_When_AllValidQueenMovementIsRetrieved_Then_ReturnsAllValid()
+        {
+            // GIVEN
+
+            //      [WHT Q]
+            //      [ 1,-1]
+            //
+            //  [WHT S]
+            //  [ q, r]
+            //
+            //      [BLK S]
+            //      [ 0, 1]
+            //
+            //          [BLK A]
+            //          [ 0, 2]
+            var coordinateSystem = CoordinateSystemPopulationHelper.CreatePopulatedCoordinateSystem(
+            [
+                (( 0, 0), typeof(SpiderPiece)),
+                (( 0, 1), typeof(SpiderPiece)),
+                (( 1,-1), typeof(QueenPiece)),
+                (( 0, 2), typeof(AntPiece))
+            ]);
+            var queenMovementRules = new QueenMovementRules();
+            var startCoordinate = (1, -1);
+
+            // WHEN
+            var allAvailableMovements = queenMovementRules.GetAllAvailablePieceMovements(coordinateSystem, startCoordinate, PlayerColor.WHITE);
+
+            // THEN
+            Assert.HasCount(2, allAvailableMovements);
+            foreach (var availableMovement in allAvailableMovements)
+            {
+                Assert.AreEqual(MovementValidationResult.VALID, queenMovementRules.ValidatePieceMovement(coordinateSystem, startCoordinate, availableMovement, PlayerColor.WHITE));
+            }
+        }
+
+        [TestMethod]
         [DataRow(-1, 0)]
         [DataRow(-1, 1)]
         [DataRow(-1, 2)]
@@ -143,6 +180,40 @@ namespace Hive.Core.Tests.Rules
         }
 
         [TestMethod]
+        public void Given_PopulatedCoordinateSystem_When_QueenMovementIsRetrievedForAnotherType_Then_ReturnsEmpty()
+        {
+            // GIVEN
+
+            //  [WHT S] [WHT Q]
+            //  [ 0,-1] [ 1,-1]
+            //
+            //      [WHT S]
+            //      [ q, r]
+            //
+            //          [BLK S]
+            //          [ 0, 1]
+            //
+            //      [BLK S] [BLK A]
+            //      [-1, 2] [ 0, 2]
+            var coordinateSystem = CoordinateSystemPopulationHelper.CreatePopulatedCoordinateSystem(
+            [
+                (( 0, 0), typeof(SpiderPiece)),
+                (( 0, 1), typeof(SpiderPiece)),
+                (( 1,-1), typeof(QueenPiece)),
+                (( 0, 2), typeof(AntPiece)),
+                (( 0,-1), typeof(SpiderPiece)),
+                ((-1, 2), typeof(SpiderPiece))
+            ]);
+            var queenMovementRules = new QueenMovementRules();
+
+            // WHEN
+            var allAvailableMovements = queenMovementRules.GetAllAvailablePieceMovements(coordinateSystem, (0, -1), PlayerColor.WHITE);
+
+            // THEN
+            Assert.HasCount(0, allAvailableMovements);
+        }
+
+        [TestMethod]
         public void Given_PopulatedCoordinateSystem_When_EmptySpaceMovementIsValidated_Then_ReturnsValidationFail()
         {
             // GIVEN
@@ -172,6 +243,38 @@ namespace Hive.Core.Tests.Rules
 
             // THEN
             Assert.AreEqual(MovementValidationResult.NO_PIECE_TO_MOVE, result);
+        }
+
+        [TestMethod]
+        public void Given_PopulatedCoordinateSystem_When_AllValidQueenMovementForEmptySpaceIsRetrieved_Then_ReturnsEmpty()
+        {
+            // GIVEN
+
+            //      [WHT Q]
+            //      [ 1,-1]
+            //
+            //  [WHT S]
+            //  [ q, r]
+            //
+            //      [BLK S]
+            //      [ 0, 1]
+            //
+            //          [BLK A]
+            //          [ 0, 2]
+            var coordinateSystem = CoordinateSystemPopulationHelper.CreatePopulatedCoordinateSystem(
+            [
+                (( 0, 0), typeof(SpiderPiece)),
+                (( 0, 1), typeof(SpiderPiece)),
+                (( 1,-1), typeof(QueenPiece)),
+                (( 0, 2), typeof(AntPiece))
+            ]);
+            var queenMovementRules = new QueenMovementRules();
+
+            // WHEN
+            var allAvailableMovements = queenMovementRules.GetAllAvailablePieceMovements(coordinateSystem, (1, 0), PlayerColor.WHITE);
+
+            // THEN
+            Assert.HasCount(0, allAvailableMovements);
         }
 
         [TestMethod]
@@ -209,6 +312,43 @@ namespace Hive.Core.Tests.Rules
 
             // THEN
             Assert.AreEqual(MovementValidationResult.BREAKS_ONE_HIVE, result);
+        }
+
+        [TestMethod]
+        public void Given_PopulatedCoordinateSystem_When_AllValidQueenMovementForMiddlePieceIsRetrieved_Then_ReturnsEmpty()
+        {
+            // GIVEN
+
+            //          [WHT B]
+            //          [ 2,-2]
+            //
+            //      [WHT Q]
+            //      [ 1,-1]
+            //
+            //  [WHT S]
+            //  [ q, r]
+            //
+            //      [BLK S]
+            //      [ 0, 1]
+            //
+            //  [BLK S] [BLK A]
+            //  [-1, 2] [ 0, 2]
+            var coordinateSystem = CoordinateSystemPopulationHelper.CreatePopulatedCoordinateSystem(
+            [
+                (( 0, 0), typeof(SpiderPiece)),
+                (( 0, 1), typeof(SpiderPiece)),
+                (( 1,-1), typeof(QueenPiece)),
+                (( 0, 2), typeof(AntPiece)),
+                (( 2,-2), typeof(BeetlePiece)),
+                ((-1, 2), typeof(SpiderPiece))
+            ]);
+            var queenMovementRules = new QueenMovementRules();
+
+            // WHEN
+            var allAvailableMovements = queenMovementRules.GetAllAvailablePieceMovements(coordinateSystem, (1, -1), PlayerColor.WHITE);
+
+            // THEN
+            Assert.HasCount(0, allAvailableMovements);
         }
 
         [TestMethod]
@@ -317,6 +457,52 @@ namespace Hive.Core.Tests.Rules
         }
 
         [TestMethod]
+        public void Given_CoordinateSystemWithPiecesInABigCShape_When_AllValidQueenMovementIsRetrieved_Then_ReturnsAllValid()
+        {
+            // GIVEN
+
+            // Movement doesn't have continuous contact with the hive
+            //
+            //  	            [ 1,-2] [ 2,-2]
+            //
+            //      [-1,-1]                 [ 2,-1]
+            //
+            //  [-2, 0]                         [ 2, 0]
+            //
+            //      [-2, 1]                 [ 1, 1]
+            //
+            //          [-2, 2] [-1, 2] [ 0, 2]
+            //
+            // Queen is at [-1,-1] and it cannot move to [ 0,-2]
+            var coordinateSystem = CoordinateSystemPopulationHelper.CreatePopulatedCoordinateSystem(
+            [
+                ((-1,-1), typeof(QueenPiece)),
+                ((-2, 0), typeof(QueenPiece)),
+                ((-2, 1), typeof(SpiderPiece)),
+                ((-2, 2), typeof(SpiderPiece)),
+                ((-1, 2), typeof(AntPiece)),
+                (( 0, 2), typeof(AntPiece)),
+                (( 1, 1), typeof(AntPiece)),
+                (( 2, 0), typeof(AntPiece)),
+                (( 2,-1), typeof(BeetlePiece)),
+                (( 2,-2), typeof(BeetlePiece)),
+                (( 1,-2), typeof(BeetlePiece))
+            ]);
+            var queenMovementRules = new QueenMovementRules();
+            var startCoordinate = (-1, -1);
+
+            // WHEN
+            var allAvailableMovements = queenMovementRules.GetAllAvailablePieceMovements(coordinateSystem, startCoordinate, PlayerColor.WHITE);
+
+            // THEN
+            Assert.HasCount(2, allAvailableMovements);
+            foreach (var availableMovement in allAvailableMovements)
+            {
+                Assert.AreEqual(MovementValidationResult.VALID, queenMovementRules.ValidatePieceMovement(coordinateSystem, startCoordinate, availableMovement, PlayerColor.WHITE));
+            }
+        }
+
+        [TestMethod]
         public void Given_CoordinateSystemWithPiecesInACircle_When_QueenMovementToCenterOfCircleValidated_Then_ReturnsValidationFail()
         {
             // GIVEN
@@ -347,6 +533,41 @@ namespace Hive.Core.Tests.Rules
         }
 
         [TestMethod]
+        public void Given_CoordinateSystemWithPiecesInACircle_When_AllValidQueenMovementIsRetrieved_Then_ReturnsAllValid()
+        {
+            // GIVEN
+
+            // Queen cannot move/slide into the center
+            //
+            //      [ 0,-1] [ 1,-1]
+            //
+            //  [-1, 0]         [ 1, 0]
+            //
+            //      [-1, 1] [ 0, 1]
+            var coordinateSystem = CoordinateSystemPopulationHelper.CreatePopulatedCoordinateSystem(
+            [
+                (( 0,-1), typeof(QueenPiece)),
+                (( 1,-1), typeof(QueenPiece)),
+                (( 1, 0), typeof(SpiderPiece)),
+                (( 0, 1), typeof(SpiderPiece)),
+                ((-1, 1), typeof(AntPiece)),
+                ((-1, 0), typeof(AntPiece))
+            ]);
+            var queenMovementRules = new QueenMovementRules();
+            var startCoordinate = (0, -1);
+
+            // WHEN
+            var allAvailableMovements = queenMovementRules.GetAllAvailablePieceMovements(coordinateSystem, startCoordinate, PlayerColor.WHITE);
+
+            // THEN
+            Assert.HasCount(2, allAvailableMovements);
+            foreach (var availableMovement in allAvailableMovements)
+            {
+                Assert.AreEqual(MovementValidationResult.VALID, queenMovementRules.ValidatePieceMovement(coordinateSystem, startCoordinate, availableMovement, PlayerColor.WHITE));
+            }
+        }
+
+        [TestMethod]
         public void Given_CoordinateSystem_When_WrongColoredQueenMovementValidated_Then_ReturnsValidationFail()
         {
             // GIVEN
@@ -372,6 +593,34 @@ namespace Hive.Core.Tests.Rules
 
             // THEN
             Assert.AreEqual(MovementValidationResult.WRONG_COLOR_MOVED, result);
+        }
+
+        [TestMethod]
+        public void Given_PopulatedCoordinateSystem_When_AllValidQueenMovementForWrongColorIsRetrieved_Then_ReturnsEmpty()
+        {
+            // GIVEN
+
+            //      [ 0,-1] [ 1,-1]
+            //
+            //  [-1, 0]         [ 1, 0]
+            //
+            //      [-1, 1] [ 0, 1]
+            var coordinateSystem = CoordinateSystemPopulationHelper.CreatePopulatedCoordinateSystem(
+            [
+                (( 0,-1), typeof(QueenPiece)),
+                (( 1,-1), typeof(QueenPiece)),
+                (( 1, 0), typeof(SpiderPiece)),
+                (( 0, 1), typeof(SpiderPiece)),
+                ((-1, 1), typeof(AntPiece)),
+                ((-1, 0), typeof(AntPiece))
+            ]);
+            var queenMovementRules = new QueenMovementRules();
+
+            // WHEN
+            var allAvailableMovements = queenMovementRules.GetAllAvailablePieceMovements(coordinateSystem, (1, -1), PlayerColor.WHITE);
+
+            // THEN
+            Assert.HasCount(0, allAvailableMovements);
         }
     }
 }
