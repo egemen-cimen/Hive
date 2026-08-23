@@ -10,7 +10,7 @@ namespace Hive.PlayerAgent.Tests
         public void Given_GameStateWhereWhiteCanWinInOneMove_When_SuggestedNextMoveRetrievedForWhite_Then_ReturnsWinningMove()
         {
             // GIVEN
-            var minimaxPlayer = new MinimaxPlayer();
+            var minimaxPlayer = new MinimaxPlayer(3);
 
             //      [BLK A]
             //      [ 0,-3]
@@ -85,7 +85,7 @@ namespace Hive.PlayerAgent.Tests
         public void Given_GameStateWhereBlackCanWinInOneMove_When_SuggestedNextMoveRetrievedForBlack_Then_ReturnsWinningMove()
         {
             // GIVEN
-            var minimaxPlayer = new MinimaxPlayer();
+            var minimaxPlayer = new MinimaxPlayer(3);
 
             //      [BLK A]
             //      [ 0,-6]
@@ -163,7 +163,7 @@ namespace Hive.PlayerAgent.Tests
         public void Given_GameStateWhereWhiteCanWinInNextTurn_When_SuggestedNextMoveRetrievedForBlack_Then_ReturnsBlockingForWinningMove()
         {
             // GIVEN
-            var minimaxPlayer = new MinimaxPlayer();
+            var minimaxPlayer = new MinimaxPlayer(3);
 
             //      [BLK A]
             //      [ 0,-3]
@@ -241,7 +241,7 @@ namespace Hive.PlayerAgent.Tests
         public void Given_GameStateWhereBlackCanWinInNextTurn_When_SuggestedNextMoveRetrievedForWhite_Then_ReturnsBlockingForWinningMove()
         {
             // GIVEN
-            var minimaxPlayer = new MinimaxPlayer();
+            var minimaxPlayer = new MinimaxPlayer(3);
 
             //      [BLK A]
             //      [ 0,-6]
@@ -316,7 +316,7 @@ namespace Hive.PlayerAgent.Tests
         public void Given_GameStateWherePlayerHasNoMoves_When_SuggestedNextMoveRetrieved_Then_ReturnsUnableToPlayAction()
         {
             // GIVEN
-            var minimaxPlayer = new MinimaxPlayer();
+            var minimaxPlayer = new MinimaxPlayer(3);
 
             // Game state copied from GameRulesTests
             var gameState = GameRules.CreateFreshGameState();
@@ -354,7 +354,7 @@ namespace Hive.PlayerAgent.Tests
         public void Given_GameStateWithTie_When_SuggestedNextMoveRetrieved_Then_ReturnsActionToImproveSituation()
         {
             // GIVEN
-            var minimaxPlayer = new MinimaxPlayer();
+            var minimaxPlayer = new MinimaxPlayer(3);
 
             //              [BLK A] [BLK Q] [BLK A]
             //              [-1,-2] [ 0,-2] [ 1,-2]

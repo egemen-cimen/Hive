@@ -3,7 +3,7 @@ using Hive.Core.Rules;
 
 namespace Hive.PlayerAgent
 {
-    public class MinimaxPlayer : IPlayerAgent
+    public class MinimaxPlayer(int maximumDepthToEvaluate) : IPlayerAgent
     {
         private const int WINNER_VALUATION = 100;
         private const int DRAW_VALUATION = 0;
@@ -11,7 +11,8 @@ namespace Hive.PlayerAgent
         private const int PIECE_NEXT_TO_QUEEN_PENALY = -10;
         private const int QUEEN_CANNOT_MOVE_PENALTY = -10;
         private static readonly QueenMovementRules _queenMovementRules = new();
-        private const int MAX_TREE_DEPTH = 3;
+        private const int MINIMUM_EVALUATION_DEPTH = 3;
+        private readonly int _maximumDepthToEvaluate = int.Max(MINIMUM_EVALUATION_DEPTH, maximumDepthToEvaluate);
         private int _gameStatesEvaluated = 0;
 
         public IPlayerAction SuggestNextPlayerAction(GameState gameState)
@@ -32,7 +33,7 @@ namespace Hive.PlayerAgent
             {
                 GameRules.ApplyPlayerActionToGameState(gameState, playerAction);
 
-                var utilityValue = Minimax(gameState, MAX_TREE_DEPTH - 1, int.MinValue, int.MaxValue); // Subtract 1 since we're going down one ply here in this method
+                var utilityValue = Minimax(gameState, _maximumDepthToEvaluate - 1, int.MinValue, int.MaxValue); // Subtract 1 since we're going down one ply here in this method
                 playerActionsAndUtilityValues.Enqueue(playerAction, utilityValue);
 
                 GameRules.UndoLastMoveFromGameState(gameState);
