@@ -32,8 +32,8 @@ namespace Hive.PlayerAgent
             {
                 GameRules.ApplyPlayerActionToGameState(gameState, playerAction);
 
-                var value = Minimax(gameState, MAX_TREE_DEPTH - 1); // Subtract 1 since we're going down one ply here in this method
-                playerActionsAndUtilityValues.Enqueue(playerAction, value);
+                var utilityValue = Minimax(gameState, MAX_TREE_DEPTH - 1, int.MinValue, int.MaxValue); // Subtract 1 since we're going down one ply here in this method
+                playerActionsAndUtilityValues.Enqueue(playerAction, utilityValue);
 
                 GameRules.UndoLastMoveFromGameState(gameState);
             }
@@ -55,7 +55,7 @@ namespace Hive.PlayerAgent
             return gameState.CurrentPlayerTurnColor == PlayerColor.WHITE;
         }
 
-        private int Minimax(GameState gameState, int maxTreeDepth)
+        private int Minimax(GameState gameState, int maxTreeDepth, int alpha, int beta)
         {
             if (maxTreeDepth == 0 || GameRules.VerifyWhetherGameStateIsTerminal(gameState))
             {
@@ -64,27 +64,41 @@ namespace Hive.PlayerAgent
 
             if (CurrentPlayerIsMaximizer(gameState))
             {
-                var value = int.MinValue;
+                var maximumUtilityValue = int.MinValue;
                 foreach (var playerAction in GameRules.GetAllAvailablePlayerActions(gameState))
                 {
                     GameRules.ApplyPlayerActionToGameState(gameState, playerAction);
-                    value = int.Max(value, Minimax(gameState, maxTreeDepth - 1));
+                    var utilityValue = Minimax(gameState, maxTreeDepth - 1, alpha, beta);
                     GameRules.UndoLastMoveFromGameState(gameState);
+
+                    maximumUtilityValue = int.Max(maximumUtilityValue, utilityValue);
+                    alpha = int.Max(alpha, utilityValue);
+                    if (beta <= alpha)
+                    {
+                        break;
+                    }
                 }
 
-                return value;
+                return maximumUtilityValue;
             }
             else
             {
-                var value = int.MaxValue;
+                var minimumUtilityValue = int.MaxValue;
                 foreach (var playerAction in GameRules.GetAllAvailablePlayerActions(gameState))
                 {
                     GameRules.ApplyPlayerActionToGameState(gameState, playerAction);
-                    value = int.Min(value, Minimax(gameState, maxTreeDepth - 1));
+                    var utilityValue = Minimax(gameState, maxTreeDepth - 1, alpha, beta);
                     GameRules.UndoLastMoveFromGameState(gameState);
+
+                    minimumUtilityValue = int.Min(minimumUtilityValue, utilityValue);
+                    beta = int.Min(beta, utilityValue);
+                    if (beta <= alpha)
+                    {
+                        break;
+                    }
                 }
 
-                return value;
+                return minimumUtilityValue;
             }
         }
 

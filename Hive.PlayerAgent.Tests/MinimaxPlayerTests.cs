@@ -78,7 +78,7 @@ namespace Hive.PlayerAgent.Tests
             Assert.IsTrue(GameRules.VerifyWhetherGameStateIsTerminal(gameState));
             Assert.AreEqual(GameResult.WHITE_WON, GameRules.GetGameResult(gameState));
 
-            Assert.AreEqual(317_494, minimaxPlayer.GetEvaluationCount());
+            Assert.AreEqual(119_033, minimaxPlayer.GetEvaluationCount()); // evaluation count without alpha-beta pruning was 317_494
         }
 
         [TestMethod]
@@ -156,7 +156,7 @@ namespace Hive.PlayerAgent.Tests
             Assert.IsTrue(GameRules.VerifyWhetherGameStateIsTerminal(gameState));
             Assert.AreEqual(GameResult.BLACK_WON, GameRules.GetGameResult(gameState));
 
-            Assert.AreEqual(341_491, minimaxPlayer.GetEvaluationCount());
+            Assert.AreEqual(152_200, minimaxPlayer.GetEvaluationCount()); // evaluation count without alpha-beta pruning was 341_491
         }
 
         [TestMethod]
@@ -234,7 +234,7 @@ namespace Hive.PlayerAgent.Tests
             var spacesNextToWhiteAnt = gameState.CoordinateSystem.GetAdjacentCoordinates(lastWhiteAntCoordinate);
             Assert.Contains(((PlayerMovementAction)suggestedAction).DestinationCoordinate, spacesNextToWhiteAnt);
 
-            Assert.AreEqual(480_157, minimaxPlayer.GetEvaluationCount());
+            Assert.AreEqual(174_828, minimaxPlayer.GetEvaluationCount()); // evaluation count without alpha-beta pruning was 480_157
         }
 
         [TestMethod]
@@ -309,7 +309,7 @@ namespace Hive.PlayerAgent.Tests
             var spacesNextToBlackAnt = gameState.CoordinateSystem.GetAdjacentCoordinates(lastBlackAntCoordinate);
             Assert.Contains(((PlayerMovementAction)suggestedAction).DestinationCoordinate, spacesNextToBlackAnt);
 
-            Assert.AreEqual(508_426, minimaxPlayer.GetEvaluationCount());
+            Assert.AreEqual(244_274, minimaxPlayer.GetEvaluationCount()); // evaluation count without alpha-beta pruning was 508_426
         }
 
         [TestMethod]
@@ -347,7 +347,7 @@ namespace Hive.PlayerAgent.Tests
             // THEN
             Assert.IsInstanceOfType<PlayerUnableToPlayAction>(suggestedAction);
 
-            Assert.AreEqual(1_944, minimaxPlayer.GetEvaluationCount());
+            Assert.AreEqual(90, minimaxPlayer.GetEvaluationCount()); // evaluation count without alpha-beta pruning was 1_944
         }
 
         [TestMethod]
@@ -396,7 +396,7 @@ namespace Hive.PlayerAgent.Tests
             var hexagon = gameState.CoordinateSystem.GetHexagonAtCoordinate(((PlayerMovementAction)suggestedAction).StartCoordinate);
             Assert.IsInstanceOfType<QueenPiece>(hexagon.PeekPiece());
 
-            Assert.AreEqual(357_966, minimaxPlayer.GetEvaluationCount());
+            Assert.AreEqual(115_027, minimaxPlayer.GetEvaluationCount()); // evaluation count without alpha-beta pruning was 357_966
         }
 
         private static PlayerSpawnAction ApplyPlayerSpawnActionPredicateToGameState(GameState gameState, Func<PlayerSpawnAction, bool> spawnPredicate)
