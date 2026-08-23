@@ -1,8 +1,9 @@
 ﻿using Hive.Core.Models;
 using Hive.Core.Rules;
 using Hive.PlayerAgent;
+using System.Diagnostics;
 
-var minimaxPlayer = new MinimaxPlayer();
+var minimaxPlayer = new MinimaxPlayer(4);
 
 var gameState = GameRules.CreateFreshGameState();
 
@@ -132,7 +133,13 @@ static void AllowPlayerMove(MinimaxPlayer minimaxPlayer, GameState gameState, bo
     }
     else
     {
+        var timer = new Stopwatch();
+        timer.Start();
         var suggestedAction = minimaxPlayer.SuggestNextPlayerAction(gameState);
+        timer.Stop();
+        TimeSpan timeTaken = timer.Elapsed;
+
+        Console.WriteLine($"Evaluated {minimaxPlayer.GetEvaluationCount()} game states in {timeTaken:ss\\.fff} seconds.");
         PrintPlayerAction(suggestedAction, gameState);
         GameRules.ApplyPlayerActionToGameState(gameState, suggestedAction);
     }
