@@ -1,4 +1,5 @@
 <Solution>
+  <Project Path="Hive.BlazorApp/Hive.BlazorApp.csproj" Id="042adebd-9258-4c00-bae6-2ad31a0f364f" />
   <Project Path="Hive.ConsoleRunner/Hive.ConsoleRunner.csproj" />
   <Project Path="Hive.Core.Tests/Hive.Core.Tests.csproj" />
   <Project Path="Hive.Core/Hive.Core.csproj" />
