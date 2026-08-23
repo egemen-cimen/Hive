@@ -1,6 +1,6 @@
 # Hive Game Engine and AI Player
 
-This project contains a C# engine and a Minimax AI for [the tabletop strategy game Hive](https://en.wikipedia.org/wiki/Hive_(game)), I built this project from scratch to explore advanced graph traversal and state management.
+This project contains a C# engine and a Minimax with alpha-beta pruning AI for [the tabletop strategy game Hive](https://en.wikipedia.org/wiki/Hive_(game)), I built this project from scratch to explore advanced graph traversal and state management.
 
 Only the base game pieces are implemented:
 
@@ -32,7 +32,7 @@ In order to accommodate the AI player's exploration of game states, I implemente
 
 ## The AI
 
-The AI uses Minimax algorithm with simple heuristics:
+The AI uses Minimax algorithm with alpha-beta pruning and simple heuristics:
 
 - Playing own queen piece is an advantage
 - Every piece next to own queen is a disadvantage
@@ -43,7 +43,6 @@ The AI uses Minimax algorithm with simple heuristics:
 ## Known Issues & Future Development
 
 - The "draw after repeating the same moves three times" rule is not implemented
-- No alpha beta pruning is implemented for the player agent
 - Since there's no visualization for the game, the game is not played stand alone. Some sort of UI could be implemented in the future
 
 ## How to Run the Project and Play the Game

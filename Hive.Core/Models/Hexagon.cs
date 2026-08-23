@@ -1,5 +1,12 @@
-﻿namespace Hive.Core.Models
+﻿#if DEBUG
+using System.Diagnostics;
+#endif
+
+namespace Hive.Core.Models
 {
+#if DEBUG
+    [DebuggerDisplay("Hexagon with {GetPieceCount()} piece(s): {PeekPiece().Color} {PeekPiece().GetPieceName()}")]
+#endif
     public class Hexagon
     {
         private Stack<IPiece> Pieces { get; } = new Stack<IPiece>();

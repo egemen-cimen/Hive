@@ -105,7 +105,7 @@ namespace Hive.Core.Tests.Rules
         }
 
         [TestMethod]
-        public void Given_ReveredGameState_When_AllAvailableActionsRetrieved_Then_ReturnsAllPossibleSpawnActions()
+        public void Given_ReversedGameState_When_AllAvailableActionsRetrieved_Then_ReturnsAllPossibleSpawnActions()
         {
             // GIVEN
             var gameState = GameRules.CreateFreshGameState();
