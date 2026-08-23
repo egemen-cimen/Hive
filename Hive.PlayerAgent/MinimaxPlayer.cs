@@ -12,9 +12,11 @@ namespace Hive.PlayerAgent
         private const int QUEEN_CANNOT_MOVE_PENALTY = -10;
         private static readonly QueenMovementRules _queenMovementRules = new();
         private const int MAX_TREE_DEPTH = 2;
+        private int _gameStatesEvaluated = 0;
 
         public IPlayerAction SuggestNextPlayerAction(GameState gameState)
         {
+            _gameStatesEvaluated = 0;
             var allAvailablePlayerActions = GameRules.GetAllAvailablePlayerActions(gameState);
             PriorityQueue<IPlayerAction, int> playerActionValues;
             if (gameState.CurrentPlayerTurnColor == PlayerColor.WHITE)
@@ -39,8 +41,16 @@ namespace Hive.PlayerAgent
             return playerActionValues.Dequeue();
         }
 
+        /// <summary>
+        /// Retrieves the number of game states evaluated in the last run
+        /// </summary>
+        /// <returns>Number of game states evaluated</returns>
+        public int GetEvaluationCount()
+        {
+            return _gameStatesEvaluated;
+        }
 
-        private static int Minimax(GameState gameState, int maxTreeDepth)
+        private int Minimax(GameState gameState, int maxTreeDepth)
         {
             if (maxTreeDepth == 0 || GameRules.VerifyWhetherGameStateIsTerminal(gameState))
             {
@@ -73,8 +83,9 @@ namespace Hive.PlayerAgent
             }
         }
 
-        private static int EvaluateValueOfGameState(GameState gameState)
+        private int EvaluateValueOfGameState(GameState gameState)
         {
+            _gameStatesEvaluated++;
             var gameResult = GameRules.GetGameResult(gameState);
             switch (gameResult)
             {

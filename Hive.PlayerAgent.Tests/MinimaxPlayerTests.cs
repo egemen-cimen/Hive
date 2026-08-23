@@ -76,6 +76,8 @@ namespace Hive.PlayerAgent.Tests
             GameRules.ApplyPlayerActionToGameState(gameState, suggestedAction);
             Assert.IsTrue(GameRules.VerifyWhetherGameStateIsTerminal(gameState));
             Assert.AreEqual(GameResult.WHITE_WON, GameRules.GetGameResult(gameState));
+
+            Assert.AreEqual(317494, minimaxPlayer.GetEvaluationCount());
         }
 
         [TestMethod]
@@ -151,6 +153,8 @@ namespace Hive.PlayerAgent.Tests
             GameRules.ApplyPlayerActionToGameState(gameState, suggestedAction);
             Assert.IsTrue(GameRules.VerifyWhetherGameStateIsTerminal(gameState));
             Assert.AreEqual(GameResult.BLACK_WON, GameRules.GetGameResult(gameState));
+
+            Assert.AreEqual(341491, minimaxPlayer.GetEvaluationCount());
         }
 
         [TestMethod]
@@ -226,6 +230,8 @@ namespace Hive.PlayerAgent.Tests
             Assert.IsInstanceOfType<PlayerMovementAction>(suggestedAction);
             var spacesNextToWhiteAnt = gameState.CoordinateSystem.GetAdjacentCoordinates(lastWhiteAntCoordinate);
             Assert.Contains(((PlayerMovementAction)suggestedAction).DestinationCoordinate, spacesNextToWhiteAnt);
+
+            Assert.AreEqual(480157, minimaxPlayer.GetEvaluationCount());
         }
 
         [TestMethod]
@@ -298,6 +304,46 @@ namespace Hive.PlayerAgent.Tests
             Assert.IsInstanceOfType<PlayerMovementAction>(suggestedAction);
             var spacesNextToBlackAnt = gameState.CoordinateSystem.GetAdjacentCoordinates(lastBlackAntCoordinate);
             Assert.Contains(((PlayerMovementAction)suggestedAction).DestinationCoordinate, spacesNextToBlackAnt);
+
+            Assert.AreEqual(508426, minimaxPlayer.GetEvaluationCount());
+        }
+
+        [TestMethod]
+        public void Given_GameStateWherePlayerHasNoMoves_When_SuggestedNextMoveRetrieved_Then_ReturnsUnableToPlayAction()
+        {
+            // GIVEN
+            var minimaxPlayer = new MinimaxPlayer();
+
+            // Game state copied from GameRulesTests
+            var gameState = GameRules.CreateFreshGameState();
+            // Spawn all non-ant pieces in a line
+            for (var i = 0; i < 16; i++)
+            {
+                var actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First(a
+                    => a.PieceToSpawn.GetType() != typeof(AntPiece) && a.DestinationCoordinate.column == 0);
+                gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
+            }
+
+            // Spawn rest of the pieces (all ants) in a line
+            for (var i = 0; i < 6; i++)
+            {
+                var actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First(a
+                    => a.DestinationCoordinate.column == 0);
+                gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
+            }
+
+            // Move ant to the other side to block the other player's last possible move
+            var antMovementToOtherSideAction = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerMovementAction>().First(a
+                => a.DestinationCoordinate.column == 0);
+            gameState = GameRules.ApplyPlayerActionToGameState(gameState, antMovementToOtherSideAction);
+
+            // WHEN
+            var suggestedAction = minimaxPlayer.SuggestNextPlayerAction(gameState);
+
+            // THEN
+            Assert.IsInstanceOfType<PlayerUnableToPlayAction>(suggestedAction);
+
+            Assert.AreEqual(1944, minimaxPlayer.GetEvaluationCount());
         }
 
         private static PlayerSpawnAction ApplyPlayerSpawnActionPredicateToGameState(GameState gameState, Func<PlayerSpawnAction, bool> spawnPredicate)
@@ -349,42 +395,6 @@ namespace Hive.PlayerAgent.Tests
             }
 
             return result;
-        }
-
-        [TestMethod]
-        public void Given_GameStateWherePlayerHasNoMoves_When_SuggestedNextMoveRetrieved_Then_ReturnsUnableToPlayAction()
-        {
-            // GIVEN
-            var minimaxPlayer = new MinimaxPlayer();
-
-            // Game state copied from GameRulesTests
-            var gameState = GameRules.CreateFreshGameState();
-            // Spawn all non-ant pieces in a line
-            for (var i = 0; i < 16; i++)
-            {
-                var actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First(a
-                    => a.PieceToSpawn.GetType() != typeof(AntPiece) && a.DestinationCoordinate.column == 0);
-                gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
-            }
-
-            // Spawn rest of the pieces (all ants) in a line
-            for (var i = 0; i < 6; i++)
-            {
-                var actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First(a
-                    => a.DestinationCoordinate.column == 0);
-                gameState = GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
-            }
-
-            // Move ant to the other side to block the other player's last possible move
-            var antMovementToOtherSideAction = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerMovementAction>().First(a
-                => a.DestinationCoordinate.column == 0);
-            gameState = GameRules.ApplyPlayerActionToGameState(gameState, antMovementToOtherSideAction);
-
-            // WHEN
-            var suggestedAction = minimaxPlayer.SuggestNextPlayerAction(gameState);
-
-            // THEN
-            Assert.IsInstanceOfType<PlayerUnableToPlayAction>(suggestedAction);
         }
     }
 }
