@@ -18,14 +18,14 @@ namespace Hive.PlayerAgent
         {
             _gameStatesEvaluated = 0;
             var allAvailablePlayerActions = GameRules.GetAllAvailablePlayerActions(gameState);
-            PriorityQueue<IPlayerAction, int> playerActionValues;
-            if (gameState.CurrentPlayerTurnColor == PlayerColor.WHITE)
+            PriorityQueue<IPlayerAction, int> playerActionsAndUtilityValues;
+            if (CurrentPlayerIsMaximizer(gameState))
             {
-                playerActionValues = new PriorityQueue<IPlayerAction, int>(Comparer<int>.Create((x, y) => y.CompareTo(x)));
+                playerActionsAndUtilityValues = new PriorityQueue<IPlayerAction, int>(Comparer<int>.Create((x, y) => y.CompareTo(x)));
             }
             else
             {
-                playerActionValues = new PriorityQueue<IPlayerAction, int>();
+                playerActionsAndUtilityValues = new PriorityQueue<IPlayerAction, int>();
             }
 
             foreach (var playerAction in allAvailablePlayerActions)
@@ -33,12 +33,12 @@ namespace Hive.PlayerAgent
                 GameRules.ApplyPlayerActionToGameState(gameState, playerAction);
 
                 var value = Minimax(gameState, MAX_TREE_DEPTH);
-                playerActionValues.Enqueue(playerAction, value);
+                playerActionsAndUtilityValues.Enqueue(playerAction, value);
 
                 GameRules.UndoLastMoveFromGameState(gameState);
             }
 
-            return playerActionValues.Dequeue();
+            return playerActionsAndUtilityValues.Dequeue();
         }
 
         /// <summary>
@@ -50,6 +50,11 @@ namespace Hive.PlayerAgent
             return _gameStatesEvaluated;
         }
 
+        private static bool CurrentPlayerIsMaximizer(GameState gameState)
+        {
+            return gameState.CurrentPlayerTurnColor == PlayerColor.WHITE;
+        }
+
         private int Minimax(GameState gameState, int maxTreeDepth)
         {
             if (maxTreeDepth == 0 || GameRules.VerifyWhetherGameStateIsTerminal(gameState))
@@ -57,7 +62,7 @@ namespace Hive.PlayerAgent
                 return EvaluateValueOfGameState(gameState);
             }
 
-            if (gameState.CurrentPlayerTurnColor == PlayerColor.WHITE)
+            if (CurrentPlayerIsMaximizer(gameState))
             {
                 var value = int.MinValue;
                 foreach (var playerAction in GameRules.GetAllAvailablePlayerActions(gameState))
@@ -98,7 +103,6 @@ namespace Hive.PlayerAgent
             }
 
             var valuation = 0;
-
             var (whiteQueenExists, whiteQueenCoordinate) = RulesHelper.VerifyWhetherQueenIsSpawned(gameState.CoordinateSystem, PlayerColor.WHITE);
             var (blackQueenExists, blackQueenCoordinate) = RulesHelper.VerifyWhetherQueenIsSpawned(gameState.CoordinateSystem, PlayerColor.BLACK);
 
