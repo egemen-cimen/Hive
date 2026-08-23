@@ -38,6 +38,7 @@ namespace Hive.PlayerAgent.Tests
             //
             //                                      [WHT A]
             //                                      [ 0, 5]
+            //
             // White can win in one move.
             var gameState = GameRules.CreateFreshGameState();
             // Spawn first pieces in a line
@@ -77,7 +78,7 @@ namespace Hive.PlayerAgent.Tests
             Assert.IsTrue(GameRules.VerifyWhetherGameStateIsTerminal(gameState));
             Assert.AreEqual(GameResult.WHITE_WON, GameRules.GetGameResult(gameState));
 
-            Assert.AreEqual(317494, minimaxPlayer.GetEvaluationCount());
+            Assert.AreEqual(317_494, minimaxPlayer.GetEvaluationCount());
         }
 
         [TestMethod]
@@ -112,6 +113,7 @@ namespace Hive.PlayerAgent.Tests
             //
             //                      [WHT B] [WHT B]
             //                      [-2, 2] [-1, 2]
+            //
             // Black can win in one move.
             var gameState = GameRules.CreateFreshGameState();
             // Spawn first pieces in a line
@@ -154,7 +156,7 @@ namespace Hive.PlayerAgent.Tests
             Assert.IsTrue(GameRules.VerifyWhetherGameStateIsTerminal(gameState));
             Assert.AreEqual(GameResult.BLACK_WON, GameRules.GetGameResult(gameState));
 
-            Assert.AreEqual(341491, minimaxPlayer.GetEvaluationCount());
+            Assert.AreEqual(341_491, minimaxPlayer.GetEvaluationCount());
         }
 
         [TestMethod]
@@ -189,6 +191,7 @@ namespace Hive.PlayerAgent.Tests
             //
             //                                      [WHT A]
             //                                      [ 0, 5]
+            //
             // White can win in the next turn. Black should pin the white ant to avoid a game over.
             var gameState = GameRules.CreateFreshGameState();
             // Spawn first pieces in a line
@@ -231,7 +234,7 @@ namespace Hive.PlayerAgent.Tests
             var spacesNextToWhiteAnt = gameState.CoordinateSystem.GetAdjacentCoordinates(lastWhiteAntCoordinate);
             Assert.Contains(((PlayerMovementAction)suggestedAction).DestinationCoordinate, spacesNextToWhiteAnt);
 
-            Assert.AreEqual(480157, minimaxPlayer.GetEvaluationCount());
+            Assert.AreEqual(480_157, minimaxPlayer.GetEvaluationCount());
         }
 
         [TestMethod]
@@ -266,6 +269,7 @@ namespace Hive.PlayerAgent.Tests
             //
             //                              [WHT B]
             //                              [-1, 2]
+            //
             // Black can win in the next turn. White should pin the black ant to avoid a game over.
             var gameState = GameRules.CreateFreshGameState();
             // Spawn first pieces in a line
@@ -305,7 +309,7 @@ namespace Hive.PlayerAgent.Tests
             var spacesNextToBlackAnt = gameState.CoordinateSystem.GetAdjacentCoordinates(lastBlackAntCoordinate);
             Assert.Contains(((PlayerMovementAction)suggestedAction).DestinationCoordinate, spacesNextToBlackAnt);
 
-            Assert.AreEqual(508426, minimaxPlayer.GetEvaluationCount());
+            Assert.AreEqual(508_426, minimaxPlayer.GetEvaluationCount());
         }
 
         [TestMethod]
@@ -343,7 +347,56 @@ namespace Hive.PlayerAgent.Tests
             // THEN
             Assert.IsInstanceOfType<PlayerUnableToPlayAction>(suggestedAction);
 
-            Assert.AreEqual(1944, minimaxPlayer.GetEvaluationCount());
+            Assert.AreEqual(1_944, minimaxPlayer.GetEvaluationCount());
+        }
+
+        [TestMethod]
+        public void Given_GameStateWithTie_When_SuggestedNextMoveRetrieved_Then_ReturnsActionToImproveSituation()
+        {
+            // GIVEN
+            var minimaxPlayer = new MinimaxPlayer();
+
+            //              [BLK A] [BLK Q] [BLK A]
+            //              [-1,-2] [ 0,-2] [ 1,-2]
+            //
+            //                  [BLK A] [BLK S]
+            //                  [-1,-1] [ 0,-1]
+            //
+            //                              [WHT S] [WHT A]
+            //                              [ 0, 0] [ 1, 0]
+            //
+            //                          [WHT A] [WHT Q] [WHT A]
+            //                          [-1, 1] [ 0, 1] [ 1, 1]
+            //
+            // Players are in a tie. White queen should move to improve it's situation.
+            var gameState = GameRules.CreateFreshGameState();
+            // Spawn first pieces in a line
+            ApplyPlayerSpawnActionPredicateToGameState(gameState, a => a.PieceToSpawn.GetType() == typeof(SpiderPiece) && a.DestinationCoordinate.column == 0);
+            ApplyPlayerSpawnActionPredicateToGameState(gameState, a => a.PieceToSpawn.GetType() == typeof(SpiderPiece) && a.DestinationCoordinate.column == 0);
+            // Spawn queens as second pieces in a line and get the coordinates
+            var queenSpawnAction = ApplyPlayerSpawnActionPredicateToGameState(gameState, a => a.PieceToSpawn.GetType() == typeof(QueenPiece) && a.DestinationCoordinate.column == 0);
+            var spacesNextToWhiteQueen = gameState.CoordinateSystem.GetAdjacentCoordinates(queenSpawnAction.DestinationCoordinate);
+            queenSpawnAction = ApplyPlayerSpawnActionPredicateToGameState(gameState, a => a.PieceToSpawn.GetType() == typeof(QueenPiece) && a.DestinationCoordinate.column == 0);
+            var spacesNextToBlackQueen = gameState.CoordinateSystem.GetAdjacentCoordinates(queenSpawnAction.DestinationCoordinate);
+
+            for (var i = 0; i < 3; i++)
+            {
+                // Surround white queen with ants
+                ApplyPlayerSpawnActionPredicateToGameState(gameState, a => a.PieceToSpawn.GetType() == typeof(AntPiece) && spacesNextToWhiteQueen.Contains(a.DestinationCoordinate));
+
+                // Surround black queen with ants
+                ApplyPlayerSpawnActionPredicateToGameState(gameState, a => a.PieceToSpawn.GetType() == typeof(AntPiece) && spacesNextToBlackQueen.Contains(a.DestinationCoordinate));
+            }
+
+            // WHEN
+            var suggestedAction = minimaxPlayer.SuggestNextPlayerAction(gameState);
+
+            // THEN
+            Assert.IsInstanceOfType<PlayerMovementAction>(suggestedAction);
+            var hexagon = gameState.CoordinateSystem.GetHexagonAtCoordinate(((PlayerMovementAction)suggestedAction).StartCoordinate);
+            Assert.IsInstanceOfType<QueenPiece>(hexagon.PeekPiece());
+
+            Assert.AreEqual(357_966, minimaxPlayer.GetEvaluationCount());
         }
 
         private static PlayerSpawnAction ApplyPlayerSpawnActionPredicateToGameState(GameState gameState, Func<PlayerSpawnAction, bool> spawnPredicate)
