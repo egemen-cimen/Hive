@@ -5,7 +5,7 @@
 
 <PageTitle>Hive Game</PageTitle>
 
-@foreach(var coordinate in HiveGameState.CoordinateSystem.GetAllCoordinates())
+@foreach (var coordinate in HiveGameState.CoordinateSystem.GetAllCoordinates())
 {
     var hexagon = HiveGameState.CoordinateSystem.GetHexagonAtCoordinate(coordinate);
     var topPiece = hexagon.PeekPiece();
@@ -14,10 +14,13 @@
 
 <p></p>
 
-<svg width="640" height="640" style="background-color: oklch(0.7 0.1 128)">
+<svg width="640"
+     height="640"
+     viewBox="-320 -320 640 640"
+     style="background-color: oklch(0.7 0.1 128)">
 
-<polygon points="150,15 258,77 258,202 150,265 42,202 42,77"></polygon>
-
+    <polygon points="150,15 258,77 258,202 150,265 42,202 42,77"></polygon>
+    <circle cx="0" cy="0" r="10" fill="oklch(0.728 0.1835 0)" stroke="oklch(0 0 0)" stroke-width="2" />
 </svg>
 
 @code {
