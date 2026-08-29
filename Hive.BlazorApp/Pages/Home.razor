@@ -1,7 +1,33 @@
 ﻿@page "/"
+@using Hive.Core.Models
+@using Hive.Core.Rules
+@using Hive.PlayerAgent
 
-<PageTitle>Home</PageTitle>
+<PageTitle>Hive Game</PageTitle>
 
-<h1>Hello, world!</h1>
+@foreach(var coordinate in HiveGameState.CoordinateSystem.GetAllCoordinates())
+{
+    var hexagon = HiveGameState.CoordinateSystem.GetHexagonAtCoordinate(coordinate);
+    var topPiece = hexagon.PeekPiece();
+    <text> At @coordinate we have a @topPiece.Color @topPiece.GetPieceName() </text>
+}
 
-Welcome to your new app.
+<p></p>
+
+<svg width="640" height="640" style="background-color: oklch(0.7 0.1 128)">
+
+<polygon points="150,15 258,77 258,202 150,265 42,202 42,77"></polygon>
+
+</svg>
+
+@code {
+    private GameState HiveGameState { get; set; } = default!;
+
+    protected override void OnInitialized()
+    {
+        HiveGameState = GameRules.CreateFreshGameState();
+        var minimaxPlayer = new MinimaxPlayer(4);
+        var suggestedAction = minimaxPlayer.SuggestNextPlayerAction(HiveGameState);
+        GameRules.ApplyPlayerActionToGameState(HiveGameState, suggestedAction);
+    }
+}
