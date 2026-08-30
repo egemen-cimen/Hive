@@ -9,28 +9,84 @@
 {
     var hexagon = HiveGameState.CoordinateSystem.GetHexagonAtCoordinate(coordinate);
     var topPiece = hexagon.PeekPiece();
-    <text> At @coordinate we have a @topPiece.Color @topPiece.GetPieceName() </text>
+    var coordinatesOnSvg = ConvertPointyHexagonCoordinateToPixel(coordinate);
+    <text> At @coordinate we have a @topPiece.Color @topPiece.GetPieceName() drawn at @coordinatesOnSvg) </text>
+    <br />
 }
 
 <p></p>
-
 <svg width="640"
      height="640"
      viewBox="-320 -320 640 640"
      style="background-color: oklch(0.7 0.1 128)">
 
-    <polygon points="150,15 258,77 258,202 150,265 42,202 42,77"></polygon>
-    <circle cx="0" cy="0" r="10" fill="oklch(0.728 0.1835 0)" stroke="oklch(0 0 0)" stroke-width="2" />
+    @* <polygon points="20,20 -20,20 -20,-20 20,-20" /> *@
+
+    @* <polygon points="150,15 258,77 258,202 150,265 42,202 42,77"></polygon> *@
+
+    @foreach (var coordinate in HiveGameState.CoordinateSystem.GetAllCoordinates())
+    {
+        var hexagon = HiveGameState.CoordinateSystem.GetHexagonAtCoordinate(coordinate);
+        var topPiece = hexagon.PeekPiece();
+        var coordinatesOnSvg = ConvertPointyHexagonCoordinateToPixel(coordinate);
+        <circle cx="@coordinatesOnSvg.x" cy="@coordinatesOnSvg.y" r="10" fill="oklch(0.728 0.1835 0)" stroke="oklch(0 0 0)" stroke-width="2" />
+    }
 </svg>
 
 @code {
     private GameState HiveGameState { get; set; } = default!;
+    private int HexagonSize { get; set; } = 40;
 
     protected override void OnInitialized()
     {
-        HiveGameState = GameRules.CreateFreshGameState();
+        HiveGameState = SetExampleGameState();
         var minimaxPlayer = new MinimaxPlayer(4);
-        var suggestedAction = minimaxPlayer.SuggestNextPlayerAction(HiveGameState);
-        GameRules.ApplyPlayerActionToGameState(HiveGameState, suggestedAction);
+        // var suggestedAction = minimaxPlayer.SuggestNextPlayerAction(HiveGameState);
+        // GameRules.ApplyPlayerActionToGameState(HiveGameState, suggestedAction);
+        // suggestedAction = minimaxPlayer.SuggestNextPlayerAction(HiveGameState);
+        // GameRules.ApplyPlayerActionToGameState(HiveGameState, suggestedAction);
+    }
+
+    private GameState SetExampleGameState()
+    {
+        var gameState = GameRules.CreateFreshGameState();
+        // Spawn first pieces in a line
+        ApplyPlayerSpawnActionPredicateToGameState(gameState, a => a.PieceToSpawn.GetType() == typeof(SpiderPiece) && a.DestinationCoordinate.column == 0);
+        ApplyPlayerSpawnActionPredicateToGameState(gameState, a => a.PieceToSpawn.GetType() == typeof(SpiderPiece) && a.DestinationCoordinate.column == 0);
+        // Spawn queens as second pieces in a line and get the coordinates
+        var queenSpawnAction = ApplyPlayerSpawnActionPredicateToGameState(gameState, a => a.PieceToSpawn.GetType() == typeof(QueenPiece) && a.DestinationCoordinate.column == 0);
+        var spacesNextToWhiteQueen = gameState.CoordinateSystem.GetAdjacentCoordinates(queenSpawnAction.DestinationCoordinate);
+        queenSpawnAction = ApplyPlayerSpawnActionPredicateToGameState(gameState, a => a.PieceToSpawn.GetType() == typeof(QueenPiece) && a.DestinationCoordinate.column == 0);
+        var spacesNextToBlackQueen = gameState.CoordinateSystem.GetAdjacentCoordinates(queenSpawnAction.DestinationCoordinate);
+
+        for (var i = 0; i < 3; i++)
+        {
+            // Surround white queen with ants
+            ApplyPlayerSpawnActionPredicateToGameState(gameState, a => a.PieceToSpawn.GetType() == typeof(AntPiece) && spacesNextToWhiteQueen.Contains(a.DestinationCoordinate));
+
+            // Surround black queen with ants
+            ApplyPlayerSpawnActionPredicateToGameState(gameState, a => a.PieceToSpawn.GetType() == typeof(AntPiece) && spacesNextToBlackQueen.Contains(a.DestinationCoordinate));
+        }
+
+        return gameState;
+    }
+
+    private static PlayerSpawnAction ApplyPlayerSpawnActionPredicateToGameState(GameState gameState, Func<PlayerSpawnAction, bool> spawnPredicate)
+    {
+        var actionToBeApplied = GameRules.GetAllAvailablePlayerActions(gameState).OfType<PlayerSpawnAction>().First(spawnPredicate);
+        GameRules.ApplyPlayerActionToGameState(gameState, actionToBeApplied);
+
+        return actionToBeApplied;
+    }
+
+    protected (double x, double y) ConvertPointyHexagonCoordinateToPixel((int column, int row) coordinate)
+    {
+        var x = Math.Sqrt(3) * coordinate.column + Math.Sqrt(3) / 2 * coordinate.row;
+        var y = 3.0 / 2 * coordinate.row;
+
+        x = x * HexagonSize;
+        y = y * HexagonSize;
+
+        return (x, y);
     }
 }
