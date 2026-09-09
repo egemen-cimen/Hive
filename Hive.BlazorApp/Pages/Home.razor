@@ -26,16 +26,11 @@
         var hexagon = HiveGameState.CoordinateSystem.GetHexagonAtCoordinate(coordinate);
         var topPiece = hexagon.PeekPiece();
         var coordinatesOnSvg = ConvertPointyHexagonCoordinateToPixel(coordinate);
-        <polygon points="@(coordinatesOnSvg.x - HexagonWidth / 2),@(coordinatesOnSvg.y - HexagonHeight / 4)
-        @(coordinatesOnSvg.x),@(coordinatesOnSvg.y - HexagonHeight / 2)
-        @(coordinatesOnSvg.x + HexagonWidth / 2),@(coordinatesOnSvg.y - HexagonHeight / 4)
-        @(coordinatesOnSvg.x + HexagonWidth / 2),@(coordinatesOnSvg.y + HexagonHeight / 4)
-        @(coordinatesOnSvg.x),@(coordinatesOnSvg.y + HexagonHeight / 2)
-        @(coordinatesOnSvg.x - HexagonWidth / 2),@(coordinatesOnSvg.y + HexagonHeight / 4)"
+        <polygon points="@GetPointyHexagonSvgPolygonPoints(coordinatesOnSvg)"
                  style="fill:@(topPiece.Color == PlayerColor.WHITE ? WhiteHexagonColor : BlackHexagonColor);stroke:oklch(0.578 0.1835 0);stroke-width:2" />
 
         <text>
-            <text x="@(coordinatesOnSvg.x - HexagonWidth / 5)" y="@(coordinatesOnSvg.y + HexagonHeight / 7)" font-size="35" fill="oklch(0.578 0.1835 0)">@topPiece.GetPieceName()[0]</text>
+            <text x="@(coordinatesOnSvg.x - 10)" y="@(coordinatesOnSvg.y + 10)" font-size="35" fill="oklch(0.578 0.1835 0)">@topPiece.GetPieceName()[0]</text>
         </text>
     }
 </svg>
@@ -43,8 +38,6 @@
 @code {
     private GameState HiveGameState { get; set; } = default!;
     private static int HexagonSize { get; } = 40;
-    private double HexagonHeight { get; set; } = HexagonSize * 2;
-    private double HexagonWidth { get; set; } = HexagonSize * Math.Sqrt(3);
     private static string BlackHexagonColor { get; } = "oklch(0.22 0 0)";
     private static string WhiteHexagonColor { get; } = "oklch(0.78 0 0)";
 
@@ -99,5 +92,20 @@
         y = y * HexagonSize;
 
         return (x, y);
+    }
+
+    private string GetPointyHexagonSvgPolygonPoints((double x, double y) coordinate)
+    {
+        var hexagonHeight = HexagonSize * 2;
+        var hexagonWidth = HexagonSize * Math.Sqrt(3);
+
+        var points = $"{coordinate.x - hexagonWidth / 2},{coordinate.y - hexagonHeight / 4} "
+            + $"{coordinate.x},{coordinate.y - hexagonHeight / 2} "
+            + $"{coordinate.x + hexagonWidth / 2},{coordinate.y - hexagonHeight / 4} "
+            + $"{coordinate.x + hexagonWidth / 2},{coordinate.y + hexagonHeight / 4} "
+            + $"{coordinate.x},{coordinate.y + hexagonHeight / 2} "
+            + $"{coordinate.x - hexagonWidth / 2},{coordinate.y + hexagonHeight / 4}";
+
+        return points;
     }
 }
