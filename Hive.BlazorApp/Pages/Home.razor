@@ -21,22 +21,26 @@
      viewBox="-320 -320 640 640"
      style="background-color: oklch(0.7 0.1 128)">
 
-    @* <polygon points="20,20 -20,20 -20,-20 20,-20" /> *@
-
-    @* <polygon points="150,15 258,77 258,202 150,265 42,202 42,77"></polygon> *@
-
     @foreach (var coordinate in HiveGameState.CoordinateSystem.GetAllCoordinates())
     {
         var hexagon = HiveGameState.CoordinateSystem.GetHexagonAtCoordinate(coordinate);
         var topPiece = hexagon.PeekPiece();
         var coordinatesOnSvg = ConvertPointyHexagonCoordinateToPixel(coordinate);
-        <circle cx="@coordinatesOnSvg.x" cy="@coordinatesOnSvg.y" r="34.64" fill="oklch(0.728 0.1835 0)" stroke="oklch(0 0 0)" stroke-width="2" />
+        <polygon points="@(coordinatesOnSvg.x - HexagonWidth / 2),@(coordinatesOnSvg.y - HexagonHeight / 4)
+        @(coordinatesOnSvg.x),@(coordinatesOnSvg.y - HexagonHeight / 2)
+        @(coordinatesOnSvg.x + HexagonWidth / 2),@(coordinatesOnSvg.y - HexagonHeight / 4)
+        @(coordinatesOnSvg.x + HexagonWidth / 2),@(coordinatesOnSvg.y + HexagonHeight / 4)
+        @(coordinatesOnSvg.x),@(coordinatesOnSvg.y + HexagonHeight / 2)
+        @(coordinatesOnSvg.x - HexagonWidth / 2),@(coordinatesOnSvg.y + HexagonHeight / 4)"
+                 style="fill:oklch(0.728 0.1835 0);stroke:purple;stroke-width:2" />
     }
 </svg>
 
 @code {
     private GameState HiveGameState { get; set; } = default!;
     private int HexagonSize { get; set; } = 40;
+    private double HexagonHeight { get; set; } = 40 * 2;
+    private double HexagonWidth { get; set; } = 40 * Math.Sqrt(3);
 
     protected override void OnInitialized()
     {
