@@ -27,7 +27,7 @@
         var topPiece = hexagon.PeekPiece();
         var coordinatesOnSvg = ConvertPointyHexagonCoordinateToPixel(coordinate);
         <polygon points="@GetPointyHexagonSvgPolygonPoints(coordinatesOnSvg)"
-                 style="fill:@(topPiece.Color == PlayerColor.WHITE ? WhiteHexagonColor : BlackHexagonColor);stroke:oklch(0.578 0.1835 0);stroke-width:2" />
+                 class="@(topPiece.Color == PlayerColor.WHITE ? "hexagon-white": "hexagon-black") hexagon-stroke" />
 
         <text>
             <text x="@(coordinatesOnSvg.x - 10)" y="@(coordinatesOnSvg.y + 10)" font-size="35" fill="oklch(0.578 0.1835 0)">@topPiece.GetPieceName()[0]</text>

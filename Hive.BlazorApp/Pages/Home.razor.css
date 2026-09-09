@@ -1,0 +1,17 @@
+﻿.hexagon-white {
+    fill: oklch(0.78 0 0);
+}
+
+.hexagon-black {
+    fill: oklch(0.22 0 0)
+}
+
+.hexagon-stroke {
+    stroke: oklch(0.578 0.1835 0);
+    stroke-width: 2
+}
+
+.hexagon-text {
+    fill: oklch(0.578 0.1835 0);
+    font-size: 35px
+}
