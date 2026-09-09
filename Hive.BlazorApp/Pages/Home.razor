@@ -32,15 +32,17 @@
         @(coordinatesOnSvg.x + HexagonWidth / 2),@(coordinatesOnSvg.y + HexagonHeight / 4)
         @(coordinatesOnSvg.x),@(coordinatesOnSvg.y + HexagonHeight / 2)
         @(coordinatesOnSvg.x - HexagonWidth / 2),@(coordinatesOnSvg.y + HexagonHeight / 4)"
-                 style="fill:oklch(0.728 0.1835 0);stroke:purple;stroke-width:2" />
+                 style="fill:@(topPiece.Color == PlayerColor.WHITE ? WhiteHexagonColor : BlackHexagonColor);stroke:oklch(0.578 0.1835 0);stroke-width:2" />
     }
 </svg>
 
 @code {
     private GameState HiveGameState { get; set; } = default!;
-    private int HexagonSize { get; set; } = 40;
-    private double HexagonHeight { get; set; } = 40 * 2;
-    private double HexagonWidth { get; set; } = 40 * Math.Sqrt(3);
+    private static int HexagonSize { get; } = 40;
+    private double HexagonHeight { get; set; } = HexagonSize * 2;
+    private double HexagonWidth { get; set; } = HexagonSize * Math.Sqrt(3);
+    private static string BlackHexagonColor { get; } = "oklch(0.22 0 0)";
+    private static string WhiteHexagonColor { get; } = "oklch(0.78 0 0)";
 
     protected override void OnInitialized()
     {
