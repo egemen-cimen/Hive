@@ -33,6 +33,10 @@
         @(coordinatesOnSvg.x),@(coordinatesOnSvg.y + HexagonHeight / 2)
         @(coordinatesOnSvg.x - HexagonWidth / 2),@(coordinatesOnSvg.y + HexagonHeight / 4)"
                  style="fill:@(topPiece.Color == PlayerColor.WHITE ? WhiteHexagonColor : BlackHexagonColor);stroke:oklch(0.578 0.1835 0);stroke-width:2" />
+
+        <text>
+            <text x="@(coordinatesOnSvg.x - HexagonWidth / 5)" y="@(coordinatesOnSvg.y + HexagonHeight / 7)" font-size="35" fill="oklch(0.578 0.1835 0)">@topPiece.GetPieceName()[0]</text>
+        </text>
     }
 </svg>
 
